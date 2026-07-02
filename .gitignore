@@ -1,0 +1,25 @@
+# backups
+/backups
+*.sql
+
+# logs
+/logs
+*.log
+
+# archivos comprimidos
+*.zip
+*.rar
+
+# archivos temporales
+*.tmp
+
+# configuraciones del sistema
+.DS_Store
+Thumbs.db
+
+# configuraciones del editor
+.vscode/
+.idea/
+
+# archivos de entorno
+.env

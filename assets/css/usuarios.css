@@ -1,0 +1,304 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* PALETA DE COLORES */
+:root {
+  --fuente: "Poppins", sans-serif;
+  --fondo: rgba(0, 0, 0, 0.4), rgba(25, 25, 25, 0.6);
+  --fondo-azul: rgba(5, 130, 200, 0.25), rgba(80, 190, 220, 0.35);
+  --negro: rgba(0, 0, 0, 0.45);
+  --teal: rgba(1, 100, 100, 0.4);
+  --verde: #145a30;
+  --limon: #1ea353;
+  --azul: #0585c0;
+  --cyan: #52bada;
+}
+
+/* =============================================
+   BODY
+============================================= */
+body {
+  font-family: var(--fuente);
+  min-height: 100vh;
+  background: linear-gradient(var(--fondo)), url("../img/fondo1.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding: 40px;
+}
+
+/* ===========================
+   CONTENEDOR PRINCIPAL
+=========================== */
+.container {
+  max-width: 1200px;
+  margin: auto;
+  margin-top: 80px;
+  background: var(--negro);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 35px;
+  border: 1px solid var(--negro);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+/* ===========================
+   TITULOS
+=========================== */
+.titulo-vista {
+  text-align: center;
+  color: var(--cyan);
+  padding: 15px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  background: linear-gradient(var(--fondo-azul));
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--teal);
+  font-weight: 600;
+}
+
+/* ===========================
+   BOTON CREAR
+=========================== */
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 25px;
+}
+.btn {
+  text-decoration: none;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(135deg, var(--verde), var(--limon));
+  transition: 0.25s;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* ===========================
+   TABLA
+=========================== */
+#containerHistorial {
+  overflow-x: auto;
+}
+.tabla {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+.tabla thead {
+  background: var(--verde);
+  border: 1px solid var(--verde);
+}
+.tabla th {
+  color: white;
+  padding: 18px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.tabla td {
+  color: var(--limon);
+  padding: 12px;
+  text-align: center;
+  border: 1px solid var(--verde);
+}
+.tabla tbody tr {
+  transition: 0.25s;
+  font-size: 14px;
+  font-weight: 600;
+}
+.tabla tbody tr:hover {
+  background: var(--teal);
+}
+
+/* ===========================
+   ESTADOS
+=========================== */
+.estado {
+  display: inline-block;
+  min-width: 90px;
+  padding: 8px 14px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.estado.activo {
+  background: rgba(74, 222, 128, 0.3);
+  color: rgb(8, 190, 105);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+}
+.estado.inactivo {
+  background: rgba(248, 113, 113, 0.3);
+  color: rgb(230, 93, 88);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+}
+
+/* ===========================
+   BOTON EDITAR
+=========================== */
+.tabla .btn {
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  background: linear-gradient(135deg, var(--azul), var(--cyan));
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+.tabla .btn:hover {
+  background: linear-gradient(135deg, var(--azul), var(--azul));
+}
+
+/* ===========================
+   BOTÓN VOLVER
+=========================== */
+#btn-volver {
+  background: linear-gradient(var(--fondo-azul));
+  cursor: pointer;
+  font-family: var(--fuente);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--cyan);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  padding: 15px 21px;
+  border-radius: 14px;
+  position: fixed;
+  bottom: 25px;
+  right: 35px;
+  text-decoration: none;
+  transition: 0.25s;
+  border: 1px solid var(--teal);
+}
+#btn-volver:hover {
+  transform: translateY(-4px);
+}
+
+/* ===========================
+   MODALES
+=========================== */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
+.modal {
+  background: rgb(30, 163, 83, 0.4);
+  backdrop-filter: blur(12px);
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+  position: relative;
+}
+.titulo-modal {
+  text-align: center;
+  font-size: 34px;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 30px;
+  position: relative;
+}
+.modal form {
+  background: var(--negro);
+  border-radius: 10px;
+  color: white;
+  display: grid;
+  padding: 15px 40px;
+  gap: 8px;
+}
+.modal label {
+  font-size: 16px;
+  justify-self: left;
+}
+.modal input {
+  border-radius: 8px;
+  height: 25px;
+  background: var(--negro);
+  font-size: 15px;
+  border: 1px solid var(--limon);
+  color: white;
+}
+.modal select {
+  border-radius: 8px;
+  height: 25px;
+  background: var(--negro);
+  font-size: 15px;
+  border: 1px solid var(--limon);
+  color: white;
+}
+.modal input:hover,
+.modal select:hover {
+  box-shadow: 8px 12px 15px rgba(100, 250, 100, 0.15);
+}
+.accionesModal .btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 16px;
+  background: var(--verde);
+  transition: 0.25s;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  margin: 15px;
+}
+.accionesModal .btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  .container {
+    padding: 20px;
+  }
+  .titulo-vista {
+    font-size: 26px;
+  }
+  .acciones {
+    justify-content: center;
+  }
+  .acciones .btn {
+    width: 100%;
+    text-align: center;
+  }
+  #btn-volver {
+    top: 20px;
+    right: 20px;
+    bottom: auto;
+    padding: 12px 18px;
+    font-size: 16px;
+  }
+  .modal {
+    padding: 15px;
+  }
+  .accionesModal {
+    display: flex;
+  }
+  .accionesModal .btn {
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+}

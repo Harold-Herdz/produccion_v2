@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* PALETA DE COLORES */
+:root {
+  --fuente: "Poppins", sans-serif;
+  --fondo: rgba(0, 0, 0, 0.4), rgba(25, 25, 25, 0.6);
+  --fondo_azul: rgba(5, 133, 192, 0.25), rgba(82, 186, 218, 0.35);
+  --negro: rgba(0, 0, 0, 0.45);
+  --teal: rgba(1, 100, 100, 0.4);
+  --verde: #145a30;
+  --limon: #1ea353;
+  --cyan: #52bada;
+}
+
+/* ===========================
+   INDEX 
+=========================== */
+.index-body {
+  font-family: var(--fuente);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(var(--fondo)), url("../img/fondo1.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+}
+.glass-container {
+  padding: 60px;
+  border-radius: 20px;
+  background: var(--negro);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--negro);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  color: var(--cyan);
+}
+.glass-container a {
+  width: 300px;
+}
+
+/* ===========================
+   CARDS AREAS
+=========================== */
+.areas {
+  display: flex;
+  gap: 40px;
+  margin-top: 40px;
+}
+.area-card {
+  padding: 40px;
+  border-radius: 18px;
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(var(--fondo_azul));
+  color: var(--cyan);
+  border: 1px solid var(--teal);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+  transition: 0.25s;
+}
+.area-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 6px 10px 40px rgba(25, 150, 200, 0.5);
+}
