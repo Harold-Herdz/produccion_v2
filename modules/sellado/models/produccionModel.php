@@ -53,6 +53,11 @@ function actualizarProduccion($conexion, $id, $datos){
             paquetes_x70='{$datos['paq_x70']}',
             paquetes_x90='{$datos['paq_x90']}',
             paquetes_x98='{$datos['paq_x98']}',
+            peso_hora1='{$datos['peso_h1']}',
+            peso_hora2='{$datos['peso_h2']}',
+            peso_hora3='{$datos['peso_h3']}',
+            peso_hora4='{$datos['peso_h4']}',
+            peso_hora5='{$datos['peso_h5']}',,
             observaciones_paq='{$datos['observaciones']}'
             WHERE id=$id";
     mysqli_query($conexion, $sql);

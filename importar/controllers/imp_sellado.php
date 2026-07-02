@@ -72,22 +72,43 @@ $nueva_fecha  = null;
 
 foreach ($filas as $data) {
     // Limpiar y convertir datos de cada fila
-    $marca      = convertirMarca($data[0]);
+    $marca      = trim($data[0]);
     $fecha      = convertirFecha($data[1]);
-    $maquina    = limpiarNombre($data[2]);
-    $operario   = limpiarNombre($data[3]);
-    $turno      = limpiarNombre($data[4]);
-    $referencia = limpiarNombre($data[5]);
-    $color      = limpiarNombre($data[6]);
-    $paq_x70    = (int)$data[7];
-    $paq_x90    = (int)$data[8];
-    $paq_x98    = (int)$data[9];
-    $obs        = mysqli_real_escape_string($conexion, $data[10]);
+    $turno      = limpiarNombre($data[2]);
+    $maquina    = limpiarNombre($data[3]);
+    $operario   = limpiarNombre($data[4]);
+    $jornada    = limpiarNombre($data[5]);
+    $referencia = limpiarNombre($data[6]);
+    $color      = limpiarNombre($data[7]);
+    $paq_x70    = (int)$data[8];
+    $paq_x90    = (int)$data[9];
+    $paq_x98    = (int)$data[10];
+    $peso_h1    = ($data[11] === "") ? null : (float)$data[11];
+    $peso_h2    = ($data[12] === "") ? null : (float)$data[12];
+    $peso_h3    = ($data[13] === "") ? null : (float)$data[13];
+    $peso_h4    = ($data[14] === "") ? null : (float)$data[14];
+    $peso_h5    = ($data[15] === "") ? null : (float)$data[15];
+    $obs        = mysqli_real_escape_string($conexion, $data[16]);
+
+    switch ($turno) {
+        case "6am - 2pm":
+            $bloque = "Día";
+            break;
+        case "2pm - 10pm":
+            $bloque = "Tarde";
+            break;
+        case "10pm - 6am":
+            $bloque = "Noche";
+            break;
+        default:
+            $bloque = "";
+    }
+    $nombreTurno = $bloque . " " . $jornada;
 
     // Obtener IDs de catálogos o crearlos si no existen
     $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
     $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
-    $id_turno      = $turnos[$turno]           ?? autoCrear($conexion, $turnos,      "TURNOS",      "nombre_turno",      $turno);
+    $id_turno      = $turnos[$nombreTurno]     ?? autoCrear($conexion, $turnos,      "TURNOS",      "nombre_turno",      $nombreTurno);
     $id_referencia = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
     $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
 
@@ -96,10 +117,11 @@ foreach ($filas as $data) {
         $sql = "INSERT INTO PRODUCCION_SELLADO
                     (marca_temporal,fecha_paq,id_maquina,id_operario,id_turno,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
-                    observaciones_paq)
+                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,observaciones_paq)
                 VALUES
                     ('$marca','$fecha','$id_maquina','$id_operario','$id_turno',
-                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98','$obs')
+                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98',
+                    '$peso_h1','$peso_h2','$peso_h3','$peso_h4','$peso_h5','$obs')
                 ON DUPLICATE KEY UPDATE
                     fecha_paq         = VALUES(fecha_paq),
                     id_maquina        = VALUES(id_maquina),
@@ -110,16 +132,22 @@ foreach ($filas as $data) {
                     paquetes_x70      = VALUES(paquetes_x70),
                     paquetes_x90      = VALUES(paquetes_x90),
                     paquetes_x98      = VALUES(paquetes_x98),
+                    peso_hora1        = VALUES(peso_hora1),
+                    peso_hora2        = VALUES(peso_hora2),
+                    peso_hora3        = VALUES(peso_hora3),
+                    peso_hora4        = VALUES(peso_hora4),
+                    peso_hora5        = VALUES(peso_hora5),
                     observaciones_paq = VALUES(observaciones_paq)";
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_SELLADO
                     (marca_temporal,fecha_paq,id_maquina,id_operario,id_turno,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
-                    observaciones_paq)
+                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,observaciones_paq)
                 VALUES
                     ('$marca','$fecha','$id_maquina','$id_operario','$id_turno',
-                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98','$obs')";
+                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98',
+                    '$peso_h1','$peso_h2','$peso_h3','$peso_h4','$peso_h5','$obs')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion, $sql, $marca, $contador, $total, $insertados, $actualizados, $duplicados, $nueva_fecha);

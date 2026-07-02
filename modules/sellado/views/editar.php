@@ -124,6 +124,48 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 name="paquetes_total"
                 value="<?php echo $fila['paquetes_total']; ?>">
 
+            <!-- Peso por Hora 1 -->
+            <label>Peso Hora 1</label>
+            <input
+                type="number"
+                name="peso_hora1"
+                value="<?php echo $fila['peso_hora1']; ?>">
+
+            <!-- Peso por Hora 2 -->
+            <label>Peso Hora 2</label>
+            <input
+                type="number"
+                name="peso_hora2"
+                value="<?php echo $fila['peso_hora2']; ?>">
+
+            <!-- Peso por Hora 3 -->
+            <label>Peso Hora 3</label>
+            <input
+                type="number"
+                name="peso_hora3"
+                value="<?php echo $fila['peso_hora3']; ?>">
+
+            <!-- Peso por Hora 4 -->
+            <label>Peso Hora 4</label>
+            <input
+                type="number"
+                name="peso_hora4"
+                value="<?php echo $fila['peso_hora4']; ?>">
+
+            <!-- Peso por Hora 5 -->
+            <label>Peso Hora 5</label>
+            <input
+                type="number"
+                name="peso_hora5"
+                value="<?php echo $fila['peso_hora5']; ?>">
+
+            <!-- Promedio de Peso -->
+            <label>Promedio Peso</label>
+            <input
+                type="number"
+                name="promedio_peso"
+                value="<?php echo $fila['promedio_peso']; ?>">
+
             <!-- Observaciones -->
             <label>Observaciones</label>
             <textarea name="observaciones_paq"><?php echo $fila['observaciones_paq']; ?></textarea>
