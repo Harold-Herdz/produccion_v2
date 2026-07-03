@@ -14,7 +14,7 @@ $modo         = $_GET['modo'] ?? 'nuevos';
 $ultima_fecha = obtenerUltimaFecha($conexion, 'sellado');
 
 // Fuente de datos
-$url        = "https://docs.google.com/spreadsheets/d/17gs1oTKRYY9S-qiU5ZMJCFrxe3K5r_pU1lgeZgUP8u8/export?format=csv&gid=399598423";      
+$url        = "https://docs.google.com/spreadsheets/d/1B1A-pSUBLG9w56ibWcERxhAKEsaPJN74SjRjeNv2UCg/export?format=csv&gid=1191265238";      
 $titulo     = "Producción de Sellado";
 $subtitulo  = "PRODUCCION_SELLADO";
 $volver_url = BASE_URL . "/modules/sellado/views/dashboard.php";
@@ -83,45 +83,49 @@ foreach ($filas as $data) {
     $paq_x70    = (int)$data[8];
     $paq_x90    = (int)$data[9];
     $paq_x98    = (int)$data[10];
-    $peso_h1    = ($data[11] === "") ? null : (float)$data[11];
-    $peso_h2    = ($data[12] === "") ? null : (float)$data[12];
-    $peso_h3    = ($data[13] === "") ? null : (float)$data[13];
-    $peso_h4    = ($data[14] === "") ? null : (float)$data[14];
-    $peso_h5    = ($data[15] === "") ? null : (float)$data[15];
+    $peso_h1    = ($data[11] === "") ? null : convertirNumero($data[11]);
+    $peso_h2    = ($data[12] === "") ? null : convertirNumero($data[12]);
+    $peso_h3    = ($data[13] === "") ? null : convertirNumero($data[13]);
+    $peso_h4    = ($data[14] === "") ? null : convertirNumero($data[14]);
+    $peso_h5    = ($data[15] === "") ? null : convertirNumero($data[15]);
     $obs        = mysqli_real_escape_string($conexion, $data[16]);
-
-    switch ($turno) {
-        case "6am - 2pm":
-            $bloque = "Día";
-            break;
-        case "2pm - 10pm":
-            $bloque = "Tarde";
-            break;
-        case "10pm - 6am":
-            $bloque = "Noche";
-            break;
-        default:
-            $bloque = "";
-    }
-    $nombreTurno = $bloque . " " . $jornada;
 
     // Obtener IDs de catálogos o crearlos si no existen
     $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
     $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
-    $id_turno      = $turnos[$nombreTurno]     ?? autoCrear($conexion, $turnos,      "TURNOS",      "nombre_turno",      $nombreTurno);
     $id_referencia = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
     $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
 
+    // Por si el peso es NULL
+    $peso1 = is_null($peso_h1) ? "NULL" : $peso_h1;
+    $peso2 = is_null($peso_h2) ? "NULL" : $peso_h2;
+    $peso3 = is_null($peso_h3) ? "NULL" : $peso_h3;
+    $peso4 = is_null($peso_h4) ? "NULL" : $peso_h4;
+    $peso5 = is_null($peso_h5) ? "NULL" : $peso_h5;
+
+    $keyTurno = $turno . '|' . $jornada;
+    if (isset($turnos[$keyTurno])) {
+        $id_turno = $turnos[$keyTurno];
+    } else {
+        mysqli_query($conexion, "
+            INSERT INTO TURNOS (bloque_horario, jornada)
+            VALUES ('$turno', '$jornada')
+        ");
+
+        $id_turno = mysqli_insert_id($conexion);
+        $turnos[$keyTurno] = $id_turno;
+    }
+    
     // Modo 'todo': Insertar o actualizar si ya existe
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_SELLADO
-                    (marca_temporal,fecha_paq,id_maquina,id_operario,id_turno,
+                    (fecha_paq,id_maquina,id_operario,id_turno,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,observaciones_paq)
                 VALUES
-                    ('$marca','$fecha','$id_maquina','$id_operario','$id_turno',
-                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98',
-                    '$peso_h1','$peso_h2','$peso_h3','$peso_h4','$peso_h5','$obs')
+                    ('$fecha','$id_maquina','$id_operario','$id_turno',
+                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98', 
+                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs')
                 ON DUPLICATE KEY UPDATE
                     fecha_paq         = VALUES(fecha_paq),
                     id_maquina        = VALUES(id_maquina),
@@ -141,16 +145,16 @@ foreach ($filas as $data) {
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_SELLADO
-                    (marca_temporal,fecha_paq,id_maquina,id_operario,id_turno,
+                    (fecha_paq,id_maquina,id_operario,id_turno,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,observaciones_paq)
                 VALUES
-                    ('$marca','$fecha','$id_maquina','$id_operario','$id_turno',
-                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98',
-                    '$peso_h1','$peso_h2','$peso_h3','$peso_h4','$peso_h5','$obs')";
+                    ('$fecha','$id_maquina','$id_operario','$id_turno',
+                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98', 
+                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs')";
     }
     // Ejecutar inserción y actualizar progreso
-    procesarFila($conexion, $sql, $marca, $contador, $total, $insertados, $actualizados, $duplicados, $nueva_fecha);
+    procesarFila($conexion, $sql, $fecha, $contador, $total, $insertados, $actualizados, $duplicados, $nueva_fecha);
 }
 
 // Al finalizar: Mostrar contadores y guardar última fecha

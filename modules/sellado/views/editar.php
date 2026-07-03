@@ -118,16 +118,17 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 value="<?php echo $fila['paquetes_x98']; ?>">
 
             <!-- Total de Paquetes -->
-            <label>Total</label>
+            <label>Total Paquetes</label>
             <input
                 type="number"
-                name="paquetes_total"
-                value="<?php echo $fila['paquetes_total']; ?>">
+                value="<?= $fila['paquetes_total']; ?>"
+                readonly>
 
             <!-- Peso por Hora 1 -->
             <label>Peso Hora 1</label>
             <input
                 type="number"
+                step="0.01"
                 name="peso_hora1"
                 value="<?php echo $fila['peso_hora1']; ?>">
 
@@ -135,6 +136,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label>Peso Hora 2</label>
             <input
                 type="number"
+                step="0.01"
                 name="peso_hora2"
                 value="<?php echo $fila['peso_hora2']; ?>">
 
@@ -142,6 +144,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label>Peso Hora 3</label>
             <input
                 type="number"
+                step="0.01"
                 name="peso_hora3"
                 value="<?php echo $fila['peso_hora3']; ?>">
 
@@ -149,6 +152,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label>Peso Hora 4</label>
             <input
                 type="number"
+                step="0.01"
                 name="peso_hora4"
                 value="<?php echo $fila['peso_hora4']; ?>">
 
@@ -156,6 +160,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label>Peso Hora 5</label>
             <input
                 type="number"
+                step="0.01"
                 name="peso_hora5"
                 value="<?php echo $fila['peso_hora5']; ?>">
 
@@ -163,8 +168,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label>Promedio Peso</label>
             <input
                 type="number"
-                name="promedio_peso"
-                value="<?php echo $fila['promedio_peso']; ?>">
+                step="0.01"
+                value="<?php echo $fila['promedio_peso']; ?>"
+                readonly>
 
             <!-- Observaciones -->
             <label>Observaciones</label>

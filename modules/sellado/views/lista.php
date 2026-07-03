@@ -72,7 +72,11 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <td><?php echo $fila['nombre_referencia']; ?></td>
                             <td><?php echo $fila['nombre_color']; ?></td>
                             <td><?php echo $fila['paquetes_total']; ?></td>
-                            <td><?php echo $fila['promedio_peso']; ?></td>
+                            <td>
+                                <?= $fila['promedio_peso'] !== null
+                                    ? number_format($fila['promedio_peso'],2).' kg'
+                                    : '-' ?>
+                            </td>
                             <!-- Botones de editar o eliminar registros -->
                             <td>
                                 <a class="btn"

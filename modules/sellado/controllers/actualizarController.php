@@ -31,8 +31,6 @@ $datos = [
 
     'paq_x98' => $_POST['paquetes_x98'],
 
-    'paquetes' => $_POST['paquetes_total'],
-
     'peso_h1' => $_POST['peso_hora1'],
 
     'peso_h2' => $_POST['peso_hora2'],
@@ -42,8 +40,6 @@ $datos = [
     'peso_h4' => $_POST['peso_hora4'],
 
     'peso_h5' => $_POST['peso_hora5'],
-
-    'promedio_peso' => $_POST['promedio_peso'],
 
     'observaciones' => $_POST['observaciones_paq']
 ];

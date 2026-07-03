@@ -13,6 +13,25 @@ function obtenerTotalSellado($conexion, $sql){
 }
 
 /* =================================================
+   DIAS TRANCURRIDOS DEL MES
+================================================= */
+function obtenerDiasTranscurridos($conexion, $mes) {
+    $anio = date('Y');
+    
+    $sql = "SELECT COUNT(DISTINCT DATE(fecha_paq)) 
+            FROM PRODUCCION_SELLADO 
+            WHERE MONTH(fecha_paq) = ? 
+            AND YEAR(fecha_paq) = ?";
+    
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("ii", $mes, $anio);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $fila = $resultado->fetch_row();
+    
+    return ($fila[0] > 0) ? $fila[0] : 0;
+}
+/* =================================================
    CONSULTAS DE TOTALES
 ================================================= */
 // Total histórico de producción

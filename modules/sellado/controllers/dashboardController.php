@@ -62,10 +62,10 @@ $diferencia = ($total_mes2 ?? 0) - ($total_mes1 ?? 0);
 $porcentaje = ($total_mes1 > 0) ? (($diferencia / $total_mes1) * 100) : 0;
 
 // Promedio diario de los meses
-$total_dias_mes1 = date('t');
-$promedio_mes1 = ($total_mes2 > 0) ? ($total_mes2 / $total_dias_mes1) : 0;
-$total_dias_mes2 = date('t', strtotime('-1 month'));
-$promedio_mes2 = ($total_mes1 > 0) ? ($total_mes1 / $total_dias_mes2) : 0;
+$total_dias_mes1 = obtenerDiasTranscurridos($conexion, $mes1);
+$total_dias_mes2 = obtenerDiasTranscurridos($conexion, $mes2);
+$promedio_mes1 = ($total_mes1 > 0 && $total_dias_mes1 > 0) ? ($total_mes1 / $total_dias_mes1) : 0;
+$promedio_mes2 = ($total_mes2 > 0 && $total_dias_mes2 > 0) ? ($total_mes2 / $total_dias_mes2) : 0;
 
 // Última fecha de importación
 $ultima_fecha = obtenerUltimaImportacionSellado($conexion);

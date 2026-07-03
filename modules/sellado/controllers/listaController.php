@@ -36,7 +36,7 @@ if(!empty($busqueda)){
         p.paquetes_x70 LIKE '%$busqueda%' OR
         p.paquetes_x90 LIKE '%$busqueda%' OR
         p.paquetes_x98 LIKE '%$busqueda%' OR
-        p.paquetes_total LIKE '%$busqueda%'
+        p.paquetes_total LIKE '%$busqueda%' OR
         p.peso_hora1 LIKE '%$busqueda%' OR
         p.peso_hora2 LIKE '%$busqueda%' OR
         p.peso_hora3 LIKE '%$busqueda%' OR

@@ -23,6 +23,19 @@ function limpiarNombre($texto) {
     }
     return $texto;
 }
+// Convertir horario del formulario al bloque correspondiente
+function convertirBloque($turno) {
+    switch (trim($turno)) {
+        case "6am - 2pm":
+            return "Día";
+        case "2pm - 10pm":
+            return "Tarde";
+        case "10pm - 6am":
+            return "Noche";
+        default:
+            return "";
+    }
+}
 // Convertir número con formato colombiano (puntos y comas) a float
 function convertirNumero($valor) {
     $valor = trim($valor);
@@ -132,14 +145,18 @@ function leerSheet($url, $modo, $ultima_fecha) {
     $primera  = true;
     $omitidas = 0;
     while (($data = fgetcsv($archivo, 1000, ',')) !== false) {
-        if ($primera) { $primera = false; continue; } // Saltar encabezado
+        if ($primera) { $primera = false; continue; }
 
         // En modo 'nuevos', omitir filas ya importadas
         if ($modo === 'nuevos') {
-            $marca_fila = convertirMarca($data[0]);
-            if ($marca_fila === null || $marca_fila <= $ultima_fecha) {
-                $omitidas++;
-                continue;
+            if ($ultima_fecha) {
+                $fecha_fila = strtotime($data[1]);
+                $ultima     = strtotime($ultima_fecha);
+
+                if ($fecha_fila <= $ultima) {
+                    $omitidas++;
+                    continue;
+                }
             }
         }
         $filas[] = $data;
@@ -148,28 +165,28 @@ function leerSheet($url, $modo, $ultima_fecha) {
     return [$filas, $omitidas];
 }
 // Ejecutar SQL, clasificar resultado e informar progreso al navegador
-function procesarFila($conexion, $sql, $marca, &$contador, $total, &$insertados, &$actualizados, &$duplicados, &$nueva_fecha) {
+function procesarFila($conexion, $sql, $fecha, &$contador, $total, &$insertados, &$actualizados, &$duplicados, &$nueva_fecha) {
     $contador++;
 
     mysqli_query($conexion, $sql);
     $rows = mysqli_affected_rows($conexion);
     // Actualizar la fecha más reciente procesada
-    if ($marca && (!isset($nueva_fecha) || $marca > $nueva_fecha)) {
-        $nueva_fecha = $marca;
+    if ($fecha && (!isset($nueva_fecha) || $fecha > $nueva_fecha)) {
+        $nueva_fecha = $fecha;
     }
     // Clasificar resultado según filas afectadas
     if ($rows === 1) {
         $insertados++;
         $tipo   = 'ok';
-        $logMsg = addslashes("✔ Insertado · $marca");
+        $logMsg = addslashes("✔ Insertado · $fecha");
     } elseif ($rows === 2) {
         $actualizados++;
         $tipo   = 'upd';
-        $logMsg = addslashes("↻ Actualizado · $marca");
+        $logMsg = addslashes("↻ Actualizado · $fecha");
     } else {
         $duplicados++;
         $tipo   = 'dup';
-        $logMsg = addslashes("⚠ Duplicado · $marca");
+        $logMsg = addslashes("⚠ Duplicado · $fecha");
     }
     // Enviar resultado al navegador en tiempo real
     echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,'$logMsg','$tipo');</script>\n";
