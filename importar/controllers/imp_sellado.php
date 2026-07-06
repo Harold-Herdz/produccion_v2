@@ -74,7 +74,7 @@ foreach ($filas as $data) {
     // Limpiar y convertir datos de cada fila
     $marca      = trim($data[0]);
     $fecha      = convertirFecha($data[1]);
-    $turno      = limpiarNombre($data[2]);
+    $turno      = $data[2];
     $maquina    = limpiarNombre($data[3]);
     $operario   = limpiarNombre($data[4]);
     $jornada    = limpiarNombre($data[5]);
@@ -103,19 +103,21 @@ foreach ($filas as $data) {
     $peso4 = is_null($peso_h4) ? "NULL" : $peso_h4;
     $peso5 = is_null($peso_h5) ? "NULL" : $peso_h5;
 
-    $keyTurno = $turno . '|' . $jornada;
+    // Convertir el turno en bloque horario
+    $bloque = convertirBloque($turno);
+    $keyTurno = $bloque . '|' . $jornada;
+
     if (isset($turnos[$keyTurno])) {
         $id_turno = $turnos[$keyTurno];
     } else {
         mysqli_query($conexion, "
             INSERT INTO TURNOS (bloque_horario, jornada)
-            VALUES ('$turno', '$jornada')
+            VALUES ('$bloque', '$jornada')
         ");
 
         $id_turno = mysqli_insert_id($conexion);
         $turnos[$keyTurno] = $id_turno;
     }
-    
     // Modo 'todo': Insertar o actualizar si ya existe
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_SELLADO

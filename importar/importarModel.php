@@ -85,7 +85,7 @@ function convertirFecha($fecha) {
     foreach ($formatos as $formato) {
         $f = DateTime::createFromFormat($formato, $fecha);
         if ($f !== false) {
-            return $f->format('Y-m-d H:i:s');
+            return $f->format('d/m/Y');
         }
     }
     return null;
