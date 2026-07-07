@@ -182,7 +182,7 @@ function obtenerTablaMaquinasPlana($conexion, $desde, $hasta){
 ================================================= */
 // Fecha de la última importación de máquina plana
 function obtenerUltimaImportacionPlana($conexion){
-    $sql = "SELECT ultima_fecha 
+    $sql = "SELECT ultimo_id_sheet
             FROM IMPORTAR 
             WHERE nombre = 'plana'";
     $res = mysqli_query($conexion, $sql);
@@ -190,5 +190,5 @@ function obtenerUltimaImportacionPlana($conexion){
         return 'Nunca';
     }
     $row = mysqli_fetch_assoc($res);
-    return $row['ultima_fecha'] ?? 'Nunca';
+    return $row['ultimo_id_sheet'] ?? 'Nunca';
 }

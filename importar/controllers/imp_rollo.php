@@ -11,16 +11,16 @@ require_once dirname(__DIR__) . '/importarModel.php';
 
 // Parametros de importación
 $modo         = $_GET['modo'] ?? 'nuevos';
-$ultima_fecha = obtenerUltimaFecha($conexion, 'rollo');
+$ultimo_id_sheet = obtenerUltimoIdSheet($conexion, 'rollo');
 
 // Fuente de datos
-$url = "https://docs.google.com/spreadsheets/d/1CpdDtlNVQJoSHJ7WAc0BrXP-FIohYWhMB6si1bzmOz0/export?format=csv&gid=1465480052";
+$url = "https://docs.google.com/spreadsheets/d/1CpdDtlNVQJoSHJ7WAc0BrXP-FIohYWhMB6si1bzmOz0/export?format=csv&gid=46026898";
 $titulo     = "Producción de Rollos";
 $subtitulo  = "PRODUCCION_ROLLO";
 $volver_url = BASE_URL . "/modules/rollo/views/dashboard.php";
 
 // Leer filas del Google Sheet
-[$filas, $omitidas] = leerSheet($url, $modo, $ultima_fecha);
+[$filas, $omitidas] = leerSheet($url, $modo, $ultimo_id_sheet);
 $total = count($filas);
 
 // Importar progreso.php
@@ -66,11 +66,10 @@ $contador     = 0;
 $insertados   = 0;
 $actualizados = 0;
 $duplicados   = 0;
-$nueva_fecha  = null;
 
 foreach ($filas as $data) {
     // Limpiar y convertir datos de cada fila
-    $marca      = convertirMarca($data[0]);
+    $id_sheet   = trim($data[0]);
     $fecha      = convertirFecha($data[1]);
     $maquina    = limpiarNombre($data[2]);
     $referencia = limpiarNombre($data[3]);
@@ -86,10 +85,10 @@ foreach ($filas as $data) {
     // Modo 'todo': Insertar o actualizar si ya existe
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_ROLLO
-                    (marca_temporal,fecha_roll,id_maquina,id_referencia,
+                    (id_sheet,fecha_roll,id_maquina,id_referencia,
                     id_color,peso_rollo,retal_roll)
                 VALUES
-                    ('$marca','$fecha','$id_maquina','$id_referencia',
+                    ('$id_sheet','$fecha','$id_maquina','$id_referencia',
                     '$id_color','$peso_rollo','$retal')
                 ON DUPLICATE KEY UPDATE
                     fecha_roll    = VALUES(fecha_roll),
@@ -101,16 +100,16 @@ foreach ($filas as $data) {
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_ROLLO
-                    (marca_temporal,fecha_roll,id_maquina,id_referencia,
+                    (id_sheet,fecha_roll,id_maquina,id_referencia,
                     id_color,peso_rollo,retal_roll)
                 VALUES
-                    ('$marca','$fecha','$id_maquina','$id_referencia',
+                    ('$id_sheet','$fecha','$id_maquina','$id_referencia',
                     '$id_color','$peso_rollo','$retal')";
     }
     // Ejecutar inserción y actualizar progreso
-    procesarFila($conexion, $sql, $marca, $contador, $total, $insertados, $actualizados, $duplicados, $nueva_fecha);
+    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
 }
 
 // Al finalizar: Mostrar contadores y guardar última fecha
-finalizarImportacion($conexion, 'rollo', $nueva_fecha, $insertados, $actualizados, $duplicados, $total);
+finalizarImportacion($conexion,'rollo',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
 ?>

@@ -76,4 +76,4 @@ $eficiencia_mes1 = ($bruto_mes1 !== null && $bruto_mes1 > 0) ? (($neto_mes1 / $b
 $eficiencia_mes2 = ($bruto_mes2 !== null && $bruto_mes2 > 0) ? (($neto_mes2 / $bruto_mes2) * 100) : null;
 
 // Última fecha de importación
-$ultima_fecha = obtenerUltimaImportacionRollo($conexion);
+$ultimo_id_sheet = obtenerUltimaImportacionRollo($conexion);

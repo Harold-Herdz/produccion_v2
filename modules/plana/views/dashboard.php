@@ -30,7 +30,7 @@
 /** @var mysqli_result $res_tabla_maquina */
 /** @var string $desde */
 /** @var string $hasta */
-/** @var string $ultima_fecha */
+/** @var string $ultimo_id_sheet */
 
 // Restringir acceso solo a administradores
 $soloAdmin = true;
@@ -479,7 +479,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <div class="modal">
         <div class="modal-header">
             <h2>Importar Plana</h2>
-            <p>Última Fecha Importada: <strong><?php echo $ultima_fecha; ?></strong></p>
+            <p>Último ID Importado: <strong><?php echo $ultimo_id_sheet; ?></strong></p>
             <button id="cerrarBtn" onclick="cerrarModal('modalImportar')">X</button>
         </div>
         <!-- Opciones de importación -->

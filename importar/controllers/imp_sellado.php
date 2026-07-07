@@ -11,7 +11,7 @@ require_once dirname(__DIR__) . '/importarModel.php';
 
 // Parametros de importación
 $modo         = $_GET['modo'] ?? 'nuevos';
-$ultima_fecha = obtenerUltimaFecha($conexion, 'sellado');
+$ultimo_id_sheet = obtenerUltimoIdSheet($conexion, 'sellado');
 
 // Fuente de datos
 $url        = "https://docs.google.com/spreadsheets/d/1B1A-pSUBLG9w56ibWcERxhAKEsaPJN74SjRjeNv2UCg/export?format=csv&gid=1191265238";      
@@ -20,7 +20,7 @@ $subtitulo  = "PRODUCCION_SELLADO";
 $volver_url = BASE_URL . "/modules/sellado/views/dashboard.php";
 
 // Leer filas del Google Sheet
-[$filas, $omitidas] = leerSheet($url, $modo, $ultima_fecha);
+[$filas, $omitidas] = leerSheet($url, $modo, $ultimo_id_sheet);
 $total = count($filas);
 
 // Importar progreso.php
@@ -68,11 +68,10 @@ $contador     = 0;
 $insertados   = 0;
 $actualizados = 0;
 $duplicados   = 0;
-$nueva_fecha  = null;
 
 foreach ($filas as $data) {
     // Limpiar y convertir datos de cada fila
-    $marca      = trim($data[0]);
+    $id_sheet   = trim($data[0]);
     $fecha      = convertirFecha($data[1]);
     $turno      = $data[2];
     $maquina    = limpiarNombre($data[3]);
@@ -121,11 +120,11 @@ foreach ($filas as $data) {
     // Modo 'todo': Insertar o actualizar si ya existe
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_SELLADO
-                    (fecha_paq,id_maquina,id_operario,id_turno,
+                    (id_sheet,fecha_paq,id_maquina,id_operario,id_turno,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,observaciones_paq)
                 VALUES
-                    ('$fecha','$id_maquina','$id_operario','$id_turno',
+                    ('$id_sheet','$fecha','$id_maquina','$id_operario','$id_turno',
                     '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98', 
                     $peso1, $peso2, $peso3, $peso4, $peso5,'$obs')
                 ON DUPLICATE KEY UPDATE
@@ -147,18 +146,18 @@ foreach ($filas as $data) {
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_SELLADO
-                    (fecha_paq,id_maquina,id_operario,id_turno,
+                    (id_sheet,fecha_paq,id_maquina,id_operario,id_turno,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,observaciones_paq)
                 VALUES
-                    ('$fecha','$id_maquina','$id_operario','$id_turno',
+                    ('$id_sheet','$fecha','$id_maquina','$id_operario','$id_turno',
                     '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98', 
                     $peso1, $peso2, $peso3, $peso4, $peso5,'$obs')";
     }
     // Ejecutar inserción y actualizar progreso
-    procesarFila($conexion, $sql, $fecha, $contador, $total, $insertados, $actualizados, $duplicados, $nueva_fecha);
+    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
 }
 
 // Al finalizar: Mostrar contadores y guardar última fecha
-finalizarImportacion($conexion, 'sellado', $nueva_fecha, $insertados, $actualizados, $duplicados, $total);
+finalizarImportacion($conexion,'sellado',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
 ?>

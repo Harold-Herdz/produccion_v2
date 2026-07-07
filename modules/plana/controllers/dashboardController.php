@@ -78,4 +78,4 @@ $eficiencia_mes2 = ($bruto_mes2 !== null && $bruto_mes2 > 0) ? (($neto_mes2 / $b
 
 
 // Última fecha de importación
-$ultima_fecha = obtenerUltimaImportacionPlana($conexion);
+$ultimo_id_sheet = obtenerUltimaImportacionPlana($conexion);

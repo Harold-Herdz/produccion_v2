@@ -654,7 +654,7 @@ canvas {
   padding: 12px;
 }
 .tabla td {
-  padding: 12px;
+  padding: 8px;
   border: 2px solid var(--verde);
   font-size: 14px;
   color: white;

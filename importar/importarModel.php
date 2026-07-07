@@ -51,46 +51,21 @@ function convertirNumero($valor) {
 /* =====================
    FUNCIONES DE FECHA
 ===================== */
-// Convertir marca temporal de Google Sheets a formato MySQL
-function convertirMarca($fecha) {
-    $fecha = trim($fecha);
-    $f = DateTime::createFromFormat('d/m/Y H:i:s', $fecha);
-    if (!$f) $f = DateTime::createFromFormat('d/m/Y G:i:s', $fecha);
-    if (!$f) $f = DateTime::createFromFormat('d/m/Y g:i:s', $fecha);
-    // Corregir hora de un solo dígito
-    if (!$f) {
-        $fecha = preg_replace('/(\d{2}\/\d{2}\/\d{4}) (\d):/', '$1 0$2:', $fecha);
-        $f = DateTime::createFromFormat('d/m/Y H:i:s', $fecha);
-    }
-    return $f ? $f->format('Y-m-d H:i:s') : null;
-}
-
 // Convertir fecha en múltiples formatos posibles a formato MySQL
 function convertirFecha($fecha) {
     $fecha = trim($fecha);
     if (empty($fecha)) {
         return null;
     }
-    $fecha = preg_replace('/\s+/', ' ', $fecha);
-    $formatos = [
-        'd/m/Y H:i:s',
-        'd/m/Y G:i:s',
-        'd/m/Y H:i:s',
-        'j/n/Y',
-        'd/m/Y',
-        'j/n/Y G:i:s',
-        'j/n/Y H:i:s',
-        'd/m/Y G:i:s',
-    ];
+    $formatos = ['d/m/Y', 'j/n/Y', 'j/m/Y', 'd/n/Y'];
     foreach ($formatos as $formato) {
         $f = DateTime::createFromFormat($formato, $fecha);
         if ($f !== false) {
-            return $f->format('d/m/Y');
+            return $f->format('Y-m-d'); 
         }
     }
     return null;
 }
-
 
 /* =====================
    FUNCIONES DE BD
@@ -112,18 +87,19 @@ function autoCrear($conexion, &$catalogo, $tabla, $campo, $valor) {
     $catalogo[$valor] = $id;
     return $id;
 }
-// Obtener la última fecha importada del registro de control
-function obtenerUltimaFecha($conexion, $nombre) {
-    $res = mysqli_query($conexion, "SELECT ultima_fecha FROM IMPORTAR WHERE nombre = '$nombre'");
+// Obtener el último id_sheet importado
+function obtenerUltimoIdSheet($conexion, $nombre) {
+    $res = mysqli_query($conexion, "SELECT ultimo_id_sheet FROM IMPORTAR WHERE nombre = '$nombre'");
     $row = mysqli_fetch_assoc($res);
-    return $row['ultima_fecha'] ?? null;
+    return $row['ultimo_id_sheet'] ?? null;
 }
-// Actualizar la última fecha importada en el registro de control
-function actualizarUltimaFecha($conexion, $nombre, $nueva_fecha) {
-    $sql = "UPDATE IMPORTAR SET ultima_fecha = '$nueva_fecha' WHERE nombre = '$nombre'";
+// Actualizar el último id_sheet importado
+function actualizarUltimoIdSheet($conexion, $nombre, $id_sheet) {
+    $sql = "UPDATE IMPORTAR
+            SET ultimo_id_sheet = '$id_sheet'
+            WHERE nombre = '$nombre'";
     mysqli_query($conexion, $sql);
 }
-
 
 /* =====================
    FUNCIONES DE PROGRESO
@@ -136,7 +112,7 @@ function sendProgress($pct, $msg) {
     flush();
 }
 // Leer filas del Google Sheet y filtrar según modo de importación
-function leerSheet($url, $modo, $ultima_fecha) {
+function leerSheet($url, $modo, $ultimo_id_sheet) {
     $archivo = fopen($url, 'r');
     if (!$archivo) {
         return [null, 0];
@@ -149,14 +125,10 @@ function leerSheet($url, $modo, $ultima_fecha) {
 
         // En modo 'nuevos', omitir filas ya importadas
         if ($modo === 'nuevos') {
-            if ($ultima_fecha) {
-                $fecha_fila = strtotime($data[1]);
-                $ultima     = strtotime($ultima_fecha);
-
-                if ($fecha_fila <= $ultima) {
-                    $omitidas++;
-                    continue;
-                }
+            $id_sheet = trim($data[0]);
+            if ($ultimo_id_sheet && strcmp($id_sheet, $ultimo_id_sheet) <= 0) {
+                $omitidas++;
+                continue;
             }
         }
         $filas[] = $data;
@@ -165,28 +137,27 @@ function leerSheet($url, $modo, $ultima_fecha) {
     return [$filas, $omitidas];
 }
 // Ejecutar SQL, clasificar resultado e informar progreso al navegador
-function procesarFila($conexion, $sql, $fecha, &$contador, $total, &$insertados, &$actualizados, &$duplicados, &$nueva_fecha) {
+function procesarFila($conexion, $sql, $id_sheet, &$contador, $total,
+    &$insertados, &$actualizados, &$duplicados, &$ultimo_id_sheet) {
     $contador++;
 
     mysqli_query($conexion, $sql);
     $rows = mysqli_affected_rows($conexion);
-    // Actualizar la fecha más reciente procesada
-    if ($fecha && (!isset($nueva_fecha) || $fecha > $nueva_fecha)) {
-        $nueva_fecha = $fecha;
-    }
+    // Guardar el último id_sheet procesado
+    $ultimo_id_sheet = $id_sheet;
     // Clasificar resultado según filas afectadas
     if ($rows === 1) {
         $insertados++;
         $tipo   = 'ok';
-        $logMsg = addslashes("✔ Insertado · $fecha");
+        $logMsg = addslashes("✔ Insertado · $id_sheet");
     } elseif ($rows === 2) {
         $actualizados++;
         $tipo   = 'upd';
-        $logMsg = addslashes("↻ Actualizado · $fecha");
+        $logMsg = addslashes("↻ Actualizado · $id_sheet");
     } else {
         $duplicados++;
         $tipo   = 'dup';
-        $logMsg = addslashes("⚠ Duplicado · $fecha");
+        $logMsg = addslashes("⚠ Duplicado · $id_sheet");
     }
     // Enviar resultado al navegador en tiempo real
     echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,'$logMsg','$tipo');</script>\n";
@@ -194,10 +165,12 @@ function procesarFila($conexion, $sql, $fecha, &$contador, $total, &$insertados,
     flush();
 }
 // Guardar última fecha e enviar señal de finalización al navegador
-function finalizarImportacion($conexion, $nombre, $nueva_fecha, $insertados, $actualizados, $duplicados, $total) {
-    if (!empty($nueva_fecha)) {
-        actualizarUltimaFecha($conexion, $nombre, $nueva_fecha);
+function finalizarImportacion($conexion, $nombre, $insertados, $actualizados, $duplicados, $total, $ultimo_id_sheet = null) {
+
+    if (!empty($ultimo_id_sheet)) {
+        actualizarUltimoIdSheet($conexion, $nombre, $ultimo_id_sheet);
     }
+
     echo "<script>done($insertados,$actualizados,$duplicados,$total);</script>\n";
     if (ob_get_level()) ob_flush();
     flush();

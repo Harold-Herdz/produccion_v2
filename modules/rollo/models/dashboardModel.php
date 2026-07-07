@@ -197,7 +197,7 @@ function obtenerTablaMaquinasRollo($conexion, $desde, $hasta){
 ================================================= */
 // Fecha de la última importación de rollos
 function obtenerUltimaImportacionRollo($conexion){
-    $sql = "SELECT ultima_fecha
+    $sql = "SELECT ultimo_id_sheet
             FROM IMPORTAR
             WHERE nombre = 'rollo'";
     $res = mysqli_query($conexion, $sql);
@@ -205,5 +205,5 @@ function obtenerUltimaImportacionRollo($conexion){
         return 'Nunca';
     }
     $row = mysqli_fetch_assoc($res);
-    return $row['ultima_fecha'] ?? 'Nunca';
+    return $row['ultimo_id_sheet'] ?? 'Nunca';
 }

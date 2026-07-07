@@ -68,4 +68,4 @@ $promedio_mes1 = ($total_mes1 > 0 && $total_dias_mes1 > 0) ? ($total_mes1 / $tot
 $promedio_mes2 = ($total_mes2 > 0 && $total_dias_mes2 > 0) ? ($total_mes2 / $total_dias_mes2) : 0;
 
 // Última fecha de importación
-$ultima_fecha = obtenerUltimaImportacionSellado($conexion);
+$ultimo_id_sheet = obtenerUltimaImportacionSellado($conexion);
