@@ -31,9 +31,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <!-- Fecha -->
             <label>Fecha</label>
             <input 
-                type="datetime-local" 
+                type="date" 
                 name="fecha_roll"
-                value="<?php echo date('Y-m-d\TH:i', strtotime($fila['fecha_roll'])); ?>">
+                value="<?php echo date('Y-m-d', strtotime($fila['fecha_roll'])); ?>">
 
             <!-- Máquina -->
             <label>Máquina</label>

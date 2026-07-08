@@ -27,14 +27,14 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <!-- Formulario de edición -->
             <form action="<?= BASE_URL ?>/modules/sellado/controllers/actualizarController.php" method="POST">
             <!-- ID del registro a actualizar -->
-            <input type="hidden" name="id" value="<?php echo $fila['id']; ?>">
+            <input type="hidden" name="id" value="<?php echo $fila['id_sheet']; ?>">
 
             <!-- Fecha -->
             <label>Fecha</label>
-                <input 
-                    type="datetime-local"
-                    name="fecha_paq"
-                    value="<?php echo date('Y-m-d\TH:i', strtotime($fila['fecha_paq'])); ?>">
+            <input 
+                type="date"
+                name="fecha_paq"
+                value="<?php echo date('Y-m-d', strtotime($fila['fecha_paq'])); ?>">
 
             <!-- Máquina -->
             <label>Máquina</label>
