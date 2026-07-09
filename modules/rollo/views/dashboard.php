@@ -422,7 +422,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <div class="modal">
         <div class="modal-header">
             <h2>Importar Rollo</h2>
-            <p>Últimmo ID Importado: <strong><?php echo $ultimo_id_sheet; ?></strong></p>
+            <p>Último ID Importado: <strong><?php echo $ultimo_id_sheet; ?></strong></p>
             <button id="cerrarBtn" onclick="cerrarModal('modalImportar')">X</button>
         </div>
         <!-- Opciones de importación -->
