@@ -184,8 +184,8 @@ function obtenerUltimaImportacionSellado($conexion){
             WHERE nombre = 'sellado'";
     $res = mysqli_query($conexion, $sql);
     if(!$res){
-        return 'Nunca';
+        return 'Ninguno';
     }
     $row = mysqli_fetch_assoc($res);
-    return $row['ultimo_id_sheet'] ?? 'Nunca';
+    return $row['ultimo_id_sheet'] ?? 'Ninguno';
 }
