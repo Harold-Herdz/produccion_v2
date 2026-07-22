@@ -19,7 +19,7 @@ require_once dirname(__DIR__) . '/includes/config.php';
 
     <!-- Versión -->
     <div class="footer-right">
-        <span>Versión 1.0</span>
+        <span>Versión 2.0</span>
     </div>
 
 </footer>
