@@ -30,7 +30,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
             <!-- Fecha -->
             <label>Fecha</label>
-            <input 
+            <input          
                 type="date" 
                 name="fecha_plana" 
                 value="<?php echo date('Y-m-d', strtotime($fila['fecha_plana'])); ?>" required>
@@ -43,18 +43,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                         value="<?php echo $m['id_maquina']; ?>" 
                         <?php if($fila['id_maquina'] == $m['id_maquina']) echo 'selected'; ?>>
                         <?php echo $m['nombre_maquina']; ?>
-                    </option>
-                <?php endwhile; ?>
-            </select>
-
-            <!-- Turno -->
-            <label>Turno</label>
-            <select name="id_turno" required>
-                <?php while($t = mysqli_fetch_assoc($turnos)): ?>
-                    <option 
-                        value="<?php echo $t['id_turno']; ?>" 
-                        <?php if($fila['id_turno'] == $t['id_turno']) echo 'selected'; ?>>
-                        <?php echo $t['nombre_turno']; ?>
                     </option>
                 <?php endwhile; ?>
             </select>
@@ -84,11 +72,18 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </select>
 
             <!-- Peso del Producido -->
-            <label>Peso (kg)</label>
+            <label>Peso Rollo (kg)</label>
             <input 
                 type="number" 
                 name="peso_plana" 
                 value="<?php echo $fila['peso_plana']; ?>" required>
+
+            <!-- Peso del Retal -->
+            <label>Peso Retal (kg)</label>
+            <input 
+                type="number" 
+                name="retal_plana" 
+                value="<?php echo $fila['retal_plana']; ?>">
 
             <!-- Cantidad de Bultos -->
             <label>Bultos</label>
@@ -97,15 +92,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 name="bultos_plana" 
                 value="<?php echo $fila['bultos_plana']; ?>">
 
-            <!-- Peso del Retal -->
-            <label>Retal (kg)</label>
-            <input 
-                type="number" 
-                name="retal_plana" 
-                value="<?php echo $fila['retal_plana']; ?>">
-
             <!-- Peso Total -->
-            <label>Total (kg)</label>
+            <label>Peso Total (kg)</label>
             <input 
                 type="number" 
                 name="total_plana" 

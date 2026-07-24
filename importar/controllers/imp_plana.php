@@ -75,10 +75,10 @@ foreach ($filas as $data) {
     $operario   = trim($data[2]);
     $maquina    = trim($data[3]);
     $referencia = trim($data[4]);
-    $bultos     = (int)$data[6];
-    $peso       = convertirNumero($data[7]);
-    $retal      = convertirNumero($data[8]);
-    $total_p      = convertirNumero($data[9]);
+    $peso       = convertirNumero($data[5]);
+    $retal      = convertirNumero($data[6]);
+    $bultos     = (int)$data[7];
+    $total_p    = convertirNumero($data[8]);
 
     // Obtener IDs de catálogos o crearlos si no existen
     $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
@@ -89,27 +89,27 @@ foreach ($filas as $data) {
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_PLANA
                     (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia,
-                    peso_plana,bultos_plana,retal_plana,total_plana)
+                    peso_plana,retal_plana,bultos_plana,total_plana)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia',
-                    '$peso','$bultos','$retal','$total_p')
+                    '$peso','$retal','$bultos','$total_p')
                 ON DUPLICATE KEY UPDATE
                     fecha_plana   = VALUES(fecha_plana),
                     id_operario   = VALUES(id_operario),
                     id_maquina    = VALUES(id_maquina),
                     id_referencia = VALUES(id_referencia),
                     peso_plana    = VALUES(peso_plana),
-                    bultos_plana  = VALUES(bultos_plana),
                     retal_plana   = VALUES(retal_plana),
+                    bultos_plana  = VALUES(bultos_plana),
                     total_plana   = VALUES(total_plana)";
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_PLANA
                     (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia,
-                    peso_plana,bultos_plana,retal_plana,total_plana)
+                    peso_plana,retal_plana,bultos_plana,total_plana)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia',
-                    '$peso','$bultos','$retal','$total_p')";
+                    '$peso','$retal','$bultos','$total_p')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);

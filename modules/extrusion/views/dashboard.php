@@ -47,7 +47,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 <!-- Contenedor Principal -->
 <div class="container">
     <!-- Título -->
-    <h2 class="titulo-vista">Producción Máquina Plana</h2>
+    <h2 class="titulo-vista">Producción Extrusión</h2>
 
     <!-- KPIs principales -->
     <div class="kpis">
