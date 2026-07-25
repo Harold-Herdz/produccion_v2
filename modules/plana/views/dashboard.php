@@ -9,13 +9,13 @@
 /** @var float $semana */
 /** @var float $mes */
 /** @var array $top_operario */
-/** @var float $bruto_mes1 */
+/** @var float $rollo_mes1 */
 /** @var float $retal_mes1 */
-/** @var float $neto_mes1 */
+/** @var float $total_mes1 */
 /** @var float $eficiencia_mes1 */
-/** @var float $bruto_mes2 */
+/** @var float $rollo_mes2 */
 /** @var float $retal_mes2 */
-/** @var float $neto_mes2 */
+/** @var float $total_mes2 */
 /** @var float $eficiencia_mes2 */
 /** @var array $mejor_dia_mes1 */
 /** @var array $peor_dia_mes1 */
@@ -99,8 +99,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </h3>
             <p>
                 🏭 Producción bruta: <?php 
-                echo $bruto_mes1 !== null 
-                    ? number_format($bruto_mes1).' kg' 
+                echo $rollo_mes1 !== null 
+                    ? number_format($rollo_mes1).' kg' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -113,8 +113,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </p>
             <p>
                 📦 Producción final: <?php 
-                echo $neto_mes1 !== null 
-                    ? number_format($neto_mes1).' kg' 
+                echo $total_mes1 !== null 
+                    ? number_format($total_mes1).' kg' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -188,8 +188,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </h3>
             <p>
                 🏭 Producción bruta: <?php 
-                echo $bruto_mes2 !== null 
-                    ? number_format($bruto_mes2).' kg' 
+                echo $rollo_mes2 !== null 
+                    ? number_format($rollo_mes2).' kg' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -202,8 +202,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </p>
             <p>
                 📦 Producción final: <?php 
-                echo $neto_mes2 !== null 
-                    ? number_format($neto_mes2).' kg' 
+                echo $total_mes2 !== null 
+                    ? number_format($total_mes2).' kg' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -253,7 +253,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     <?php foreach($meses as $num => $nombre){ ?>
                         <option 
                             value="<?php echo $num; ?>" 
-                            <?php if($mes_actual == $num) echo "selected"; ?>>
+                            <?php if($num == $mes_actual) echo "selected"; ?>>
                             <?php echo $nombre; ?>
                         </option>
                     <?php } ?>

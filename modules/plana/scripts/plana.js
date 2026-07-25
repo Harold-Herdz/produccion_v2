@@ -6,10 +6,10 @@ window.chartReferencias = window.chartReferencias || null;
 
 // Cargar gráficos de producción y operarios según filtros
 function cargarDatos(tipo){
-    let filtroMes    = document.getElementById("filtroMes").value;
-    let filtroSemana = document.getElementById("filtroSemana").value;
+    let mes    = document.getElementById("filtroMes").value;
+    let semana = document.getElementById("filtroSemana").value;
 
-    fetch("../ajax/getProduccionPlana.php?tipo=" + tipo + "&mes=" + filtroMes + "&semana=" + filtroSemana)
+    fetch("../ajax/getProduccionPlana.php?tipo=" + tipo + "&mes=" + mes + "&semana=" + semana)
     .then(res => res.json())
     .then(data => {
 

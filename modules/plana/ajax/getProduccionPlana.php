@@ -108,7 +108,7 @@ $res2 = mysqli_query($conexion, $sql2);
 $operarios = [];
 $bultos = [];
 while($row = mysqli_fetch_assoc($res2)){
-    $operarios[] = $row['nombre'];
+    $operarios[] = $row['nombre_operario'];
     $bultos[] = $row['total'];
 }
 
