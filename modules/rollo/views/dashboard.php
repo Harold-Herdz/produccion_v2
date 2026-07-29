@@ -66,10 +66,10 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
     </div>
 
-    <!-- Top máquina del mes -->
+    <!-- Top máquina -->
     <div class="top-container">
         <div class="card-kpi top-card" id="top-card">
-            <p>Top maquina del mes</p>
+            <p>Top maquina</p>
             <h2>
                 <?php 
                 if(!empty($top_maquina)){

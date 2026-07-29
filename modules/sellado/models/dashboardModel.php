@@ -57,17 +57,17 @@ function obtenerProduccionMesSellado($conexion){
 }
 
 /* =================================================
-   TOP OPERARIO (MES ACTUAL)
+   TOP MÁQUINA
 ================================================= */
-// Operario con más producción en el mes actual 
-function obtenerTopOperarioSellado($conexion){
-    $sql = "SELECT o.nombre_operario, IFNULL(SUM(p.paquetes_total),0) total
+// Máquina con más producción
+function obtenerTopMaquinaSellado($conexion){
+    $sql = "SELECT m.nombre_maquina, 
+            IFNULL(SUM(p.paquetes_total),0) total
             FROM PRODUCCION_SELLADO p
-            LEFT JOIN OPERARIOS o 
-            ON p.id_operario = o.id_operario
-            WHERE MONTH(p.fecha_paq)=MONTH(CURDATE())
-            AND YEAR(p.fecha_paq)=YEAR(CURDATE())
-            GROUP BY p.id_operario
+            LEFT JOIN MAQUINAS m 
+            ON p.id_maquina = m.id_maquina
+            WHERE YEAR(p.fecha_paq)=YEAR(CURDATE())
+            GROUP BY p.id_maquina
             ORDER BY total DESC
             LIMIT 1";
     $res = mysqli_query($conexion,$sql);
@@ -75,7 +75,7 @@ function obtenerTopOperarioSellado($conexion){
         return mysqli_fetch_assoc($res);
     }
     return [
-        "nombre_operario" => "Sin datos",
+        "nombre_maquina" => "Sin datos",
         "total" => 0
     ];
 }
@@ -126,11 +126,37 @@ function obtenerMejorPeorDiaMesSellado($conexion,$mes){
 }
 
 /* =================================================
+   TOP MÁQUINA
+================================================= */
+// Máquina con más producción en el mes
+function obtenerTopMaquinaMesSellado($conexion,$mes){
+    $sql = "SELECT m.nombre_maquina, 
+            IFNULL(SUM(p.paquetes_total),0) total
+            FROM PRODUCCION_SELLADO p
+            LEFT JOIN MAQUINAS m
+            ON p.id_maquina = m.id_maquina
+            WHERE MONTH(p.fecha_paq) = $mes
+            AND YEAR(p.fecha_paq)=YEAR(CURDATE())
+            GROUP BY p.id_maquina
+            ORDER BY total DESC
+            LIMIT 1";
+    $res = mysqli_query($conexion,$sql);
+    if($res && mysqli_num_rows($res) > 0){
+        return mysqli_fetch_assoc($res);
+    }
+    return [
+        "nombre_maquina" => "Sin datos",
+        "total" => 0
+    ];
+}
+
+/* =================================================
    TOP OPERARIO
 ================================================= */
 // Operario con más producción en el mes
 function obtenerTopOperarioMesSellado($conexion,$mes){
-    $sql = "SELECT o.nombre_operario, IFNULL(SUM(p.paquetes_total),0) total
+    $sql = "SELECT o.nombre_operario, 
+            IFNULL(SUM(p.paquetes_total),0) total
             FROM PRODUCCION_SELLADO p
             LEFT JOIN OPERARIOS o 
             ON p.id_operario = o.id_operario

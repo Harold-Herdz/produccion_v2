@@ -32,7 +32,7 @@ $total = obtenerTotalHistoricoSellado($conexion);
 $semana = obtenerProduccionSemanaSellado($conexion);
 $mes = obtenerProduccionMesSellado($conexion);
 // Top operario del mes actual
-$top_operario = obtenerTopOperarioSellado($conexion);
+$top_maquina = obtenerTopMaquinaSellado($conexion);
 
 // Totales de los meses
 $total_mes1 = obtenerTotalMesSellado($conexion,$mes1);
@@ -46,6 +46,9 @@ $dias_mes2 = obtenerMejorPeorDiaMesSellado($conexion,$mes2);
 $mejor_dia_mes2 = $dias_mes2['mejor'];
 $peor_dia_mes2 = $dias_mes2['peor'];
 
+// Top máquina de los meses
+$top_maquina_mes1 = obtenerTopMaquinaMesSellado($conexion,$mes1);
+$top_maquina_mes2 = obtenerTopMaquinaMesSellado($conexion,$mes2);
 // Top operario de los meses
 $top_operario_mes1 = obtenerTopOperarioMesSellado($conexion,$mes1);
 $top_operario_mes2 = obtenerTopOperarioMesSellado($conexion,$mes2);

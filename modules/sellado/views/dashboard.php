@@ -63,14 +63,14 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
     </div>
 
-    <!-- Top operario del mes -->
+    <!-- Top máquina -->
     <div class="top-container">
         <div class="card-kpi top-card" id="top-card">
-            <p>Top operario del mes</p>
+            <p>Top máquina</p>
             <h2>
                 <?php 
-                if(!empty($top_operario)){
-                    echo $top_operario['nombre_operario'] . "<br><span style='font-size:14px'>(".$top_operario['total']." paquetes)</span>";
+                if(!empty($top_maquina)){
+                    echo $top_maquina['nombre_maquina'] . "<br><span style='font-size:14px'>(".$top_maquina['total']." paquetes)</span>";
                 }else{
                     echo "Sin datos";
                 }
@@ -120,10 +120,17 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 echo round($promedio_mes1); ?> paquetes
             </p>
             <p>
+                🔧 Mejor máquina: <?php 
+                echo $top_maquina_mes1['nombre_maquina'] ?? 'Sin datos'; ?>
+                <?php if(!empty($top_maquina_mes1['total']) && $top_maquina_mes1['total'] > 0){ ?>
+                    (<?php echo number_format($top_maquina_mes1['total']); ?> paqs.)
+                <?php } ?>
+            </p>
+            <p>
                 👷 Mejor operario: <?php 
                 echo $top_operario_mes1['nombre_operario'] ?? 'Sin datos'; ?>
                 <?php if(!empty($top_operario_mes1['total']) && $top_operario_mes1['total'] > 0){ ?>
-                    (<?php echo number_format($top_operario_mes1['total']); ?> paquetes)
+                    (<?php echo number_format($top_operario_mes1['total']); ?> paqs.)
                 <?php } ?>
             </p>
         </div>
@@ -191,10 +198,17 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 echo round($promedio_mes2); ?> paquetes
             </p>
             <p>
+                🔧 Mejor máquina: <?php 
+                echo $top_maquina_mes2['nombre_maquina'] ?? 'Sin datos'; ?>
+                <?php if(!empty($top_maquina_mes2['total']) && $top_maquina_mes2['total'] > 0){ ?>
+                    (<?php echo number_format($top_maquina_mes2['total']); ?> paqs.)
+                <?php } ?>
+            </p>
+            <p>
                 👷 Mejor operario: <?php 
                 echo $top_operario_mes2['nombre_operario'] ?? 'Sin datos'; ?>
                 <?php if(!empty($top_operario_mes2['total']) && $top_operario_mes2['total'] > 0){ ?>
-                    (<?php echo number_format($top_operario_mes2['total']); ?> paquetes)
+                    (<?php echo number_format($top_operario_mes2['total']); ?> paqs.)
                 <?php } ?>
             </p>
         </div>

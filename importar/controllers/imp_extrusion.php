@@ -14,7 +14,7 @@ $modo         = $_GET['modo'] ?? 'nuevos';
 $ultimo_id_sheet = obtenerUltimoIdSheet($conexion, 'extrusion');
 
 // Fuente de datos
-$url = "https://docs.google.com/spreadsheets/d/1TLsQx_s9tWBjJwuPm9xseJfsDQbKDQNQKOK9lf9Xezk/export?format=csv&gid=1284283091";
+$url = "https://docs.google.com/spreadsheets/d/1TLsQx_s9tWBjJwuPm9xseJfsDQbKDQNQKOK9lf9Xezk/export?format=csv&gid=1583688034";
 $titulo     = "Producción de Extrusión";
 $subtitulo  = "PRODUCCION_EXTRUSION";
 $volver_url = BASE_URL . "/modules/extrusion/views/dashboard.php";
@@ -78,8 +78,10 @@ foreach ($filas as $data) {
     $operador_ext   = limpiarNombre($data[4]);
     $referencia     = limpiarNombre($data[5]);
     $color          = limpiarNombre($data[6]);
-    $peso_rollo     = convertirNumero($data[7]);
-    $lamina_p       = limpiarNombre($data[8]);
+    $lamina_p       = limpiarNombre($data[7]);
+    $rollos         = convertirNumero($data[8]);
+    $total_peso     = convertirNumero($data[9]);
+    
 
     // Obtener IDs de catálogos o crearlos si no existen
     $id_maquina      = $maquinas[$maquina]            ?? autoCrear($conexion, $maquinas,       "MAQUINAS",             "nombre_maquina",      $maquina);
@@ -95,7 +97,7 @@ foreach ($filas as $data) {
                     id_referencia,id_color,peso_rollo,lamina_p)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_turno_ext','$id_operador_ext',
-                    '$id_referencia','$id_color','$peso_rollo','$lamina_p')
+                    '$id_referencia','$id_color','$lamina_p','$rollos','$total_peso')
                 ON DUPLICATE KEY UPDATE
                     fecha_ext       = VALUES(fecha_ext),
                     id_maquina      = VALUES(id_maquina),
@@ -112,7 +114,7 @@ foreach ($filas as $data) {
                     id_referencia,id_color,peso_rollo,lamina_p)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_turno_ext','$id_operador_ext',
-                    '$id_referencia','$id_color','$peso_rollo','$lamina_p')";
+                    '$id_referencia','$id_color','$lamina_p','$rollos','$total_peso')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
