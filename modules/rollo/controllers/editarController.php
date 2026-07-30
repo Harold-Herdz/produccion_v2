@@ -11,6 +11,8 @@ $id = $_GET['id'];
 $fila = obtenerProduccionPorId($conexion, $id);
 
 // Cargar catálogos para los selectores del formulario
+$operarios = obtenerOperarios($conexion);
+
 $maquinas = obtenerMaquinas($conexion);
 
 $referencias = obtenerReferencias($conexion);

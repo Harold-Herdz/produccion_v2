@@ -56,6 +56,9 @@ $dias_mes2 = obtenerMejorPeorDiaMesRollo($conexion,$mes2);
 $mejor_dia_mes2 = $dias_mes2['mejor'];
 $peor_dia_mes2 = $dias_mes2['peor'];
 
+// Top operario de los meses
+$top_operario_mes1 = obtenerTopOperarioMesRollo($conexion,$mes1);
+$top_operario_mes2 = obtenerTopOperarioMesRollo($conexion,$mes2);
 // Top máquina de los meses
 $top_maquina_mes1 = obtenerTopMaquinaMesRollo($conexion,$mes1);
 $top_maquina_mes2 = obtenerTopMaquinaMesRollo($conexion,$mes2);

@@ -21,7 +21,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <h2 class="titulo-vista">Historial Producción Rollo</h2>
 
         <!-- Botón para registrar producción en Google Forms -->
-        <a class="btn" id="btnRegistrar" href="https://docs.google.com/forms/d/e/1FAIpQLSch9DWsxKlht9EWeGYErV7ZpUKCQ0anjesuLoku87wk8ds8Bw/viewform?usp=dialog" target="_blank">
+        <a class="btn" id="btnRegistrar" href="https://docs.google.com/forms/d/e/1FAIpQLScylHvavBGIPO_o_gF4Wio0Gnn69H1Q3wBJWaBx0age4sAvcQ/viewform?usp=dialog" target="_blank">
             Registrar Producción
         </a>
 
@@ -48,12 +48,13 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     <tr>
                         <th>ID</th>
                         <th>Fecha</th>
+                        <th>Operario</th>
                         <th>Máquina</th>
                         <th>Referencia</th>
                         <th>Color</th>
-                        <th>Peso</th>
-                        <th>Retal</th>
-                        <th>Total</th>
+                        <th>Bruto (kg)</th>
+                        <th>Retal (kg)</th>
+                        <th>Total (kg)</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -63,13 +64,14 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     <?php while($fila = mysqli_fetch_assoc($resultado)): ?>
                         <tr>
                             <td><?php echo $fila['id_sheet']; ?></td>
-                            <td><?php echo $fila['fecha_roll']; ?></td>
+                            <td><?php echo $fila['fecha_rollo']; ?></td>
+                            <td><?php echo $fila['nombre_operario']; ?></td>
                             <td><?php echo $fila['nombre_maquina']; ?></td>
                             <td><?php echo $fila['nombre_referencia']; ?></td>
                             <td><?php echo $fila['nombre_color']; ?></td>
                             <td><?php echo $fila['peso_rollo']; ?></td>
-                            <td><?php echo $fila['retal_roll']; ?></td>
-                            <td><?php echo $fila['total_roll']; ?></td>
+                            <td><?php echo $fila['retal_rollo']; ?></td>
+                            <td><?php echo $fila['total_rollo']; ?></td>
                             <!-- Botones de editar o eliminar registros -->
                             <td>
                                 <a class="btn"

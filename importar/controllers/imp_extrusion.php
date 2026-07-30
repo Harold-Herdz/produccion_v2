@@ -71,16 +71,16 @@ $duplicados   = 0;
 
 foreach ($filas as $data) {
     // Limpiar y convertir datos de cada fila
-    $id_sheet       = trim($data[0]);
-    $fecha          = convertirFecha($data[1]);
-    $maquina        = limpiarNombre($data[2]);
-    $turno_ext      = limpiarNombre($data[3]);
-    $operador_ext   = limpiarNombre($data[4]);
-    $referencia     = limpiarNombre($data[5]);
-    $color          = limpiarNombre($data[6]);
-    $lamina_p       = limpiarNombre($data[7]);
-    $rollos         = convertirNumero($data[8]);
-    $total_peso     = convertirNumero($data[9]);
+    $id_sheet     = trim($data[0]);
+    $fecha        = convertirFecha($data[1]);
+    $maquina      = limpiarNombre($data[2]);
+    $turno_ext    = limpiarNombre($data[3]);
+    $operador_ext = limpiarNombre($data[4]);
+    $referencia   = limpiarNombre($data[5]);
+    $color        = limpiarNombre($data[6]);
+    $lamina_p     = limpiarNombre($data[7]);
+    $rollos_ext   = convertirNumero($data[8]);
+    $total_ext    = convertirNumero($data[9]);
     
 
     // Obtener IDs de catálogos o crearlos si no existen
@@ -93,28 +93,29 @@ foreach ($filas as $data) {
     // Modo 'todo': Insertar o actualizar si ya existe
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_EXTRUSION
-                    (id_sheet,fecha_ext,id_maquina,id_turno_ext,id_operador_ext,
-                    id_referencia,id_color,peso_rollo,lamina_p)
+                    (id_sheet,fecha_extrusion,id_maquina,id_turno_ext,id_operador_ext,
+                    id_referencia,id_color,lamina_p,rollos_extrusion,total_extrusion)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_turno_ext','$id_operador_ext',
-                    '$id_referencia','$id_color','$lamina_p','$rollos','$total_peso')
+                    '$id_referencia','$id_color','$lamina_p','$rollos_ext','$total_ext')
                 ON DUPLICATE KEY UPDATE
-                    fecha_ext       = VALUES(fecha_ext),
-                    id_maquina      = VALUES(id_maquina),
-                    id_turno_ext    = VALUES(id_turno_ext),
-                    id_operador_ext = VALUES(id_operador_ext),
-                    id_referencia   = VALUES(id_referencia),
-                    id_color        = VALUES(id_color),
-                    peso_rollo      = VALUES(peso_rollo),
-                    lamina_p        = VALUES(lamina_p)";
+                    fecha_extrusion     = VALUES(fecha_extrusion),
+                    id_maquina          = VALUES(id_maquina),
+                    id_turno_ext        = VALUES(id_turno_ext),
+                    id_operador_ext     = VALUES(id_operador_ext),
+                    id_referencia       = VALUES(id_referencia),
+                    id_color            = VALUES(id_color),
+                    lamina_p            = VALUES(lamina_p),
+                    rollos_extrusion    = VALUES(rollos_extrusion),
+                    total_extrusion     = VALUES(total_extrusion)";
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_EXTRUSION
-                    (id_sheet,fecha_ext,id_maquina,id_turno_ext,id_operador_ext,
-                    id_referencia,id_color,peso_rollo,lamina_p)
+                    (id_sheet,fecha_extrusion,id_maquina,id_turno_ext,id_operador_ext,
+                    id_referencia,id_color,lamina_p,rollos_extrusion,total_extrusion)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_turno_ext','$id_operador_ext',
-                    '$id_referencia','$id_color','$lamina_p','$rollos','$total_peso')";
+                    '$id_referencia','$id_color','$lamina_p','$rollos_ext','$total_ext')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);

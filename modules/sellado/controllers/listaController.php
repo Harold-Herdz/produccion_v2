@@ -16,12 +16,12 @@ $pagina = $_GET['pagina'] ?? 1;
 $inicio = ($pagina - 1) * $limite;
 
 // Base de la consulta con JOINs
-$sql_base = "FROM PRODUCCION_SELLADO p
-LEFT JOIN OPERARIOS o ON p.id_operario = o.id_operario
-LEFT JOIN MAQUINAS m ON p.id_maquina = m.id_maquina
-LEFT JOIN REFERENCIAS r ON p.id_referencia = r.id_referencia
-LEFT JOIN COLORES c ON p.id_color = c.id_color
-LEFT JOIN TURNOS t ON p.id_turno = t.id_turno
+$sql_base = "FROM PRODUCCION_SELLADO s
+LEFT JOIN OPERARIOS o ON s.id_operario = o.id_operario
+LEFT JOIN MAQUINAS m ON s.id_maquina = m.id_maquina
+LEFT JOIN REFERENCIAS r ON s.id_referencia = r.id_referencia
+LEFT JOIN COLORES c ON s.id_color = c.id_color
+LEFT JOIN TURNOS t ON s.id_turno = t.id_turno
 WHERE 1=1";
 
 // Aplicar filtro de búsqueda por texto
@@ -32,23 +32,23 @@ if(!empty($busqueda)){
         r.nombre_referencia LIKE '%$busqueda%' OR
         c.nombre_color LIKE '%$busqueda%' OR
         t.nombre_turno LIKE '%$busqueda%' OR
-        p.id LIKE '%$busqueda%' OR
-        p.paquetes_x70 LIKE '%$busqueda%' OR
-        p.paquetes_x90 LIKE '%$busqueda%' OR
-        p.paquetes_x98 LIKE '%$busqueda%' OR
-        p.paquetes_total LIKE '%$busqueda%' OR
-        p.peso_hora1 LIKE '%$busqueda%' OR
-        p.peso_hora2 LIKE '%$busqueda%' OR
-        p.peso_hora3 LIKE '%$busqueda%' OR
-        p.peso_hora4 LIKE '%$busqueda%' OR
-        p.peso_hora5 LIKE '%$busqueda%' OR
-        p.promedio_peso LIKE '%$busqueda%'
+        s.id LIKE '%$busqueda%' OR
+        s.paquetes_x70 LIKE '%$busqueda%' OR
+        s.paquetes_x90 LIKE '%$busqueda%' OR
+        s.paquetes_x98 LIKE '%$busqueda%' OR
+        s.paquetes_total LIKE '%$busqueda%' OR
+        s.peso_hora1 LIKE '%$busqueda%' OR
+        s.peso_hora2 LIKE '%$busqueda%' OR
+        s.peso_hora3 LIKE '%$busqueda%' OR
+        s.peso_hora4 LIKE '%$busqueda%' OR
+        s.peso_hora5 LIKE '%$busqueda%' OR
+        s.promedio_peso LIKE '%$busqueda%'
     )";
 }
 
 // Aplicar filtro por fecha
 if(!empty($fecha)){
-    $sql_base .= " AND DATE(p.fecha_paq) = '$fecha'";
+    $sql_base .= " AND DATE(s.fecha_sellado) = '$fecha'";
 }
 
 // Contar total de registros para la paginación
@@ -59,14 +59,14 @@ $total_registros = $total_fila['total'];
 $total_paginas = ceil($total_registros / $limite);
 
 // Consulta final con campos y límite de página
-$sql = "SELECT p.*, 
+$sql = "SELECT s.*, 
             o.nombre_operario,
             m.nombre_maquina,
             r.nombre_referencia,
             c.nombre_color,
             t.nombre_turno
         $sql_base
-        ORDER BY p.id DESC
+        ORDER BY s.id DESC
         LIMIT $inicio, $limite";
 
 $resultado = mysqli_query($conexion,$sql);

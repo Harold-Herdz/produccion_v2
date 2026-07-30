@@ -23,13 +23,13 @@ $datos = [
 
     'id_referencia' => $_POST['id_referencia'],
 
-    'peso' => $_POST['peso_plana'],
+    'peso_plana' => $_POST['peso_plana'],
 
-    'bultos' => $_POST['bultos_plana'],
+    'bultos_plana' => $_POST['bultos_plana'],
 
-    'retal' => $_POST['retal_plana'],
+    'retal_plana' => $_POST['retal_plana'],
     
-    'total' => $_POST['total_plana']
+    'total_plana' => $_POST['total_plana']
 ];
 
 // Actualizar registro 

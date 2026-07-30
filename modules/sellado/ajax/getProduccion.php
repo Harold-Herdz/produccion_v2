@@ -25,37 +25,37 @@ $semana = $filtros['semana'];
 if($tipo == "semana"){
     // Todas las semanas del mes
     if($semana == ""){
-        $sql = "SELECT DATE(fecha_paq) fecha, SUM(paquetes_total) total
+        $sql = "SELECT DATE(fecha_sellado) fecha, SUM(paquetes_total) total
                 FROM PRODUCCION_SELLADO
-                WHERE MONTH(fecha_paq) = $mes
-                AND YEAR(fecha_paq) = YEAR(CURDATE())
-                GROUP BY DATE(fecha_paq)";
+                WHERE MONTH(fecha_sellado) = $mes
+                AND YEAR(fecha_sellado) = YEAR(CURDATE())
+                GROUP BY DATE(fecha_sellado)";
     } else {
         // Rango de días de la semana seleccionada
         $inicio = (($semana - 1) * 7) + 1;
         $fin = $semana * 7;
-        $sql = "SELECT DATE(fecha_paq) fecha, SUM(paquetes_total) total
+        $sql = "SELECT DATE(fecha_sellado) fecha, SUM(paquetes_total) total
                 FROM PRODUCCION_SELLADO
-                WHERE MONTH(fecha_paq) = $mes
-                AND DAY(fecha_paq) BETWEEN $inicio AND $fin
-                AND YEAR(fecha_paq) = YEAR(CURDATE())
-                GROUP BY DATE(fecha_paq)";
+                WHERE MONTH(fecha_sellado) = $mes
+                AND DAY(fecha_sellado) BETWEEN $inicio AND $fin
+                AND YEAR(fecha_sellado) = YEAR(CURDATE())
+                GROUP BY DATE(fecha_sellado)";
     }
 // Mostrar por año
 } elseif($tipo === 'anio') {
     // Agrupado por semana del año
-    $sql = "SELECT CONCAT('Sem ', WEEK(fecha_paq, 1)) fecha, SUM(paquetes_total) total
+    $sql = "SELECT CONCAT('Sem ', WEEK(fecha_sellado, 1)) fecha, SUM(paquetes_total) total
             FROM PRODUCCION_SELLADO
-            WHERE YEAR(fecha_paq) = YEAR(CURDATE())
-            GROUP BY WEEK(fecha_paq, 1), CONCAT('Sem ', WEEK(fecha_paq, 1))
-            ORDER BY WEEK(fecha_paq, 1) ASC";
+            WHERE YEAR(fecha_sellado) = YEAR(CURDATE())
+            GROUP BY WEEK(fecha_sellado, 1), CONCAT('Sem ', WEEK(fecha_sellado, 1))
+            ORDER BY WEEK(fecha_sellado, 1) ASC";
 }else{
     // Agrupado por día del mes
-    $sql = "SELECT DATE(fecha_paq) fecha, SUM(paquetes_total) total
+    $sql = "SELECT DATE(fecha_sellado) fecha, SUM(paquetes_total) total
             FROM PRODUCCION_SELLADO
-            WHERE MONTH(fecha_paq) = $mes
-            AND YEAR(fecha_paq) = YEAR(CURDATE())
-            GROUP BY DATE(fecha_paq)";
+            WHERE MONTH(fecha_sellado) = $mes
+            AND YEAR(fecha_sellado) = YEAR(CURDATE())
+            GROUP BY DATE(fecha_sellado)";
 }
 $res = mysqli_query($conexion,$sql);
 
@@ -74,41 +74,41 @@ while($row = mysqli_fetch_assoc($res)){
 if($tipo == "semana"){
     // Operarios de todas las semanas del mes
     if($semana == ""){
-        $sql2 = "SELECT o.nombre_operario, SUM(p.paquetes_total) total
-                 FROM PRODUCCION_SELLADO p
-                 LEFT JOIN OPERARIOS o ON p.id_operario=o.id_operario
-                 WHERE MONTH(p.fecha_paq) = $mes
-                 AND YEAR(p.fecha_paq) = YEAR(CURDATE())
-                 GROUP BY p.id_operario";
+        $sql2 = "SELECT o.nombre_operario, SUM(s.paquetes_total) total
+                 FROM PRODUCCION_SELLADO s
+                 LEFT JOIN OPERARIOS o ON s.id_operario=o.id_operario
+                 WHERE MONTH(s.fecha_sellado) = $mes
+                 AND YEAR(s.fecha_sellado) = YEAR(CURDATE())
+                 GROUP BY s.id_operario";
 
     } else {
         // Operarios por rango de días de la semana seleccionada
         $inicio = (($semana - 1) * 7) + 1;
         $fin = $semana * 7;
-        $sql2 = "SELECT o.nombre_operario, SUM(p.paquetes_total) total
-                 FROM PRODUCCION_SELLADO p
-                 LEFT JOIN OPERARIOS o ON p.id_operario=o.id_operario
-                 WHERE MONTH(p.fecha_paq) = $mes
-                 AND DAY(p.fecha_paq) BETWEEN $inicio AND $fin
-                 AND YEAR(p.fecha_paq) = YEAR(CURDATE())
-                 GROUP BY p.id_operario";
+        $sql2 = "SELECT o.nombre_operario, SUM(s.paquetes_total) total
+                 FROM PRODUCCION_SELLADO s
+                 LEFT JOIN OPERARIOS o ON s.id_operario=o.id_operario
+                 WHERE MONTH(s.fecha_sellado) = $mes
+                 AND DAY(s.fecha_sellado) BETWEEN $inicio AND $fin
+                 AND YEAR(s.fecha_sellado) = YEAR(CURDATE())
+                 GROUP BY s.id_operario";
     }
 // Mostrar por año
 }elseif($tipo === 'anio') {
     // Agrupado del año
-    $sql2 = "SELECT o.nombre_operario, SUM(p.paquetes_total) total
-             FROM PRODUCCION_SELLADO p
-             LEFT JOIN OPERARIOS o ON p.id_operario=o.id_operario
-             WHERE YEAR(p.fecha_paq) = YEAR(CURDATE())
+    $sql2 = "SELECT o.nombre_operario, SUM(s.paquetes_total) total
+             FROM PRODUCCION_SELLADO s
+             LEFT JOIN OPERARIOS o ON s.id_operario=o.id_operario
+             WHERE YEAR(s.fecha_sellado) = YEAR(CURDATE())
              GROUP BY o.nombre_operario
              ORDER BY total DESC";
 }else{
     // Operarios del mes
-    $sql2 = "SELECT o.nombre_operario, SUM(p.paquetes_total) total
-             FROM PRODUCCION_SELLADO p
-             LEFT JOIN OPERARIOS o ON p.id_operario=o.id_operario
-             WHERE MONTH(p.fecha_paq) = $mes
-             AND YEAR(p.fecha_paq) = YEAR(CURDATE())
+    $sql2 = "SELECT o.nombre_operario, SUM(s.paquetes_total) total
+             FROM PRODUCCION_SELLADO s
+             LEFT JOIN OPERARIOS o ON s.id_operario=o.id_operario
+             WHERE MONTH(s.fecha_sellado) = $mes
+             AND YEAR(s.fecha_sellado) = YEAR(CURDATE())
              GROUP BY p.id_operario";
 }
 $res2 = mysqli_query($conexion,$sql2);

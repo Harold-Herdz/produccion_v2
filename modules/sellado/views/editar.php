@@ -33,8 +33,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label>Fecha</label>
             <input 
                 type="date"
-                name="fecha_paq"
-                value="<?php echo date('Y-m-d', strtotime($fila['fecha_paq'])); ?>">
+                name="fecha_sellado"
+                value="<?php echo date('Y-m-d', strtotime($fila['fecha_sellado'])); ?>">
 
             <!-- Máquina -->
             <label>Máquina</label>
@@ -174,7 +174,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
             <!-- Observaciones -->
             <label>Observaciones</label>
-            <textarea name="observaciones_paq"><?php echo $fila['observaciones_paq']; ?></textarea>
+            <textarea name="obs_sellado"><?php echo $fila['obs_sellado']; ?></textarea>
 
             <!-- Botón de Actualizar -->
             <button type="submit" class="btn" id="btnActualizar">Actualizar</button>

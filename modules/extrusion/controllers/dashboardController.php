@@ -27,46 +27,40 @@ $mes1 = $_GET['mes1'] ?? $mes_anterior;
 $mes2 = $_GET['mes2'] ?? $mes_actual;
 
 // Total histórico de producción
-$total = obtenerTotalHistoricoPlana($conexion);
+$total = obtenerTotalHistoricoExtrusion($conexion);
 // Producción de la semana y del mes actual
-$semana = obtenerProduccionSemanaPlana($conexion);
-$mes = obtenerProduccionMesPlana($conexion);
+$semana = obtenerProduccionSemanaExtrusion($conexion);
+$mes = obtenerProduccionMesExtrusion($conexion);
 // Top operario del mes actual
-$top_operario = obtenerTopOperarioPlana($conexion);
+$top_operario = obtenerTopMaquinaExtrusion($conexion);
 
 // Totales de los meses
-$total_mes1 = obtenerTotalMesPlana($conexion,$mes1);
-$total_mes2 = obtenerTotalMesPlana($conexion,$mes2);
+$total_mes1 = obtenerTotalMesExtrusion($conexion,$mes1);
+$total_mes2 = obtenerTotalMesExtrusion($conexion,$mes2);
 
-// Resumenes de los meses
-$resumen_mes1 = obtenerResumenMesPlana($conexion,$mes1);
-$bruto_mes1 = $resumen_mes1['bruto'];
-$retal_mes1 = $resumen_mes1['retal'];
-$neto_mes1  = $resumen_mes1['neto'];
-$resumen_mes2 = obtenerResumenMesPlana($conexion,$mes2);
-$bruto_mes2 = $resumen_mes2['bruto'];
-$retal_mes2 = $resumen_mes2['retal'];
-$neto_mes2  = $resumen_mes2['neto'];
+// Rollos de los meses
+$rollos_mes1 = obtenerRollosMesExtrusion($conexion,$mes1);
+$rollos_mes2 = obtenerRollosMesExtrusion($conexion,$mes2);
 
 // Mejor y peor día de los meses
-$dias_mes1 = obtenerMejorPeorDiaMesPlana($conexion,$mes1);
+$dias_mes1 = obtenerMejorPeorDiaMesExtrusion($conexion,$mes1);
 $mejor_dia_mes1 = $dias_mes1['mejor'];
 $peor_dia_mes1 = $dias_mes1['peor'];
-$dias_mes2 = obtenerMejorPeorDiaMesPlana($conexion,$mes2);
+$dias_mes2 = obtenerMejorPeorDiaMesExtrusion($conexion,$mes2);
 $mejor_dia_mes2 = $dias_mes2['mejor'];
 $peor_dia_mes2 = $dias_mes2['peor'];
 
-// Top operario de los meses
-$top_operario_mes1 = obtenerTopOperarioMesPlana($conexion,$mes1);
-$top_operario_mes2 = obtenerTopOperarioMesPlana($conexion,$mes2);
+// Top maquina de los meses
+$top_maquina_mes1 = obtenerTopMaquinaMesExtrusion($conexion,$mes1);
+$top_maquina_mes2 = obtenerTopMaquinaMesExtrusion($conexion,$mes2);
 
 // Filtros de fecha para tablas
 $desde = $_GET['desde'] ?? date('Y-m-01');
 $hasta = $_GET['hasta'] ?? date('Y-m-d');
 // Tablas de producción por fecha, referencias y máquina
-$res_tabla_fecha = obtenerTablaFechasPlana($conexion, $desde, $hasta);
-$res_tabla_referencias = obtenerTablaReferenciasPlana($conexion, $desde, $hasta);
-$res_tabla_maquina = obtenerTablaMaquinasPlana($conexion, $desde, $hasta);
+$res_tabla_fecha = obtenerTablaFechasExtrusion($conexion, $desde, $hasta);
+$res_tabla_referencias = obtenerTablaReferenciasExtrusion($conexion, $desde, $hasta);
+$res_tabla_maquina = obtenerTablaMaquinasExtrusion($conexion, $desde, $hasta);
 
 // Diferencia y porcentaje de variación entre meses
 $diferencia = ($total_mes2 ?? 0) - ($total_mes1 ?? 0);

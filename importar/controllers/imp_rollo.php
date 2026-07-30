@@ -14,7 +14,7 @@ $modo         = $_GET['modo'] ?? 'nuevos';
 $ultimo_id_sheet = obtenerUltimoIdSheet($conexion, 'rollo');
 
 // Fuente de datos
-$url = "https://docs.google.com/spreadsheets/d/1CpdDtlNVQJoSHJ7WAc0BrXP-FIohYWhMB6si1bzmOz0/export?format=csv&gid=46026898";
+$url = "https://docs.google.com/spreadsheets/d/1LtibtaYF6GEsXE5Mxgq6uq8BR_ZEQ1idlqFUof5mgRo/export?format=csv&gid=46026898";
 $titulo     = "Producción de Rollos";
 $subtitulo  = "PRODUCCION_ROLLO";
 $volver_url = BASE_URL . "/modules/rollo/views/dashboard.php";
@@ -57,6 +57,7 @@ if (ob_get_level()) ob_flush(); flush();
 echo "<script>document.getElementById('msg').textContent='Cargando catálogos…';</script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
+$operarios   = cargarCatalogo($conexion, "OPERARIOS",   "nombre_operario",   "id_operario");
 $maquinas    = cargarCatalogo($conexion, "MAQUINAS",    "nombre_maquina",    "id_maquina");
 $referencias = cargarCatalogo($conexion, "REFERENCIAS", "nombre_referencia", "id_referencia");
 $colores     = cargarCatalogo($conexion, "COLORES",     "nombre_color",      "id_color");
@@ -69,15 +70,17 @@ $duplicados   = 0;
 
 foreach ($filas as $data) {
     // Limpiar y convertir datos de cada fila
-    $id_sheet   = trim($data[0]);
-    $fecha      = convertirFecha($data[1]);
-    $maquina    = limpiarNombre($data[2]);
-    $referencia = limpiarNombre($data[3]);
-    $color      = limpiarNombre($data[4]);
-    $peso_rollo = convertirNumero($data[5]);
-    $retal      = convertirNumero($data[6]);
+    $id_sheet    = trim($data[0]);
+    $fecha       = convertirFecha($data[1]);
+    $operario    = limpiarNombre($data[2]);
+    $maquina     = limpiarNombre($data[3]);
+    $referencia  = limpiarNombre($data[4]);
+    $color       = limpiarNombre($data[5]);
+    $peso_rollo  = convertirNumero($data[6]);
+    $retal_rollo = convertirNumero($data[7]);
 
     // Obtener IDs de catálogos o crearlos si no existen
+    $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
     $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
     $id_referencia = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
     $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
@@ -85,26 +88,27 @@ foreach ($filas as $data) {
     // Modo 'todo': Insertar o actualizar si ya existe
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_ROLLO
-                    (id_sheet,fecha_roll,id_maquina,id_referencia,
-                    id_color,peso_rollo,retal_roll)
+                    (id_sheet,fecha_rollo,id_operario,id_maquina,
+                    id_referencia,id_color,peso_rollo,retal_rollo)
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina','$id_referencia',
-                    '$id_color','$peso_rollo','$retal')
+                    ('$id_sheet','$fecha','$id_operario','$id_maquina',
+                    '$id_referencia','$id_color','$peso_rollo','$retal_rollo')
                 ON DUPLICATE KEY UPDATE
-                    fecha_roll    = VALUES(fecha_roll),
+                    fecha_rollo   = VALUES(fecha_rollo),
+                    id_operario   = VALUES(id_operario),
                     id_maquina    = VALUES(id_maquina),
                     id_referencia = VALUES(id_referencia),
                     id_color      = VALUES(id_color),
                     peso_rollo    = VALUES(peso_rollo),
-                    retal_roll    = VALUES(retal_roll)";
+                    retal_rollo   = VALUES(retal_rollo)";
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_ROLLO
-                    (id_sheet,fecha_roll,id_maquina,id_referencia,
-                    id_color,peso_rollo,retal_roll)
+                    (id_sheet,fecha_rollo,id_operario,id_maquina,
+                    id_referencia,id_color,peso_rollo,retal_rollo)
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina','$id_referencia',
-                    '$id_color','$peso_rollo','$retal')";
+                    ('$id_sheet','$fecha','$id_operario','$id_maquina',
+                    '$id_referencia','$id_color','$peso_rollo','$retal_rollo')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);

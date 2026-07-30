@@ -10,6 +10,11 @@ function obtenerProduccionPorId($conexion, $id){
 }
 
 // Catálogos para selectores del formulario
+function obtenerOperarios($conexion){
+    return mysqli_query($conexion,
+        "SELECT * FROM OPERARIOS"
+    );
+}
 function obtenerMaquinas($conexion){
     return mysqli_query($conexion,
         "SELECT * FROM MAQUINAS"
@@ -32,13 +37,14 @@ function obtenerColores($conexion){
 // Actualizar registro de producción por ID
 function actualizarProduccion($conexion, $id, $datos){
     $sql = "UPDATE PRODUCCION_ROLLO SET
-            fecha_roll='{$datos['fecha']}',
+            fecha_rollo='{$datos['fecha']}',
+            id_operario='{$datos['id_operario']}',
             id_maquina='{$datos['id_maquina']}',
             id_referencia='{$datos['id_referencia']}',
             id_color='{$datos['id_color']}',
-            peso_rollo='{$datos['peso']}',
-            retal_roll='{$datos['retal']}',
-            total_roll='{$datos['total']}'
+            peso_rollo='{$datos['peso_rollo']}',
+            retal_rollo='{$datos['retal_rollo']}',
+            total_rollo='{$datos['total_rollo']}'
             WHERE id=$id";
     mysqli_query($conexion, $sql);
 }

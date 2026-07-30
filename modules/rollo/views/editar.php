@@ -32,8 +32,20 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label>Fecha</label>
             <input 
                 type="date" 
-                name="fecha_roll"
-                value="<?php echo date('Y-m-d', strtotime($fila['fecha_roll'])); ?>">
+                name="fecha_rollo"
+                value="<?php echo date('Y-m-d', strtotime($fila['fecha_rollo'])); ?>">
+
+            <!-- Operario -->
+            <label>Operario</label>
+            <select name="id_maquina">
+                <?php while($o = mysqli_fetch_assoc($operarios)): ?>
+                    <option 
+                        value="<?php echo $o['id_operario']; ?>"
+                        <?php if($fila['id_operario'] == $o['id_operario']) echo "selected"; ?>>
+                        <?php echo $o['nombre_operario']; ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
 
             <!-- Máquina -->
             <label>Máquina</label>
@@ -72,7 +84,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </select>
 
             <!-- Peso del Producido -->
-            <label>Peso (kg)</label>
+            <label>Bruto (kg)</label>
             <input 
                 type="number"
                 name="peso_rollo" 
@@ -84,19 +96,19 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label>Retal (kg)</label>
             <input 
                 type="number" 
-                name="retal_roll" 
+                name="retal_rollo" 
                 step="any" 
                 class="form-control" 
-                value="<?php echo $fila['retal_roll']; ?>">
+                value="<?php echo $fila['retal_rollo']; ?>">
 
             <!-- Peso Total -->
             <label>Total (kg)</label>
             <input 
                 type="number" 
-                name="total_roll" 
+                name="total_rollo" 
                 step="any" 
                 class="form-control" 
-                value="<?php echo $fila['total_roll']; ?>">
+                value="<?php echo $fila['total_rollo']; ?>">
         
             <!-- Botón de Actualizar -->
             <button type="submit" class="btn" id="btnActualizar">Actualizar</button>

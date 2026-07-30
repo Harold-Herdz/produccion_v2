@@ -12,14 +12,14 @@ function obtenerProduccionPorId($conexion, $id){
 }
 
 // Catálogos para selectores del formulario
-function obtenerOperarios($conexion){
-    return mysqli_query($conexion,
-        "SELECT * FROM OPERARIOS"
-    );
-}
 function obtenerMaquinas($conexion){
     return mysqli_query($conexion,
         "SELECT * FROM MAQUINAS"
+    );
+}
+function obtenerOperarios($conexion){
+    return mysqli_query($conexion,
+        "SELECT * FROM OPERARIOS"
     );
 }
 function obtenerReferencias($conexion){
@@ -44,7 +44,7 @@ function obtenerTurnos($conexion){
 // Actualizar registro de producción por ID
 function actualizarProduccion($conexion, $id, $datos){
     $sql = "UPDATE PRODUCCION_SELLADO SET
-            fecha_paq='{$datos['fecha']}',
+            fecha_sellado='{$datos['fecha']}',
             id_operario='{$datos['id_operario']}',
             id_maquina='{$datos['id_maquina']}',
             id_referencia='{$datos['id_referencia']}',
@@ -58,7 +58,7 @@ function actualizarProduccion($conexion, $id, $datos){
             peso_hora3='{$datos['peso_h3']}',
             peso_hora4='{$datos['peso_h4']}',
             peso_hora5='{$datos['peso_h5']}',
-            observaciones_paq='{$datos['observaciones']}'
+            obs_sellado='{$datos['obs_sellado']}'
             WHERE id=$id";
     mysqli_query($conexion, $sql);
 }

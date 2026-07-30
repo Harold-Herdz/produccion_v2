@@ -72,14 +72,14 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </select>
 
             <!-- Peso del Producido -->
-            <label>Peso Rollo (kg)</label>
+            <label>Bruto (kg)</label>
             <input 
                 type="number" 
                 name="peso_plana" 
                 value="<?php echo $fila['peso_plana']; ?>" required>
 
             <!-- Peso del Retal -->
-            <label>Peso Retal (kg)</label>
+            <label>Retal (kg)</label>
             <input 
                 type="number" 
                 name="retal_plana" 
@@ -93,7 +93,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 value="<?php echo $fila['bultos_plana']; ?>">
 
             <!-- Peso Total -->
-            <label>Peso Total (kg)</label>
+            <label>Total (kg)</label>
             <input 
                 type="number" 
                 name="total_plana" 

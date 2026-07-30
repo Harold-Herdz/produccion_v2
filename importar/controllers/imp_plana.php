@@ -70,15 +70,15 @@ $nueva_fecha  = null;
 
 foreach ($filas as $data) {
     // Limpiar y convertir datos de cada fila
-    $id_sheet   = trim($data[0]);
-    $fecha      = convertirFecha($data[1]);
-    $operario   = trim($data[2]);
-    $maquina    = trim($data[3]);
-    $referencia = trim($data[4]);
-    $peso       = convertirNumero($data[5]);
-    $retal      = convertirNumero($data[6]);
-    $bultos     = (int)$data[7];
-    $total_p    = convertirNumero($data[8]);
+    $id_sheet     = trim($data[0]);
+    $fecha        = convertirFecha($data[1]);
+    $operario     = trim($data[2]);
+    $maquina      = trim($data[3]);
+    $referencia   = trim($data[4]);
+    $peso_plana   = convertirNumero($data[5]);
+    $retal_plana  = convertirNumero($data[6]);
+    $bultos_plana = (int)$data[7];
+    $total_plana  = convertirNumero($data[8]);
 
     // Obtener IDs de catálogos o crearlos si no existen
     $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
@@ -92,7 +92,7 @@ foreach ($filas as $data) {
                     peso_plana,retal_plana,bultos_plana,total_plana)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia',
-                    '$peso','$retal','$bultos','$total_p')
+                    '$peso_plana','$retal_plana','$bultos_plana','$total_plana')
                 ON DUPLICATE KEY UPDATE
                     fecha_plana   = VALUES(fecha_plana),
                     id_operario   = VALUES(id_operario),
@@ -109,7 +109,7 @@ foreach ($filas as $data) {
                     peso_plana,retal_plana,bultos_plana,total_plana)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia',
-                    '$peso','$retal','$bultos','$total_p')";
+                    '$peso_plana','$retal_plana','$bultos_plana','$total_plana')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);

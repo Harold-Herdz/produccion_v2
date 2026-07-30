@@ -87,7 +87,7 @@ foreach ($filas as $data) {
     $peso_h3    = ($data[13] === "") ? null : convertirNumero($data[13]);
     $peso_h4    = ($data[14] === "") ? null : convertirNumero($data[14]);
     $peso_h5    = ($data[15] === "") ? null : convertirNumero($data[15]);
-    $obs        = mysqli_real_escape_string($conexion, $data[16]);
+    $obs_sellado        = mysqli_real_escape_string($conexion, $data[16]);
 
     // Obtener IDs de catálogos o crearlos si no existen
     $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
@@ -120,39 +120,39 @@ foreach ($filas as $data) {
     // Modo 'todo': Insertar o actualizar si ya existe
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_SELLADO
-                    (id_sheet,fecha_paq,id_maquina,id_operario,id_turno,
+                    (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
-                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,observaciones_paq)
+                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_operario','$id_turno',
                     '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98', 
-                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs')
+                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')
                 ON DUPLICATE KEY UPDATE
-                    fecha_paq         = VALUES(fecha_paq),
-                    id_maquina        = VALUES(id_maquina),
-                    id_operario       = VALUES(id_operario),
-                    id_turno          = VALUES(id_turno),
-                    id_referencia     = VALUES(id_referencia),
-                    id_color          = VALUES(id_color),
-                    paquetes_x70      = VALUES(paquetes_x70),
-                    paquetes_x90      = VALUES(paquetes_x90),
-                    paquetes_x98      = VALUES(paquetes_x98),
-                    peso_hora1        = VALUES(peso_hora1),
-                    peso_hora2        = VALUES(peso_hora2),
-                    peso_hora3        = VALUES(peso_hora3),
-                    peso_hora4        = VALUES(peso_hora4),
-                    peso_hora5        = VALUES(peso_hora5),
-                    observaciones_paq = VALUES(observaciones_paq)";
+                    fecha_sellado   = VALUES(fecha_sellado),
+                    id_maquina      = VALUES(id_maquina),
+                    id_operario     = VALUES(id_operario),
+                    id_turno        = VALUES(id_turno),
+                    id_referencia   = VALUES(id_referencia),
+                    id_color        = VALUES(id_color),
+                    paquetes_x70    = VALUES(paquetes_x70),
+                    paquetes_x90    = VALUES(paquetes_x90),
+                    paquetes_x98    = VALUES(paquetes_x98),
+                    peso_hora1      = VALUES(peso_hora1),
+                    peso_hora2      = VALUES(peso_hora2),
+                    peso_hora3      = VALUES(peso_hora3),
+                    peso_hora4      = VALUES(peso_hora4),
+                    peso_hora5      = VALUES(peso_hora5),
+                    obs_sellado     = VALUES(obs_sellado)";
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_SELLADO
-                    (id_sheet,fecha_paq,id_maquina,id_operario,id_turno,
+                    (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
-                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,observaciones_paq)
+                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_operario','$id_turno',
                     '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98', 
-                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs')";
+                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);

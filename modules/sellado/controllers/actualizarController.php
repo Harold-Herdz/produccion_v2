@@ -13,7 +13,7 @@ $id = $_POST['id'];
 
 // Recopilar datos del formulario
 $datos = [
-    'fecha' => $_POST['fecha_paq'],
+    'fecha' => $_POST['fecha_sellado'],
 
     'id_operario' => $_POST['id_operario'],
 
@@ -41,7 +41,7 @@ $datos = [
 
     'peso_h5' => $_POST['peso_hora5'],
 
-    'observaciones' => $_POST['observaciones_paq']
+    'obs_sellado' => $_POST['obs_sellado']
 ];
 
 // Actualizar registro 

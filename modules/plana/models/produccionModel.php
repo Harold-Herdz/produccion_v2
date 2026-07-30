@@ -34,10 +34,10 @@ function actualizarProduccion($conexion, $id, $datos){
             id_turno = '{$datos['id_turno']}',
             id_operario = '{$datos['id_operario']}',
             id_referencia = '{$datos['id_referencia']}',
-            peso_plana = '{$datos['peso']}',
-            bultos_plana = '{$datos['bultos']}',
-            retal_plana = '{$datos['retal']}',
-            total_plana = '{$datos['total']}'
+            peso_plana = '{$datos['peso_plana']}',
+            retal_plana = '{$datos['retal_plana']}',
+            bultos_plana = '{$datos['bultos_plana']}',
+            total_plana = '{$datos['total_plana']}'
             WHERE id = $id";
     mysqli_query($conexion, $sql);
 }

@@ -16,11 +16,11 @@ $anio = $filtros['anio'];
 
 // Producción total agrupada por mes
 $sql = "SELECT 
-            MONTH(fecha_roll) mes,
-            SUM(total_roll) total
+            MONTH(fecha_rollo) mes,
+            SUM(total_rollo) total
         FROM PRODUCCION_ROLLO
-        WHERE YEAR(fecha_roll) = $anio
-        GROUP BY MONTH(fecha_roll)
+        WHERE YEAR(fecha_rollo) = $anio
+        GROUP BY MONTH(fecha_rollo)
         ORDER BY mes";
 $res = mysqli_query($conexion,$sql);
 

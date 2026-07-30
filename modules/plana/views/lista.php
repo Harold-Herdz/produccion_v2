@@ -53,7 +53,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                         <th>Operario</th>
                         <th>Máquina</th>
                         <th>Referencia</th>
-                        <th>Rollo (kg)</th>
+                        <th>Bruto (kg)</th>
                         <th>Retal (kg)</th>
                         <th>Bultos</th>
                         <th>Total (kg)</th>

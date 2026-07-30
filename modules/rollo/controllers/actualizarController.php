@@ -13,7 +13,7 @@ $id = $_POST['id'];
 
 // Recopilar datos del formulario
 $datos = [
-    'fecha' => $_POST['fecha_roll'],
+    'fecha' => $_POST['fecha_rollo'],
 
     'id_maquina' => $_POST['id_maquina'],
 
@@ -21,11 +21,11 @@ $datos = [
 
     'id_color' => $_POST['id_color'],
 
-    'peso' => $_POST['peso_rollo'],
+    'peso_rollo' => $_POST['peso_rollo'],
 
-    'retal' => $_POST['retal_roll'],
+    'retal_rollo' => $_POST['retal_rollo'],
 
-    'total' => $_POST['total_roll']
+    'total_rollo' => $_POST['total_rollo']
 ];
 
 // Actualizar registro 

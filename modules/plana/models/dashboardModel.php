@@ -77,7 +77,7 @@ function obtenerTotalMesPlana($conexion,$mes){
 ================================================= */
 // Resumen de producción del mes
 function obtenerResumenMesPlana($conexion,$mes){
-    $sql = "SELECT SUM(peso_plana) rollo, SUM(retal_plana) retal, SUM(total_plana) total
+    $sql = "SELECT SUM(peso_plana) bruto, SUM(retal_plana) retal, SUM(bultos_plana) bultos, SUM(total_plana) neto
             FROM PRODUCCION_PLANA
             WHERE MONTH(fecha_plana) = $mes
             AND YEAR(fecha_plana)=YEAR(CURDATE())";
@@ -85,12 +85,13 @@ function obtenerResumenMesPlana($conexion,$mes){
     if($res){
         $row = mysqli_fetch_assoc($res);
         return [
-            'rollo' => $row['rollo'] ?? null,
+            'bruto' => $row['bruto'] ?? null,
             'retal' => $row['retal'] ?? null,
-            'total'  => $row['total']  ?? null
+            'bultos' => $row['bultos'] ?? null,
+            'neto'  => $row['neto']  ?? null
         ];
     }
-    return ['rollo' => null, 'retal' => null, 'total' => null];
+    return ['bruto' => null, 'retal' => null, 'bultos' => null, 'neto' => null];
 }
 
 /* =================================================
@@ -175,7 +176,8 @@ function obtenerTopOperarioMesPlana($conexion,$mes){
 ================================================= */
 // Producción agrupada por fecha en un rango
 function obtenerTablaFechasPlana($conexion, $desde, $hasta){
-    $sql = "SELECT DATE(fecha_plana) fecha, SUM(peso_plana) rollo, SUM(bultos_plana) bultos, SUM(retal_plana) retal, SUM(total_plana) total
+    $sql = "SELECT 
+            DATE(fecha_plana) fecha, SUM(peso_plana) bruto, SUM(retal_plana) retal, SUM(bultos_plana) bultos, SUM(total_plana) neto
             FROM PRODUCCION_PLANA
             WHERE DATE(fecha_plana) BETWEEN '$desde' AND '$hasta'
             GROUP BY DATE(fecha_plana)
@@ -184,22 +186,30 @@ function obtenerTablaFechasPlana($conexion, $desde, $hasta){
 }
 // Producción por referencias en un rango
 function obtenerTablaReferenciasPlana($conexion, $desde, $hasta){
-    $sql = "SELECT r.nombre_referencia, SUM(p.peso_plana) rollo, SUM(p.bultos_plana) bultos, SUM(p.retal_plana) retal, SUM(p.total_plana) total
+    $sql = "SELECT r.nombre_referencia, 
+                SUM(p.peso_plana) bruto, 
+                SUM(p.retal_plana) retal,
+                SUM(p.bultos_plana) bultos,  
+                SUM(p.total_plana) neto
             FROM PRODUCCION_PLANA p
             LEFT JOIN REFERENCIAS r ON p.id_referencia = r.id_referencia
             WHERE DATE(p.fecha_plana) BETWEEN '$desde' AND '$hasta'
             GROUP BY r.id_referencia, r.nombre_referencia
-            ORDER BY total DESC";
+            ORDER BY neto DESC";
     return mysqli_query($conexion, $sql);
 }
 // Producción agrupada por máquina en un rango
 function obtenerTablaMaquinasPlana($conexion, $desde, $hasta){
-    $sql = "SELECT m.nombre_maquina, SUM(p.peso_plana) rollo, SUM(p.bultos_plana) bultos, SUM(p.retal_plana) retal, SUM(p.total_plana) total
+    $sql = "SELECT m.nombre_maquina, 
+                SUM(p.peso_plana) bruto, 
+                SUM(p.retal_plana) retal, 
+                SUM(p.bultos_plana) bultos, 
+                SUM(p.total_plana) neto
             FROM PRODUCCION_PLANA p
             LEFT JOIN MAQUINAS m ON p.id_maquina = m.id_maquina
             WHERE DATE(p.fecha_plana) BETWEEN '$desde' AND '$hasta'
             GROUP BY m.id_maquina, m.nombre_maquina
-            ORDER BY total DESC";
+            ORDER BY neto DESC";
     return mysqli_query($conexion, $sql);
 }
 

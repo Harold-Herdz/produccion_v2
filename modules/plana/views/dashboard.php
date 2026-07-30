@@ -102,8 +102,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </h3>
             <p>
                 🏭 Producción bruta: <?php 
-                echo $rollo_mes1 !== null 
-                    ? number_format($rollo_mes1).' kg' 
+                echo $bruto_mes1 !== null 
+                    ? number_format($bruto_mes1).' kg' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -122,9 +122,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 ?>
             </p>
             <p>
-                ⚙️ Eficiencia: <?php 
-                echo $eficiencia_mes1 !== null 
-                    ? round($eficiencia_mes1,1).'%' 
+                💰 Cantidad Bultos: <?php 
+                echo $bultos_mes1 !== null 
+                    ? number_format($bultos_mes1).' bultos' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -198,8 +198,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </h3>
             <p>
                 🏭 Producción bruta: <?php 
-                echo $rollo_mes2 !== null 
-                    ? number_format($rollo_mes2).' kg' 
+                echo $bruto_mes2 !== null 
+                    ? number_format($bruto_mes2).' kg' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -218,9 +218,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 ?>
             </p>
             <p>
-                ⚙️ Eficiencia: <?php 
-                echo $eficiencia_mes2 !== null 
-                    ? round($eficiencia_mes2,1).'%' 
+                💰 Cantidad Bultos: <?php 
+                echo $bultos_mes2 !== null 
+                    ? number_format($bultos_mes2).' bultos' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -358,37 +358,37 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <table>
             <tr>
                 <th>Fecha</th>
-                <th>Peso Rollo</th>
-                <th>Peso Retal</th>
+                <th>Bruto (kg)</th>
+                <th>Retal (kg)</th>
                 <th>Bultos</th>
-                <th>Peso Total</th>
+                <th>Neto (kg)</th>
             </tr>
             <?php
-            $total_rollo = 0;
+            $total_bruto = 0;
             $total_retal = 0;
             $total_bultos = 0;
-            $total = 0;
+            $total_neto = 0;
             while($row = mysqli_fetch_assoc($res_tabla_fecha)){
-                $total_rollo += $row['rollo'];
+                $total_bruto += $row['bruto'];
                 $total_retal += $row['retal'];
                 $total_bultos += $row['bultos'];
-                $total += $row['total'];
+                $total_neto += $row['neto'];
             ?>
             <tr>
                 <td><?php echo date("d M Y", strtotime($row['fecha'])); ?></td>
-                <td><?php echo number_format($row['rollo'],2); ?></td>
+                <td><?php echo number_format($row['bruto'],2); ?></td>
                 <td><?php echo number_format($row['retal'],2); ?></td>
                 <td><?php echo number_format($row['bultos']); ?></td>
-                <td><?php echo number_format($row['total'],2); ?></td>
+                <td><?php echo number_format($row['neto'],2); ?></td>
             </tr>
             <?php } ?>
             <!-- Fila de total -->
             <tr class="fila-total">
                 <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_rollo,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_bruto,2); ?></strong></td>
                 <td><strong><?php echo number_format($total_retal,2); ?></strong></td>                
                 <td><strong><?php echo number_format($total_bultos); ?></strong></td>
-                <td><strong><?php echo number_format($total,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_neto,2); ?></strong></td>
             </tr>
         </table>
     </div>
@@ -401,37 +401,37 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <table>
             <tr>
                 <th>Referencia</th>
-                <th>Peso Rollo</th>
-                <th>Peso Retal</th>
+                <th>Bruto (kg)</th>
+                <th>Retal (kg)</th>
                 <th>Bultos</th>
-                <th>Peso Total</th>
+                <th>Neto (kg)</th>
             </tr>
             <?php
-            $total_rollo = 0;
+            $total_bruto = 0;
             $total_retal = 0;
             $total_bultos = 0;
-            $total = 0;
+            $total_neto = 0;
             while($row = mysqli_fetch_assoc($res_tabla_referencias)){
-                $total_rollo += $row['rollo'];
+                $total_bruto += $row['bruto'];
                 $total_retal += $row['retal'];
                 $total_bultos += $row['bultos'];
-                $total += $row['total'];
+                $total_neto += $row['neto'];
             ?>
             <tr>
                 <td><?php echo $row['nombre_referencia']; ?></td>
-                <td><?php echo number_format($row['rollo'],2); ?></td>
+                <td><?php echo number_format($row['bruto'],2); ?></td>
                 <td><?php echo number_format($row['retal'],2); ?></td>                
                 <td><?php echo number_format($row['bultos']); ?></td>
-                <td><?php echo number_format($row['total'],2); ?></td>
+                <td><?php echo number_format($row['neto'],2); ?></td>
             </tr>
             <?php } ?>
             <!-- Fila de total -->
             <tr class="fila-total">
                 <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_rollo,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_bruto,2); ?></strong></td>
                 <td><strong><?php echo number_format($total_retal,2); ?></strong></td>
                 <td><strong><?php echo number_format($total_bultos); ?></strong></td>
-                <td><strong><?php echo number_format($total,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_neto,2); ?></strong></td>
             </tr>
         </table>
     </div>
@@ -444,37 +444,37 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <table>
             <tr>
                 <th>Máquina</th>
-                <th>Peso Rollo</th>
-                <th>Peso Retal</th>
+                <th>Bruto (kg)</th>
+                <th>Retal (kg)</th>
                 <th>Bultos</th>
-                <th>Peso Total</th>
+                <th>Neto (kg)</th>
             </tr>
             <?php
-            $total_rollo = 0;
+            $total_bruto = 0;
             $total_retal = 0;
             $total_bultos = 0;
-            $total = 0;
+            $total_neto = 0;
             while($row = mysqli_fetch_assoc($res_tabla_maquina)){
-                $total_rollo += $row['rollo'];
+                $total_bruto += $row['bruto'];
                 $total_retal += $row['retal'];
                 $total_bultos += $row['bultos'];
-                $total += $row['total'];
+                $total_neto += $row['neto'];
             ?>
             <tr>
                 <td><?php echo $row['nombre_maquina']; ?></td>
-                <td><?php echo number_format($row['rollo'],2); ?></td>
+                <td><?php echo number_format($row['bruto'],2); ?></td>
                 <td><?php echo number_format($row['retal'],2); ?></td>
                 <td><?php echo number_format($row['bultos']); ?></td>
-                <td><?php echo number_format($row['total'],2); ?></td>
+                <td><?php echo number_format($row['neto'],2); ?></td>
             </tr>
             <?php } ?>
             <!-- Fila de total -->
             <tr class="fila-total">
                 <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_rollo,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_bruto,2); ?></strong></td>
                 <td><strong><?php echo number_format($total_retal,2); ?></strong></td>
                 <td><strong><?php echo number_format($total_bultos); ?></strong></td>
-                <td><strong><?php echo number_format($total,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_neto,2); ?></strong></td>
             </tr>
         </table>
     </div>

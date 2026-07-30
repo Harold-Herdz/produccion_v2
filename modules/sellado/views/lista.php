@@ -65,7 +65,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     <?php while($fila = mysqli_fetch_assoc($resultado)): ?>
                         <tr>
                             <td><?php echo $fila['id_sheet']; ?></td>
-                            <td><?php echo $fila['fecha_paq']; ?></td>
+                            <td><?php echo $fila['fecha_sellado']; ?></td>
                             <td><?php echo $fila['nombre_maquina']; ?></td>
                             <td><?php echo $fila['nombre_operario']; ?></td>
                             <td><?php echo $fila['nombre_turno']; ?></td>

@@ -18,10 +18,10 @@ function obtenerTotalSellado($conexion, $sql){
 function obtenerDiasTranscurridos($conexion, $mes) {
     $anio = date('Y');
     
-    $sql = "SELECT COUNT(DISTINCT DATE(fecha_paq)) 
+    $sql = "SELECT COUNT(DISTINCT DATE(fecha_sellado)) 
             FROM PRODUCCION_SELLADO 
-            WHERE MONTH(fecha_paq) = ? 
-            AND YEAR(fecha_paq) = ?";
+            WHERE MONTH(fecha_sellado) = ? 
+            AND YEAR(fecha_sellado) = ?";
     
     $stmt = $conexion->prepare($sql);
     $stmt->bind_param("ii", $mes, $anio);
@@ -44,15 +44,15 @@ function obtenerTotalHistoricoSellado($conexion){
 function obtenerProduccionSemanaSellado($conexion){
     $sql = "SELECT SUM(paquetes_total) total
             FROM PRODUCCION_SELLADO
-            WHERE YEARWEEK(fecha_paq, 1) = YEARWEEK(CURDATE(), 1)";
+            WHERE YEARWEEK(fecha_sellado, 1) = YEARWEEK(CURDATE(), 1)";
     return obtenerTotalSellado($conexion, $sql);
 }
 // Producción del mes actual
 function obtenerProduccionMesSellado($conexion){
     $sql = "SELECT SUM(paquetes_total) total
             FROM PRODUCCION_SELLADO
-            WHERE MONTH(fecha_paq) = MONTH(CURDATE())
-            AND YEAR(fecha_paq) = YEAR(CURDATE())";
+            WHERE MONTH(fecha_sellado) = MONTH(CURDATE())
+            AND YEAR(fecha_sellado) = YEAR(CURDATE())";
     return obtenerTotalSellado($conexion, $sql);
 }
 
@@ -62,12 +62,12 @@ function obtenerProduccionMesSellado($conexion){
 // Máquina con más producción
 function obtenerTopMaquinaSellado($conexion){
     $sql = "SELECT m.nombre_maquina, 
-            IFNULL(SUM(p.paquetes_total),0) total
-            FROM PRODUCCION_SELLADO p
+            IFNULL(SUM(s.paquetes_total),0) total
+            FROM PRODUCCION_SELLADO s
             LEFT JOIN MAQUINAS m 
-            ON p.id_maquina = m.id_maquina
-            WHERE YEAR(p.fecha_paq)=YEAR(CURDATE())
-            GROUP BY p.id_maquina
+            ON s.id_maquina = m.id_maquina
+            WHERE YEAR(s.fecha_sellado)=YEAR(CURDATE())
+            GROUP BY s.id_maquina
             ORDER BY total DESC
             LIMIT 1";
     $res = mysqli_query($conexion,$sql);
@@ -87,8 +87,8 @@ function obtenerTopMaquinaSellado($conexion){
 function obtenerTotalMesSellado($conexion,$mes){
     $sql = "SELECT SUM(paquetes_total) total
             FROM PRODUCCION_SELLADO
-            WHERE MONTH(fecha_paq) = $mes
-            AND YEAR(fecha_paq)=YEAR(CURDATE())";
+            WHERE MONTH(fecha_sellado) = $mes
+            AND YEAR(fecha_sellado)=YEAR(CURDATE())";
     return obtenerTotalSellado($conexion,$sql);
 }
 
@@ -98,11 +98,11 @@ function obtenerTotalMesSellado($conexion,$mes){
 // Mejor y peor día de producción del mes
 function obtenerMejorPeorDiaMesSellado($conexion,$mes){
     $sql = "SELECT 
-                DATE(fecha_paq) fecha, SUM(paquetes_total) total
+                DATE(fecha_sellado) fecha, SUM(paquetes_total) total
             FROM PRODUCCION_SELLADO
-            WHERE MONTH(fecha_paq) = $mes
-            AND YEAR(fecha_paq)=YEAR(CURDATE())
-            GROUP BY DATE(fecha_paq)";
+            WHERE MONTH(fecha_sellado) = $mes
+            AND YEAR(fecha_sellado)=YEAR(CURDATE())
+            GROUP BY DATE(fecha_sellado)";
     $res = mysqli_query($conexion,$sql);
     $mejor_dia = ["fecha"=>"Sin datos","total"=>0];
     $peor_dia = ["fecha"=>"Sin datos","total"=>0];
@@ -131,13 +131,13 @@ function obtenerMejorPeorDiaMesSellado($conexion,$mes){
 // Máquina con más producción en el mes
 function obtenerTopMaquinaMesSellado($conexion,$mes){
     $sql = "SELECT m.nombre_maquina, 
-            IFNULL(SUM(p.paquetes_total),0) total
-            FROM PRODUCCION_SELLADO p
+            IFNULL(SUM(s.paquetes_total),0) total
+            FROM PRODUCCION_SELLADO s
             LEFT JOIN MAQUINAS m
-            ON p.id_maquina = m.id_maquina
-            WHERE MONTH(p.fecha_paq) = $mes
-            AND YEAR(p.fecha_paq)=YEAR(CURDATE())
-            GROUP BY p.id_maquina
+            ON s.id_maquina = m.id_maquina
+            WHERE MONTH(s.fecha_sellado) = $mes
+            AND YEAR(s.fecha_sellado)=YEAR(CURDATE())
+            GROUP BY s.id_maquina
             ORDER BY total DESC
             LIMIT 1";
     $res = mysqli_query($conexion,$sql);
@@ -156,13 +156,13 @@ function obtenerTopMaquinaMesSellado($conexion,$mes){
 // Operario con más producción en el mes
 function obtenerTopOperarioMesSellado($conexion,$mes){
     $sql = "SELECT o.nombre_operario, 
-            IFNULL(SUM(p.paquetes_total),0) total
-            FROM PRODUCCION_SELLADO p
+            IFNULL(SUM(s.paquetes_total),0) total
+            FROM PRODUCCION_SELLADO s
             LEFT JOIN OPERARIOS o 
-            ON p.id_operario = o.id_operario
-            WHERE MONTH(p.fecha_paq) = $mes
-            AND YEAR(p.fecha_paq)=YEAR(CURDATE())
-            GROUP BY p.id_operario
+            ON s.id_operario = o.id_operario
+            WHERE MONTH(s.fecha_sellado) = $mes
+            AND YEAR(s.fecha_sellado)=YEAR(CURDATE())
+            GROUP BY s.id_operario
             ORDER BY total DESC
             LIMIT 1";
     $res = mysqli_query($conexion,$sql);
@@ -181,21 +181,21 @@ function obtenerTopOperarioMesSellado($conexion,$mes){
 // Producción agrupada por fecha en un rango
 function obtenerTablaFechasSellado($conexion,$desde,$hasta){
     $sql = "SELECT 
-            DATE(fecha_paq) as fecha, SUM(paquetes_total) total
+            DATE(fecha_sellado) fecha, SUM(paquetes_total) total
             FROM PRODUCCION_SELLADO
-            WHERE DATE(fecha_paq) BETWEEN '$desde' AND '$hasta'
-            GROUP BY DATE(fecha_paq)
+            WHERE DATE(fecha_sellado) BETWEEN '$desde' AND '$hasta'
+            GROUP BY DATE(fecha_sellado)
             ORDER BY fecha DESC";
     return mysqli_query($conexion,$sql);
 }
 // Producción agrupada por operario en un rango
 function obtenerTablaOperariosSellado($conexion,$desde,$hasta){
-    $sql = "SELECT o.nombre_operario, SUM(p.paquetes_total) total
-            FROM PRODUCCION_SELLADO p
+    $sql = "SELECT o.nombre_operario, SUM(s.paquetes_total) total
+            FROM PRODUCCION_SELLADO s
             LEFT JOIN OPERARIOS o 
-            ON p.id_operario = o.id_operario
-            WHERE DATE(p.fecha_paq) BETWEEN '$desde' AND '$hasta'
-            GROUP BY o.nombre_operario
+            ON s.id_operario = o.id_operario
+            WHERE DATE(s.fecha_sellado) BETWEEN '$desde' AND '$hasta'
+            GROUP BY o.id_operario, o.nombre_operario
             ORDER BY total DESC";
     return mysqli_query($conexion,$sql);
 }

@@ -15,9 +15,9 @@ $filtros = [
 $anio = $filtros['anio'];
 
 // Total de paquetes producidos en el año
-$sql = "SELECT SUM(total_roll) total
+$sql = "SELECT SUM(total_rollo) total
         FROM PRODUCCION_ROLLO
-        WHERE YEAR(fecha_roll) = $anio";
+        WHERE YEAR(fecha_rollo) = $anio";
 $res = mysqli_query($conexion,$sql);
 $row = mysqli_fetch_assoc($res);
 

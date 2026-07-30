@@ -25,38 +25,38 @@ $semana = $filtros['semana'];
 if($tipo === "anio"){
     // Agrupado por semana del año
     $sql = "SELECT 
-                CONCAT('Sem ', WEEK(fecha_roll, 1)) fecha,
-                SUM(total_roll) total,
-                SUM(retal_roll) retal
+                CONCAT('Sem ', WEEK(fecha_rollo, 1)) fecha,
+                SUM(total_rollo) total,
+                SUM(retal_rollo) retal
             FROM PRODUCCION_ROLLO
-            WHERE YEAR(fecha_roll) = YEAR(CURDATE())
-            GROUP BY WEEK(fecha_roll, 1), CONCAT('Sem ', WEEK(fecha_roll, 1))
-            ORDER BY WEEK(fecha_roll, 1) ASC";
+            WHERE YEAR(fecha_rollo) = YEAR(CURDATE())
+            GROUP BY WEEK(fecha_rollo, 1), CONCAT('Sem ', WEEK(fecha_rollo, 1))
+            ORDER BY WEEK(fecha_rollo, 1) ASC";
 }else{
     // Todos los días del mes
     if($semana == ""){
         $sql = "SELECT 
-                    DATE(fecha_roll) fecha,
-                    SUM(total_roll) total,
-                    SUM(retal_roll) retal
+                    DATE(fecha_rollo) fecha,
+                    SUM(total_rollo) total,
+                    SUM(retal_rollo) retal
                 FROM PRODUCCION_ROLLO
-                WHERE MONTH(fecha_roll) = $mes
-                AND YEAR(fecha_roll) = YEAR(CURDATE())
-                GROUP BY DATE(fecha_roll)";
+                WHERE MONTH(fecha_rollo) = $mes
+                AND YEAR(fecha_rollo) = YEAR(CURDATE())
+                GROUP BY DATE(fecha_rollo)";
     }else{
         // Rango de días de la semana seleccionada
         $inicio = (($semana - 1) * 7) + 1;
         $fin = $semana * 7;
 
         $sql = "SELECT 
-                    DATE(fecha_roll) fecha,
-                    SUM(total_roll) total,
-                    SUM(retal_roll) retal
+                    DATE(fecha_rollo) fecha,
+                    SUM(total_rollo) total,
+                    SUM(retal_rollo) retal
                 FROM PRODUCCION_ROLLO
-                WHERE MONTH(fecha_roll) = $mes
-                AND DAY(fecha_roll) BETWEEN $inicio AND $fin
-                AND YEAR(fecha_roll) = YEAR(CURDATE())
-                GROUP BY DATE(fecha_roll)";
+                WHERE MONTH(fecha_rollo) = $mes
+                AND DAY(fecha_rollo) BETWEEN $inicio AND $fin
+                AND YEAR(fecha_rollo) = YEAR(CURDATE())
+                GROUP BY DATE(fecha_rollo)";
     }
 }
 $res = mysqli_query($conexion,$sql);
@@ -80,11 +80,11 @@ while($row = mysqli_fetch_assoc($res)){
 if($tipo === "anio") {
     // Máquinas del año ordenadas por total
     $sql_maquinas = "SELECT m.nombre_maquina, 
-                        SUM(r.total_roll) total
+                        SUM(r.total_rollo) total
                     FROM PRODUCCION_ROLLO r
                     LEFT JOIN MAQUINAS m 
                         ON r.id_maquina = m.id_maquina
-                    WHERE YEAR(r.fecha_roll) = YEAR(CURDATE())
+                    WHERE YEAR(r.fecha_rollo) = YEAR(CURDATE())
                     GROUP BY m.nombre_maquina
                     ORDER BY total DESC";
 }else{
@@ -92,12 +92,12 @@ if($tipo === "anio") {
     if($semana == ""){
         $sql_maquinas = "SELECT 
                             m.nombre_maquina, 
-                            SUM(r.total_roll) total
+                            SUM(r.total_rollo) total
                         FROM PRODUCCION_ROLLO r
                         LEFT JOIN MAQUINAS m 
                             ON r.id_maquina = m.id_maquina
-                        WHERE MONTH(r.fecha_roll) = $mes
-                        AND YEAR(r.fecha_roll) = YEAR(CURDATE())
+                        WHERE MONTH(r.fecha_rollo) = $mes
+                        AND YEAR(r.fecha_rollo) = YEAR(CURDATE())
                         GROUP BY m.nombre_maquina
                         ORDER BY total DESC";
     }else{
@@ -106,13 +106,13 @@ if($tipo === "anio") {
         $fin = $semana * 7;
 
         $sql_maquinas = "SELECT m.nombre_maquina, 
-                            SUM(r.total_roll) total
+                            SUM(r.total_rollo) total
                         FROM PRODUCCION_ROLLO r
                         LEFT JOIN MAQUINAS m 
                             ON r.id_maquina = m.id_maquina
-                        WHERE MONTH(r.fecha_roll) = $mes
-                        AND DAY(r.fecha_roll) BETWEEN $inicio AND $fin
-                        AND YEAR(r.fecha_roll) = YEAR(CURDATE())
+                        WHERE MONTH(r.fecha_rollo) = $mes
+                        AND DAY(r.fecha_rollo) BETWEEN $inicio AND $fin
+                        AND YEAR(r.fecha_rollo) = YEAR(CURDATE())
                         GROUP BY m.nombre_maquina
                         ORDER BY total DESC";
     }
