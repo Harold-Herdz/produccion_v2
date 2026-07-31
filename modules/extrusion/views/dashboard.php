@@ -8,25 +8,20 @@
 /** @var float $total */
 /** @var float $semana */
 /** @var float $mes */
-/** @var array $top_operario */
-/** @var float $bruto_mes1 */
-/** @var float $retal_mes1 */
-/** @var float $neto_mes1 */
-/** @var float $eficiencia_mes1 */
-/** @var float $bruto_mes2 */
-/** @var float $retal_mes2 */
-/** @var float $neto_mes2 */
-/** @var float $eficiencia_mes2 */
+/** @var array $top_maquina */
+/** @var float $total_mes1 */
+/** @var float $total_mes2 */
+/** @var int $rollos_mes1 */
+/** @var int $rollos_mes2 */
 /** @var array $mejor_dia_mes1 */
 /** @var array $peor_dia_mes1 */
 /** @var array $mejor_dia_mes2 */
 /** @var array $peor_dia_mes2 */
-/** @var array $top_operario_mes1 */
-/** @var array $top_operario_mes2 */
+/** @var array $top_maquina_mes1 */
+/** @var array $top_maquina_mes2 */
 /** @var float $diferencia */
 /** @var float $porcentaje */
 /** @var mysqli_result $res_tabla_fecha */
-/** @var mysqli_result $res_tabla_referencias */
 /** @var mysqli_result $res_tabla_maquina */
 /** @var string $desde */
 /** @var string $hasta */
@@ -68,15 +63,18 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
     </div>
 
-    <!-- Top operario del mes -->
+    <!-- Top máquina -->
     <div class="top-container">
         <div class="card-kpi top-card" id="top-card">
-            <p>Top operario del mes</p>
+            <p>Top máquina</p>
             <h2>
-                <?php echo $top_operario['nombre'] ?? 'Sin datos'; ?><br>
-                <small>
-                    <?php echo number_format($top_operario['total'] ?? 0); ?> paquetes
-                </small>
+                <?php 
+                if(!empty($top_maquina)){
+                    echo $top_maquina['nombre_maquina'] . "<br><span style='font-size:14px'>(".$top_maquina['total']." kg)</span>";
+                }else{
+                    echo "Sin datos";
+                }
+                ?>
             </h2>
         </div>
     </div>
@@ -98,30 +96,16 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </select>
             </h3>
             <p>
-                🏭 Producción bruta: <?php 
-                echo $bruto_mes1 !== null 
-                    ? number_format($bruto_mes1).' kg' 
+                📦 Producción total: <?php 
+                echo $total_mes1 !== null 
+                    ? number_format($total_mes1).' kg' 
                     : 'Sin datos'; 
                 ?>
             </p>
             <p>
-                ♻️ Retal: <?php 
-                echo $retal_mes1 !== null 
-                    ? number_format($retal_mes1).' kg' 
-                    : 'Sin datos'; 
-                ?>
-            </p>
-            <p>
-                📦 Producción final: <?php 
-                echo $neto_mes1 !== null 
-                    ? number_format($neto_mes1).' kg' 
-                    : 'Sin datos'; 
-                ?>
-            </p>
-            <p>
-                ⚙️ Eficiencia: <?php 
-                echo $eficiencia_mes1 !== null 
-                    ? round($eficiencia_mes1,1).'%' 
+                🧻 Rollos: <?php 
+                echo $rollos_mes1 !== null 
+                    ? round($rollos_mes1,1).'rollos' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -141,9 +125,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </p>
             <p>
                 🔧 Mejor máquina: <?php 
-                echo $top_operario_mes1['nombre'] ?? 'Sin datos'; ?> 
-                <?php if(!empty($top_operario_mes1['total'])){ ?>
-                    (<?php echo number_format($top_operario_mes1['total']); ?> kg)
+                echo $top_maquina_mes1['nombre'] ?? 'Sin datos'; ?> 
+                <?php if(!empty($top_maquina_mes1['total'])){ ?>
+                    (<?php echo number_format($top_maquina_mes1['total']); ?> kg)
                 <?php } ?>
             </p>
         </div>
@@ -187,30 +171,16 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </select>
             </h3>
             <p>
-                🏭 Producción bruta: <?php 
-                echo $bruto_mes2 !== null 
-                    ? number_format($bruto_mes2).' kg' 
+                📦 Producción total: <?php 
+                echo $total_mes2 !== null 
+                    ? number_format($total_mes2).' kg' 
                     : 'Sin datos'; 
                 ?>
             </p>
             <p>
-                ♻️ Retal: <?php 
-                echo $retal_mes2 !== null 
-                    ? number_format($retal_mes2).' kg' 
-                    : 'Sin datos'; 
-                ?>
-            </p>
-            <p>
-                📦 Producción final: <?php 
-                echo $neto_mes2 !== null 
-                    ? number_format($neto_mes2).' kg' 
-                    : 'Sin datos'; 
-                ?>
-            </p>
-            <p>
-                ⚙️ Eficiencia: <?php 
-                echo $eficiencia_mes2 !== null 
-                    ? round($eficiencia_mes2,1).'%' 
+                🧻 Rollos: <?php 
+                echo $rollos_mes2 !== null 
+                    ? round($rollos_mes2,1).'rollos' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -227,12 +197,12 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     ? date("d M Y", strtotime($peor_dia_mes2['fecha'])) 
                     : "Sin datos"; ?> (<?php echo number_format($peor_dia_mes2['total']); 
                 ?> kg)
-            </p> 
+            </p>
             <p>
                 🔧 Mejor máquina: <?php 
-                echo $top_operario_mes2['nombre'] ?? 'Sin datos'; ?> 
-                <?php if(!empty($top_operario_mes2['total'])){ ?>
-                    (<?php echo number_format($top_operario_mes2['total']); ?> kg)
+                echo $top_maquina_mes2['nombre'] ?? 'Sin datos'; ?> 
+                <?php if(!empty($top_maquina_mes2['total'])){ ?>
+                    (<?php echo number_format($top_maquina_mes2['total']); ?> kg)
                 <?php } ?>
             </p>
         </div>
@@ -281,13 +251,13 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <!-- Gráficos de producción y operarios -->
         <div class="grid-graficos">
             <div class="card-grafico">
-                <h3>Producción (kg)</h3>
+                <h3>Producción por Peso</h3>
                 <canvas id="graficoProduccion"></canvas>
             </div>
 
             <div class="card-grafico">
-                <h3>Producción por operario (bultos)</h3>
-                <canvas id="graficoOperarios"></canvas>
+                <h3>Producción por Máquina</h3>
+                <canvas id="graficoMaquinas"></canvas>
             </div>
         </div>
 
@@ -295,17 +265,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <br><br><br>
 
-    <!-- Gráfico de producción por referencia -->
-    <div class="card-grafico" id="card-referencias">
-        <h3>Producción por referencia</h3>
-        <canvas id="graficoReferencias"></canvas>
-    </div>
-
-    <br><br>
-
     <!-- Gráfico de producción mensual por año -->
     <div class="contenedor-grafico">
-        <h3>Producción por año (Máquina Plana)</h3>
+        <h3>Producción por año (Extrusión)</h3>
             <div class="header-grafico-meses">
                 <!-- Selector de año -->
                 <select id="filtroAnioMes" onchange="cargarGraficoMeses()">
@@ -337,127 +299,62 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- Tabla de producción por fecha -->
     <div class="tabla-dashboard">
-        <h3>Producción por fecha</h3>
+        <h3>Producción por Fecha</h3>
         <table>
             <tr>
                 <th>Fecha</th>
-                <th>Bruto</th>
-                <th>Bultos</th>
-                <th>Retal</th>
-                <th>Neto</th>
+                <th>Rollos</th>
+                <th>Total (kg)</th>
             </tr>
             <?php
-            $total_bruto = 0;
-            $total_bultos = 0;
-            $total_retal = 0;
-            $total_neto = 0;
+            $total_rollos = 0;
+            $total_peso = 0;
             while($row = mysqli_fetch_assoc($res_tabla_fecha)){
-                $total_bruto += $row['bruto'];
-                $total_bultos += $row['bultos'];
-                $total_retal += $row['retal'];
-                $total_neto += $row['neto'];
+                $total_rollos += $row['rollos'];
+                $total_peso += $row['total'];
             ?>
             <tr>
                 <td><?php echo date("d M Y", strtotime($row['fecha'])); ?></td>
-                <td><?php echo number_format($row['bruto'],2); ?></td>
-                <td><?php echo number_format($row['bultos']); ?></td>
-                <td><?php echo number_format($row['retal'],2); ?></td>
-                <td><?php echo number_format($row['neto'],2); ?></td>
+                <td><?php echo number_format($row['rollos']); ?></td>
+                <td><?php echo number_format($row['total'],2); ?></td>
             </tr>
             <?php } ?>
             <!-- Fila de total -->
             <tr class="fila-total">
                 <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_bruto,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_bultos); ?></strong></td>
-                <td><strong><?php echo number_format($total_retal,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_neto,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_rollos,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_peso,2); ?></strong></td>
             </tr>
         </table>
     </div>
-
-    <br><br>
-
-    <!-- Tabla de producción por referencia -->
-    <div class="tabla-dashboard">
-        <h3>Producción por referencia</h3>
-        <table>
-            <tr>
-                <th>Referencia</th>
-                <th>Bruto</th>
-                <th>Bultos</th>
-                <th>Retal</th>
-                <th>Neto</th>
-            </tr>
-            <?php
-            $total_bruto = 0;
-            $total_bultos = 0;
-            $total_retal = 0;
-            $total_neto = 0;
-            while($row = mysqli_fetch_assoc($res_tabla_referencias)){
-                $total_bruto += $row['bruto'];
-                $total_bultos += $row['bultos'];
-                $total_retal += $row['retal'];
-                $total_neto += $row['neto'];
-            ?>
-            <tr>
-                <td><?php echo $row['nombre_referencia']; ?></td>
-                <td><?php echo number_format($row['bruto'],2); ?></td>
-                <td><?php echo number_format($row['bultos']); ?></td>
-                <td><?php echo number_format($row['retal'],2); ?></td>
-                <td><?php echo number_format($row['neto'],2); ?></td>
-            </tr>
-            <?php } ?>
-            <!-- Fila de total -->
-            <tr class="fila-total">
-                <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_bruto,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_bultos); ?></strong></td>
-                <td><strong><?php echo number_format($total_retal,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_neto,2); ?></strong></td>
-            </tr>
-        </table>
-    </div>
-
-    <br><br>
 
     <!-- Tabla de producción por máquina -->
     <div class="tabla-dashboard">
-        <h3>Producción por máquina</h3>
+        <h3>Producción por Máquina</h3>
         <table>
             <tr>
                 <th>Máquina</th>
-                <th>Bruto</th>
-                <th>Bultos</th>
-                <th>Retal</th>
-                <th>Neto</th>
+                <th>Rollos</th>
+                <th>Total (kg)</th>
             </tr>
             <?php
-            $total_bruto = 0;
-            $total_bultos = 0;
-            $total_retal = 0;
-            $total_neto = 0;
+            $total_rollos = 0;
+            $total_peso = 0;
             while($row = mysqli_fetch_assoc($res_tabla_maquina)){
-                $total_bruto += $row['bruto'];
-                $total_bultos += $row['bultos'];
-                $total_retal += $row['retal'];
-                $total_neto += $row['neto'];
+                $total_rollos += $row['rollos'];
+                $total_peso += $row['total'];
             ?>
             <tr>
                 <td><?php echo $row['nombre_maquina']; ?></td>
-                <td><?php echo number_format($row['bruto'],2); ?></td>
-                <td><?php echo number_format($row['bultos']); ?></td>
-                <td><?php echo number_format($row['retal'],2); ?></td>
-                <td><?php echo number_format($row['neto'],2); ?></td>
+                <td><?php echo number_format($row['rollos']); ?></td>
+                <td><?php echo number_format($row['total'],2); ?></td>
             </tr>
             <?php } ?>
             <!-- Fila de total -->
             <tr class="fila-total">
                 <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_bruto,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_bultos); ?></strong></td>
-                <td><strong><?php echo number_format($total_retal,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_neto,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_rollos,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_peso,2); ?></strong></td>
             </tr>
         </table>
     </div>
@@ -478,16 +375,16 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 <div class="overlay" id="modalImportar">
     <div class="modal">
         <div class="modal-header">
-            <h2>Importar Plana</h2>
+            <h2>Importar Extrusion</h2>
             <p>Último ID Importado: <strong><?php echo $ultimo_id_sheet; ?></strong></p>
             <button id="cerrarBtn" onclick="cerrarModal('modalImportar')">X</button>
         </div>
         <!-- Opciones de importación -->
         <div class="btn-row">
-            <a class="btn-nuevos" href="<?= BASE_URL ?>/importar/controllers/imp_plana.php?modo=nuevos" >
+            <a class="btn-nuevos" href="<?= BASE_URL ?>/importar/controllers/imp_extrusion.php?modo=nuevos" >
                 <div class="btn-text"><span class="btn-icon">🗲</span>Importar Nuevos<span class="btn-arrow">›</span></div>
             </a>
-            <a class="btn-todo" href="<?= BASE_URL ?>/importar/controllers/imp_plana.php?modo=todo" >
+            <a class="btn-todo" href="<?= BASE_URL ?>/importar/controllers/imp_extrusion.php?modo=todo" >
                 <div class="btn-text"><span class="btn-icon">⟳</span>Reimportar Todo<span class="btn-arrow">›</span></div>
             </a>
         </div>
@@ -497,7 +394,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
-<script src="<?= BASE_URL ?>/modules/plana/scripts/plana.js"></script>
+<script src="<?= BASE_URL ?>/modules/extrusion/scripts/extrusion.js"></script>
 
 <?php 
 // Importar footer.php

@@ -18,10 +18,10 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 <!-- Contenedor del Historial -->
 <div class="container" id="containerHistorial">
     <!-- Título -->
-    <h2 class="titulo-vista">Historial Producción Máquina Plana</h2>
+    <h2 class="titulo-vista">Historial Producción Extrusión</h2>
 
         <!-- Botón para registrar producción en Google Forms -->
-        <a class="btn" id="btnRegistrar" href="https://docs.google.com/forms/d/e/1FAIpQLSfaRx43KiOMm9vi_y_TB46Mw2c-obkC9RCe7aMIZfdR2ACYcA/viewform?usp=dialog" target="_blank">
+        <a class="btn" id="btnRegistrar" href="https://docs.google.com/spreadsheets/d/1uz2fLXe-I0f_PjtKPGf0ZA4_Dsw01xyUyHdJ_Zl_1FI/edit?gid=753648130#gid=753648130" target="_blank">
             Registrar Producción
         </a>
 
@@ -50,12 +50,12 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     <tr>
                         <th>ID</th>
                         <th>Fecha</th>
-                        <th>Operario</th>
                         <th>Máquina</th>
+                        <th>Turno</th>
+                        <th>Operador</th>
                         <th>Referencia</th>
-                        <th>Peso (kg)</th>
-                        <th>Bultos</th>
-                        <th>Retal (kg)</th>
+                        <th>Color</th>
+                        <th>Rollos</th>
                         <th>Total (kg)</th>
                         <th>Acciones</th>
                     </tr>
@@ -66,14 +66,14 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     <?php while($fila = mysqli_fetch_assoc($resultado)): ?>
                         <tr>
                             <td><?php echo $fila['id_sheet']; ?></td>
-                            <td><?php echo $fila['fecha_plana']; ?></td>
-                            <td><?php echo $fila['nombre_operario']; ?></td>
+                            <td><?php echo $fila['fecha_extrusion']; ?></td>
                             <td><?php echo $fila['nombre_maquina']; ?></td>
+                            <td><?php echo $fila['nombre_turno_ext']; ?></td>
+                            <td><?php echo $fila['nombre_operador_ext']; ?></td>
                             <td><?php echo $fila['nombre_referencia']; ?></td>
-                            <td><?php echo $fila['peso_plana']; ?></td>
-                            <td><?php echo $fila['bultos_plana']; ?></td>
-                            <td><?php echo $fila['retal_plana']; ?></td>
-                            <td><?php echo $fila['total_plana']; ?></td>
+                            <td><?php echo $fila['nombre_color']; ?></td>
+                            <td><?php echo $fila['rollos_extrusion']; ?></td>
+                            <td><?php echo $fila['total_extrusion']; ?></td>
                              <!-- Botones de editar o eliminar registros -->
                             <td>
                                 <a class="btn"

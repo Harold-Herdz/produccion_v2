@@ -60,6 +60,16 @@ require_once __DIR__ . '/includes/config.php';
                 <p>Control producción <br>máquina plana</p>
             </a>
 
+            <!-- Módulo Extrusión -->
+            <a href="<?php
+                echo ($_SESSION['rol'] == 'admin')
+                    ? BASE_URL . '/modules/extrusion/views/dashboard.php'
+                    : BASE_URL . '/modules/extrusion/views/lista.php';
+            ?>" class="area-card">
+                <h2>Extrusión</h2>
+                <p>Control producción <br>extrusoras</p>
+            </a>
+
         </div>
 
     </div>

@@ -15,5 +15,5 @@ $id = intval($_GET['id'] ?? 0);
 eliminarProduccion($conexion, $id);
 
 // Redirigir al Lista
-header("Location: " . BASE_URL . "/modules/rollo/views/lista.php");
+header("Location: " . BASE_URL . "/modules/extrusion/views/lista.php");
 exit;

@@ -76,7 +76,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <input 
                 type="number" 
                 name="peso_plana" 
-                value="<?php echo $fila['peso_plana']; ?>" required>
+                value="<?php echo $fila['peso_plana']; ?>">
 
             <!-- Peso del Retal -->
             <label>Retal (kg)</label>
@@ -97,7 +97,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <input 
                 type="number" 
                 name="total_plana" 
-                value="<?php echo $fila['total_plana']; ?>" required>
+                value="<?php echo $fila['total_plana']; ?>">
 
             <!-- Botón de Actualizar -->
             <button type="submit" class="btn" id="btnActualizar">Actualizar</button>

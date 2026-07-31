@@ -1,19 +1,18 @@
 // Variables globales para instancias de gráficos
 window.chartProduccion  = window.chartProduccion  || null;
-window.chartOperarios   = window.chartOperarios   || null;
+window.chartMaquinas    = window.chartMaquinas    || null;
 window.chartMeses       = window.chartMeses       || null;
-window.chartReferencias = window.chartReferencias || null;
 
 // Cargar gráficos de producción y operarios según filtros
 function cargarDatos(tipo){
-    let filtroMes    = document.getElementById("filtroMes").value;
-    let filtroSemana = document.getElementById("filtroSemana").value;
+    let mes    = document.getElementById("filtroMes").value;
+    let semana = document.getElementById("filtroSemana").value;
 
-    fetch("../ajax/getProduccionPlana.php?tipo=" + tipo + "&mes=" + filtroMes + "&semana=" + filtroSemana)
+    fetch("../ajax/getProduccionExtrusion.php?tipo=" + tipo + "&mes=" + mes + "&semana=" + semana)
     .then(res => res.json())
     .then(data => {
 
-        // Gráfico de producción y retal (línea por mes/semana, barras por año)
+        // Gráfico de producción y rollos (línea por mes/semana, barras por año)
         if(chartProduccion) chartProduccion.destroy();
         const tipo_grafico = (tipo === 'anio') ? 'bar' : 'line';
         chartProduccion = new Chart(document.getElementById('graficoProduccion'), {
@@ -25,8 +24,8 @@ function cargarDatos(tipo){
                     data: data.totales,
                     tension: 0.3
                 }, {
-                    label: 'Retal (kg)',
-                    data: data.retales,
+                    label: 'Rollos',
+                    data: data.rollos,
                     tension: 0.3
                 }]
             },
@@ -56,15 +55,25 @@ function cargarDatos(tipo){
             }
         });
 
-        // Gráfico de bultos por operario
-        if(chartOperarios) chartOperarios.destroy();
-        chartOperarios = new Chart(document.getElementById('graficoOperarios'), {
+        // Ordenar máquinas de mayor a menor producción
+        let maquinasOrdenadas = data.maquinas.map((maq, i) => ({
+            maquina: maq,
+            total:   data.totales_maquinas[i]
+        }));
+        maquinasOrdenadas.sort((a, b) => b.total - a.total);
+        let labelsMaquinas = maquinasOrdenadas.map(m => m.maquina);
+        let datosMaquinas  = maquinasOrdenadas.map(m => m.total);
+
+        // Gráfico de producción de máquinas
+        if(chartMaquinas) chartMaquinas.destroy();
+        chartMaquinas = new Chart(document.getElementById('graficoMaquinas'), {
             type: 'bar',
             data: {
-                labels: data.operarios,
+                labels: labelsMaquinas,
                 datasets: [{
-                    label: 'Bultos',
-                    data: data.bultos_operarios
+                    label: 'Producción por máquina',
+                    data: datosMaquinas,
+                    maxBarThickness: 40
                 }]
             },
             options: {
@@ -126,63 +135,19 @@ function actualizarFiltros(){
 }
 actualizarFiltros();
 
-// Cargar gráfico de producción y bultos por referencia
-function cargarGraficoReferencias(){
-    fetch("../ajax/getReferenciasPlana.php")
-    .then(res => res.json())
-    .then(data => {
-        if(chartReferencias) chartReferencias.destroy();
-        chartReferencias = new Chart(document.getElementById('graficoReferencias'), {
-            type: 'bar',
-            data: {
-                labels: data.referencias,
-                datasets: [{
-                    label: 'Producción (kg)',
-                    data: data.totales
-                }, {
-                    label: 'Bultos',
-                    data: data.bultos
-                }]
-            },
-            options: {  
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { labels: { color: 'white' } },
-                    tooltip: {
-                        enabled: true,
-                        bodyFont:  { size: 12 },
-                        titleFont: { size: 13 },
-                        padding: 10,
-                        displayColors: false
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
-                    },
-                    y: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
-                    }
-                }
-            }
-        });
-    });
-}
-cargarGraficoReferencias();
-
 // Cargar gráfico de producción mensual por año
 function cargarGraficoMeses(){
     let anio = document.getElementById("filtroAnioMes").value;
 
-    fetch(`../ajax/getProduccionMesesPlana.php?anio=${anio}`)
+    fetch(`../ajax/getProduccionMesesExtrusion.php?anio=${anio}`)
     .then(res => res.json())
     .then(data => {
         if(chartMeses) chartMeses.destroy();
 
-        const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+        const meses = [
+            "Ene","Feb","Mar","Abr","May","Jun",
+            "Jul","Ago","Sep","Oct","Nov","Dic"
+        ];
 
         // Gráfico de barras por mes
         chartMeses = new Chart(document.getElementById('graficoMeses'), {
@@ -190,7 +155,7 @@ function cargarGraficoMeses(){
             data: {
                 labels: data.meses.map(m => meses[m-1]),
                 datasets: [{
-                    label: 'Producción mensual',
+                    label: 'Producción mensual (kg)',
                     data: data.totales
                 }]
             },
@@ -217,7 +182,7 @@ function cargarGraficoMeses(){
     });
 
     // Obtener y mostrar total del año en kg
-    fetch(`../ajax/getTotalAnioPlana.php?anio=${anio}`)
+    fetch(`../ajax/getTotalAnioExtrusion.php?anio=${anio}`)
     .then(res => res.json())
     .then(data => {
         document.getElementById("totalAnio").innerText =

@@ -57,7 +57,7 @@ $sql = "SELECT e.*,
             t.nombre_turno_ext, 
             o.nombre_operador_ext, 
             r.nombre_referencia,
-            c.nombre_color 
+            c.nombre_color,
         $sql_base 
         ORDER BY e.id DESC 
         LIMIT $inicio, $limite";

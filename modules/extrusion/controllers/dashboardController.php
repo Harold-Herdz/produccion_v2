@@ -31,13 +31,12 @@ $total = obtenerTotalHistoricoExtrusion($conexion);
 // Producción de la semana y del mes actual
 $semana = obtenerProduccionSemanaExtrusion($conexion);
 $mes = obtenerProduccionMesExtrusion($conexion);
-// Top operario del mes actual
-$top_operario = obtenerTopMaquinaExtrusion($conexion);
+// Top máquina
+$top_maquina = obtenerTopMaquinaExtrusion($conexion);
 
 // Totales de los meses
 $total_mes1 = obtenerTotalMesExtrusion($conexion,$mes1);
 $total_mes2 = obtenerTotalMesExtrusion($conexion,$mes2);
-
 // Rollos de los meses
 $rollos_mes1 = obtenerRollosMesExtrusion($conexion,$mes1);
 $rollos_mes2 = obtenerRollosMesExtrusion($conexion,$mes2);
@@ -50,7 +49,7 @@ $dias_mes2 = obtenerMejorPeorDiaMesExtrusion($conexion,$mes2);
 $mejor_dia_mes2 = $dias_mes2['mejor'];
 $peor_dia_mes2 = $dias_mes2['peor'];
 
-// Top maquina de los meses
+// Top máquina de los meses
 $top_maquina_mes1 = obtenerTopMaquinaMesExtrusion($conexion,$mes1);
 $top_maquina_mes2 = obtenerTopMaquinaMesExtrusion($conexion,$mes2);
 

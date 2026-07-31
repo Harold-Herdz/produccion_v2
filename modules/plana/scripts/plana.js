@@ -1,8 +1,8 @@
 // Variables globales para instancias de gráficos
 window.chartProduccion  = window.chartProduccion  || null;
 window.chartOperarios   = window.chartOperarios   || null;
-window.chartMeses       = window.chartMeses       || null;
 window.chartReferencias = window.chartReferencias || null;
+window.chartMeses       = window.chartMeses       || null;
 
 // Cargar gráficos de producción y operarios según filtros
 function cargarDatos(tipo){
@@ -182,7 +182,10 @@ function cargarGraficoMeses(){
     .then(data => {
         if(chartMeses) chartMeses.destroy();
 
-        const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+        const meses = [
+            "Ene","Feb","Mar","Abr","May","Jun",
+            "Jul","Ago","Sep","Oct","Nov","Dic"
+        ];
 
         // Gráfico de barras por mes
         chartMeses = new Chart(document.getElementById('graficoMeses'), {

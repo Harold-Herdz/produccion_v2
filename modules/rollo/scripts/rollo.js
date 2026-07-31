@@ -1,6 +1,6 @@
 // Variables globales para instancias de gráficos
 window.chartProduccion = window.chartProduccion || null;
-window.chartOperarios  = window.chartOperarios  || null;
+window.chartMaquinas   = window.chartMaquinas   || null;
 window.chartMeses      = window.chartMeses      || null;
 
 // Cargar gráficos de producción y máquinas según filtros
@@ -35,7 +35,6 @@ function cargarDatos(tipo){
                 },
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
                 scales: {
                     x: {
                         ticks:  { color: 'white' },
@@ -51,17 +50,17 @@ function cargarDatos(tipo){
         });
 
         // Ordenar máquinas de mayor a menor producción
-        let maquinasOrdenadas = data.operarios.map((maq, i) => ({
+        let maquinasOrdenadas = data.maquinas.map((maq, i) => ({
             maquina: maq,
-            total:   data.totales_operarios[i]
+            total:   data.totales_maquinas[i]
         }));
         maquinasOrdenadas.sort((a, b) => b.total - a.total);
         let labelsMaquinas = maquinasOrdenadas.map(m => m.maquina);
         let datosMaquinas  = maquinasOrdenadas.map(m => m.total);
 
         // Gráfico de producción por máquina
-        if(chartOperarios) chartOperarios.destroy();
-        chartOperarios = new Chart(document.getElementById('graficoOperarios'), {
+        if(chartMaquinas) chartMaquinas.destroy();
+        chartMaquinas = new Chart(document.getElementById('graficoMaquinas'), {
             type: 'bar',
             data: {
                 labels: labelsMaquinas,

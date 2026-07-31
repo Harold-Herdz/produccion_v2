@@ -298,12 +298,12 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <!-- Gráficos de producción y operarios -->
         <div class="grid-graficos">
             <div class="card-grafico">
-                <h3>Producción (kg)</h3>
+                <h3>Producción por Peso</h3>
                 <canvas id="graficoProduccion"></canvas>
             </div>
 
             <div class="card-grafico">
-                <h3>Producción por operario (bultos)</h3>
+                <h3>Producción por Operario (bultos)</h3>
                 <canvas id="graficoOperarios"></canvas>
             </div>
         </div>
@@ -314,7 +314,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- Gráfico de producción por referencia -->
     <div class="card-grafico" id="card-referencias">
-        <h3>Producción por referencia</h3>
+        <h3>Producción por Referencia</h3>
         <canvas id="graficoReferencias"></canvas>
     </div>
 
@@ -354,7 +354,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- Tabla de producción por fecha -->
     <div class="tabla-dashboard">
-        <h3>Producción por fecha</h3>
+        <h3>Producción por Fecha</h3>
         <table>
             <tr>
                 <th>Fecha</th>
@@ -397,7 +397,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- Tabla de producción por referencia -->
     <div class="tabla-dashboard">
-        <h3>Producción por referencia</h3>
+        <h3>Producción por Referencia</h3>
         <table>
             <tr>
                 <th>Referencia</th>
@@ -440,7 +440,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- Tabla de producción por máquina -->
     <div class="tabla-dashboard">
-        <h3>Producción por máquina</h3>
+        <h3>Producción por Máquina</h3>
         <table>
             <tr>
                 <th>Máquina</th>

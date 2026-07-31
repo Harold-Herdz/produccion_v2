@@ -257,7 +257,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <!-- Gráficos de producción y operarios -->
         <div class="grid-graficos">
             <div class="card-grafico">
-                <h3>Producción de paquetes</h3>
+                <h3>Producción de Paquetes</h3>
                 <canvas id="graficoProduccion"></canvas>
             </div>
 
@@ -306,7 +306,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <div class="grid-tablas">
         <!-- Tabla de producción por fecha -->
         <div class="tabla-dashboard">
-            <h3>Producción por fecha</h3>
+            <h3>Producción por Fecha</h3>
             <table>
                 <tr>
                     <th>Fecha</th>
@@ -329,10 +329,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </tr>
             </table>
         </div>
-
         <!-- Tabla de producción por operario -->
         <div class="tabla-dashboard">
-            <h3>Producción por operario</h3>
+            <h3>Producción por Operario</h3>
             <table>
                 <tr>
                     <th>Operario</th>

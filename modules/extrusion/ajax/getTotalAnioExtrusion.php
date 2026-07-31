@@ -14,10 +14,10 @@ $filtros = [
 ];
 $anio = $filtros['anio'];
 
-// Total de paquetes producidos en el año
-$sql = "SELECT SUM(total_plana) total
-        FROM PRODUCCION_PLANA
-        WHERE YEAR(fecha_plana) = $anio";
+// Total de producción en el año
+$sql = "SELECT SUM(total_extrusion) total
+        FROM PRODUCCION_EXTRUSION
+        WHERE YEAR(fecha_extrusion) = $anio";
 $res = mysqli_query($conexion, $sql);
 $row = mysqli_fetch_assoc($res);
 

@@ -65,8 +65,6 @@ $res = mysqli_query($conexion,$sql);
 $fechas = [];
 $totales = [];
 $retales = [];
-$operarios = [];
-$totales_operarios = [];
 while($row = mysqli_fetch_assoc($res)){
     $fechas[] = $row['fecha'];
     $totales[] = $row['total'];
@@ -120,9 +118,11 @@ if($tipo === "anio") {
 $res2 = mysqli_query($conexion,$sql_maquinas);
 
 // Recopilar máquinas y sus totales
+$maquinas = [];
+$totales_maquinas = [];
 while($row = mysqli_fetch_assoc($res2)){
-    $operarios[] = $row['nombre_maquina'];
-    $totales_operarios[] = $row['total'];
+    $maquinas[] = $row['nombre_maquina'];
+    $totales_maquinas[] = $row['total'];
 }
 
 // Devolver datos como JSON
@@ -131,6 +131,6 @@ echo json_encode([
     "fechas"=>$fechas,
     "totales"=>$totales,
     "retales"=>$retales,
-    "operarios"=>$operarios,
-    "totales_operarios"=>$totales_operarios
+    "maquinas"=>$maquinas,
+    "totales_maquinas"=>$totales_maquinas
 ]);

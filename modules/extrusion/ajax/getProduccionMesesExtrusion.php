@@ -16,12 +16,12 @@ $anio = $filtros['anio'];
 
 // Producción total agrupada por mes
 $sql = "SELECT 
-            MONTH(fecha_plana) mes, 
-            SUM(total_plana) totales
-        FROM PRODUCCION_PLANA
-        WHERE YEAR(fecha_plana) = $anio
-        GROUP BY MONTH(fecha_plana)
-        ORDER BY MONTH(fecha_plana) ASC";
+            MONTH(fecha_extrusion) mes, 
+            SUM(total_extrusion) total
+        FROM PRODUCCION_EXTRUSION
+        WHERE YEAR(fecha_extrusion) = $anio
+        GROUP BY MONTH(fecha_extrusion)
+        ORDER BY mes";
 $res = mysqli_query($conexion, $sql);
 
 // Recopilar meses y totales
@@ -29,7 +29,7 @@ $meses = [];
 $totales = [];
 while($row = mysqli_fetch_assoc($res)){
     $meses[] = $row['mes'];
-    $totales[] = $row['totales'];
+    $totales[] = $row['total'];
 }
 
 // Devolver datos como JSON
