@@ -42,13 +42,13 @@ function obtenerProduccionMesExtrusion($conexion){
 ================================================= */
 // Máquina con más producción
 function obtenerTopMaquinaExtrusion($conexion){
-    $sql = "SELECT o.nombre_operario, 
+    $sql = "SELECT m.nombre_maquina, 
             IFNULL(SUM(e.total_extrusion),0) total
             FROM PRODUCCION_EXTRUSION e
-            LEFT JOIN OPERARIOS o 
-            ON e.id_operario = o.id_operario
+            LEFT JOIN MAQUINAS m 
+            ON e.id_maquina = m.id_maquina
             WHERE YEAR(e.fecha_extrusion)=YEAR(CURDATE())
-            GROUP BY e.id_operario
+            GROUP BY e.id_maquina
             ORDER BY total DESC
             LIMIT 1";
     $res = mysqli_query($conexion, $sql);

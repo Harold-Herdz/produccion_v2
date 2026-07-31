@@ -13,28 +13,28 @@ $id = $_POST['id'];
 
 // Recopilar datos del formulario
 $datos = [
-    'fecha' => $_POST['fecha_plana'],
+    'fecha' => $_POST['fecha_extrusion'],
 
     'id_maquina' => $_POST['id_maquina'],
 
-    'id_turno' => $_POST['id_turno'],
+    'id_turno_ext' => $_POST['id_turno_ext'],
 
-    'id_operario' => $_POST['id_operario'],
+    'id_operador_ext' => $_POST['id_operador_ext'],
 
     'id_referencia' => $_POST['id_referencia'],
 
-    'peso' => $_POST['peso_plana'],
+    'id_color' => $_POST['id_color'],
 
-    'bultos' => $_POST['bultos_plana'],
+    'lamina_p' => $_POST['lamina_p'],
 
-    'retal' => $_POST['retal_plana'],
+    'rollos_ext' => $_POST['rollos_extrusion'],
     
-    'total' => $_POST['total_plana']
+    'total_ext' => $_POST['total_extrusion']
 ];
 
 // Actualizar registro 
 actualizarProduccion($conexion, $id, $datos);
 
 // Redirigir al Lista
-header("Location: " . BASE_URL . "/modules/rollo/views/lista.php");
+header("Location: " . BASE_URL . "/modules/extrusion/views/lista.php");
 exit;

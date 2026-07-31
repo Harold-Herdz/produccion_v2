@@ -3,24 +3,27 @@
    CONSULTAS
 ================================================= */
 // Obtener registro de producción por ID
-function obtenerRegistroPlanaPorId($conexion, $id){
-    $sql = "SELECT * FROM PRODUCCION_PLANA WHERE id = $id";
+function obtenerRegistroExtrusionPorId($conexion, $id){
+    $sql = "SELECT * FROM PRODUCCION_EXTRUSION WHERE id = $id";
     $res = mysqli_query($conexion, $sql);
     return mysqli_fetch_assoc($res);
 }
 
 // Catálogos para selectores del formulario
-function obtenerMaquinasPlana($conexion){
+function obtenerMaquinasExtrusion($conexion){
     return mysqli_query($conexion, "SELECT * FROM MAQUINAS");
 }
-function obtenerTurnosPlana($conexion){
-    return mysqli_query($conexion, "SELECT * FROM TURNOS");
+function obtenerTurnosExtrusion($conexion){
+    return mysqli_query($conexion, "SELECT * FROM TURNOS_EXTRUSION");
 }
-function obtenerOperariosPlana($conexion){
-    return mysqli_query($conexion, "SELECT * FROM OPERARIOS");
+function obtenerOperadoresExtrusion($conexion){
+    return mysqli_query($conexion, "SELECT * FROM OPERADORES_EXTRUSION");
 }
-function obtenerReferenciasPlana($conexion){
+function obtenerReferenciasExtrusion($conexion){
     return mysqli_query($conexion, "SELECT * FROM REFERENCIAS");
+}
+function obtenerColoresExtrusion($conexion){
+    return mysqli_query($conexion, "SELECT * FROM COLORES");
 }
 
 /* =================================================
@@ -28,16 +31,16 @@ function obtenerReferenciasPlana($conexion){
 ================================================= */
 // Actualizar registro de producción por ID
 function actualizarProduccion($conexion, $id, $datos){
-    $sql = "UPDATE PRODUCCION_PLANA SET
-            fecha_plana = '{$datos['fecha']}',
+    $sql = "UPDATE PRODUCCION_EXTRUSION SET
+            fecha_extrusion = '{$datos['fecha']}',
             id_maquina = '{$datos['id_maquina']}',
-            id_turno = '{$datos['id_turno']}',
-            id_operario = '{$datos['id_operario']}',
+            id_turno_ext = '{$datos['id_turno_ext']}',
+            id_operador_ext = '{$datos['id_operador_ext']}',
             id_referencia = '{$datos['id_referencia']}',
-            peso_plana = '{$datos['peso']}',
-            bultos_plana = '{$datos['bultos']}',
-            retal_plana = '{$datos['retal']}',
-            total_plana = '{$datos['total']}'
+            id_color = '{$datos['id_color']}',
+            lamina_p = '{$datos['lamina_p']}',
+            rollos_extrusion = '{$datos['rollos_ext']}',
+            total_extrusion = '{$datos['total_ext']}'
             WHERE id = $id";
     mysqli_query($conexion, $sql);
 }
@@ -47,7 +50,7 @@ function actualizarProduccion($conexion, $id, $datos){
 ================================================= */
 // Eliminar registro de producción por ID
 function eliminarProduccion($conexion, $id){
-    $sql = "DELETE FROM PRODUCCION_PLANA 
+    $sql = "DELETE FROM PRODUCCION_EXTRUSION 
             WHERE id = $id";
     mysqli_query($conexion, $sql);
 }

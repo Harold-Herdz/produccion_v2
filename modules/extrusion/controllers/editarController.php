@@ -8,13 +8,15 @@ require_once dirname(__DIR__) . '/models/produccionModel.php';
 
 // Obtener ID del registro a editar
 $id = $_GET['id'];
-$fila = obtenerRegistroPlanaPorId($conexion, $id);
+$fila = obtenerRegistroExtrusionPorId($conexion, $id);
 
 // Cargar catálogos para los selectores del formulario
-$maquinas = obtenerMaquinasPlana($conexion);
+$maquinas = obtenerMaquinasExtrusion($conexion);
 
-$turnos = obtenerTurnosPlana($conexion);
+$turnos_ext = obtenerTurnosExtrusion($conexion);
 
-$operarios = obtenerOperariosPlana($conexion);
+$operadores_ext = obtenerOperadoresExtrusion($conexion);
 
-$referencias = obtenerReferenciasPlana($conexion);
+$referencias = obtenerReferenciasExtrusion($conexion);
+
+$colores = obtenerColoresExtrusion($conexion);

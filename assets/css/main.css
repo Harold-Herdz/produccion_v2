@@ -441,7 +441,7 @@ body {
   padding: 6px 8px;
   border-radius: 5px;
   border: 1px solid var(--negro);
-  background: transparent;
+  background: var(--negro);
   backdrop-filter: blur(5px);
   transition: 0.25s;
   cursor: pointer;
@@ -453,13 +453,14 @@ body {
   box-shadow: 6px 12px 20px rgba(1, 90, 90, 0.8);
 }
 select {
+  background: rgb(1, 140, 200);
+  color: white;
   border-radius: 20px;
   font-family: var(--fuente);
   font-size: 12px;
 }
-select:hover {
-  background: var(--negro);
-  color: white;
+select option {
+  background: rgb(1, 140, 200);
 }
 #btnAnio {
   width: 100px;
@@ -573,14 +574,18 @@ canvas {
 .filtro-fechas input {
   padding: 6px 8px;
   border: 2px solid var(--cyan);
-  color: var(--cyan);
   background: var(--teal);
+  color: var(--cyan);
   width: 100%;
   padding: 12px 14px;
   margin-top: 5px;
   border-radius: 10px;
   transition: 0.25s;
   font-size: 14px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5) sepia(1) saturate(500%) hue-rotate(150deg);
+  cursor: pointer;
 }
 .filtro-fechas input:hover {
   transform: translatey(-1.5px);
@@ -636,6 +641,10 @@ canvas {
   width: 100%;
   min-width: 900px;
   border-collapse: collapse;
+}
+input::placeholder {
+  color: white;
+  opacity: 0.6;
 }
 
 /* ===========================

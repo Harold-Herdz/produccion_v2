@@ -300,7 +300,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <!-- Gráficos de producción y maquina -->
         <div class="grid-graficos">
             <div class="card-grafico">
-                <h3>Producción por rollo</h3>
+                <h3>Producción por peso</h3>
                 <canvas id="graficoProduccion"></canvas>
             </div>
 

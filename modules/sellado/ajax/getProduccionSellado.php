@@ -109,7 +109,7 @@ if($tipo == "semana"){
              LEFT JOIN OPERARIOS o ON s.id_operario=o.id_operario
              WHERE MONTH(s.fecha_sellado) = $mes
              AND YEAR(s.fecha_sellado) = YEAR(CURDATE())
-             GROUP BY p.id_operario";
+             GROUP BY s.id_operario";
 }
 $res2 = mysqli_query($conexion,$sql2);
 

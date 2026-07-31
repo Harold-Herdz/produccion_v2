@@ -59,17 +59,11 @@ $desde = $_GET['desde'] ?? date('Y-m-01');
 $hasta = $_GET['hasta'] ?? date('Y-m-d');
 // Tablas de producción por fecha, referencias y máquina
 $res_tabla_fecha = obtenerTablaFechasExtrusion($conexion, $desde, $hasta);
-$res_tabla_referencias = obtenerTablaReferenciasExtrusion($conexion, $desde, $hasta);
 $res_tabla_maquina = obtenerTablaMaquinasExtrusion($conexion, $desde, $hasta);
 
 // Diferencia y porcentaje de variación entre meses
 $diferencia = ($total_mes2 ?? 0) - ($total_mes1 ?? 0);
 $porcentaje = ($total_mes1 > 0) ? (($diferencia / $total_mes1) * 100) : 0;
 
-// Calculo de eficiencia de los meses
-$eficiencia_mes1 = ($bruto_mes1 !== null && $bruto_mes1 > 0) ? (($neto_mes1 / $bruto_mes1) * 100) : null;
-$eficiencia_mes2 = ($bruto_mes2 !== null && $bruto_mes2 > 0) ? (($neto_mes2 / $bruto_mes2) * 100) : null;
-
-
 // Última fecha de importación
-$ultimo_id_sheet = obtenerUltimaImportacionPlana($conexion);
+$ultimo_id_sheet = obtenerUltimaImportacionExtrusion($conexion);
