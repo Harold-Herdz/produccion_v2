@@ -3,14 +3,17 @@
 
 // Importar conexion.php
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
-// Importar produccionModel.php
-require_once dirname(__DIR__) . '/models/produccionModel.php';
 
-// Obtener ID del registro a editar
-$id = $_GET['id'];
+// Importar historialModel.php
+require_once dirname(__DIR__) . '/models/historialModel.php';
+
+// Obtener ID del registro
+$id = $_GET['id'] ?? 0;
+
+// Obtener registro
 $fila = obtenerRegistroExtrusionPorId($conexion, $id);
 
-// Cargar catálogos para los selectores del formulario
+// Cargar catálogos
 $maquinas = obtenerMaquinasExtrusion($conexion);
 
 $turnos_ext = obtenerTurnosExtrusion($conexion);

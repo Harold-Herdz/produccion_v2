@@ -57,7 +57,7 @@ require_once __DIR__ . '/includes/config.php';
                     : BASE_URL . '/modules/plana/views/lista.php';
             ?>" class="area-card">
                 <h2>Máquina Plana</h2>
-                <p>Control producción <br>máquina plana</p>
+                <p>Control producción <br>de máquina plana</p>
             </a>
 
             <!-- Módulo Extrusión -->
@@ -67,7 +67,7 @@ require_once __DIR__ . '/includes/config.php';
                     : BASE_URL . '/modules/extrusion/views/lista.php';
             ?>" class="area-card">
                 <h2>Extrusión</h2>
-                <p>Control producción <br>extrusoras</p>
+                <p>Control producción <br>de extrusoras</p>
             </a>
 
         </div>

@@ -10,7 +10,7 @@ require_once dirname(__DIR__, 3) . '/auth/proteger.php';
 // Importar config.php
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 // Importar listaController.php
-include dirname(__DIR__) . '/controllers/listaController.php';
+include dirname(__DIR__) . '/controllers/historialController.php';
 // Importar header.php
 include dirname(__DIR__, 3) . '/templates/header.php';
 ?>

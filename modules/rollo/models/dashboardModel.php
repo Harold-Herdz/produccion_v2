@@ -38,9 +38,9 @@ function obtenerProduccionMesRollo($conexion){
 }
 
 /* =================================================
-   TOP MÁQUINA (MES ACTUAL)
+   TOP MÁQUINA
 ================================================= */
-// Máquina con más producción en el mes actual
+// Máquina con más producción
 function obtenerTopMaquinaRollo($conexion){
     $sql = "SELECT m.nombre_maquina,
             IFNULL(SUM(r.total_rollo),0) total

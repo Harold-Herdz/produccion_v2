@@ -11,8 +11,6 @@
 /** @var array $top_maquina */
 /** @var float $total_mes1 */
 /** @var float $total_mes2 */
-/** @var int $rollos_mes1 */
-/** @var int $rollos_mes2 */
 /** @var array $mejor_dia_mes1 */
 /** @var array $peor_dia_mes1 */
 /** @var array $mejor_dia_mes2 */
@@ -105,7 +103,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <p>
                 🧻 Rollos: <?php 
                 echo $rollos_mes1 !== null 
-                    ? round($rollos_mes1,1).'rollos' 
+                    ? number_format($rollos_mes1).' rollos' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -125,7 +123,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </p>
             <p>
                 🔧 Mejor máquina: <?php 
-                echo $top_maquina_mes1['nombre'] ?? 'Sin datos'; ?> 
+                echo $top_maquina_mes1['nombre_maquina'] ?? 'Sin datos'; ?> 
                 <?php if(!empty($top_maquina_mes1['total'])){ ?>
                     (<?php echo number_format($top_maquina_mes1['total']); ?> kg)
                 <?php } ?>
@@ -180,7 +178,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <p>
                 🧻 Rollos: <?php 
                 echo $rollos_mes2 !== null 
-                    ? round($rollos_mes2,1).'rollos' 
+                    ? number_format($rollos_mes2).' rollos' 
                     : 'Sin datos'; 
                 ?>
             </p>
@@ -200,7 +198,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </p>
             <p>
                 🔧 Mejor máquina: <?php 
-                echo $top_maquina_mes2['nombre'] ?? 'Sin datos'; ?> 
+                echo $top_maquina_mes2['nombre_maquina'] ?? 'Sin datos'; ?> 
                 <?php if(!empty($top_maquina_mes2['total'])){ ?>
                     (<?php echo number_format($top_maquina_mes2['total']); ?> kg)
                 <?php } ?>
@@ -297,66 +295,67 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <button class="btn" type="submit">Filtrar</button>
     </form>
 
-    <!-- Tabla de producción por fecha -->
-    <div class="tabla-dashboard">
-        <h3>Producción por Fecha</h3>
-        <table>
-            <tr>
-                <th>Fecha</th>
-                <th>Rollos</th>
-                <th>Total (kg)</th>
-            </tr>
-            <?php
-            $total_rollos = 0;
-            $total_peso = 0;
-            while($row = mysqli_fetch_assoc($res_tabla_fecha)){
-                $total_rollos += $row['rollos'];
-                $total_peso += $row['total'];
-            ?>
-            <tr>
-                <td><?php echo date("d M Y", strtotime($row['fecha'])); ?></td>
-                <td><?php echo number_format($row['rollos']); ?></td>
-                <td><?php echo number_format($row['total'],2); ?></td>
-            </tr>
-            <?php } ?>
-            <!-- Fila de total -->
-            <tr class="fila-total">
-                <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_rollos,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_peso,2); ?></strong></td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Tabla de producción por máquina -->
-    <div class="tabla-dashboard">
-        <h3>Producción por Máquina</h3>
-        <table>
-            <tr>
-                <th>Máquina</th>
-                <th>Rollos</th>
-                <th>Total (kg)</th>
-            </tr>
-            <?php
-            $total_rollos = 0;
-            $total_peso = 0;
-            while($row = mysqli_fetch_assoc($res_tabla_maquina)){
-                $total_rollos += $row['rollos'];
-                $total_peso += $row['total'];
-            ?>
-            <tr>
-                <td><?php echo $row['nombre_maquina']; ?></td>
-                <td><?php echo number_format($row['rollos']); ?></td>
-                <td><?php echo number_format($row['total'],2); ?></td>
-            </tr>
-            <?php } ?>
-            <!-- Fila de total -->
-            <tr class="fila-total">
-                <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_rollos,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_peso,2); ?></strong></td>
-            </tr>
-        </table>
+    <div class="grid-tablas">
+        <!-- Tabla de producción por fecha -->
+        <div class="tabla-dashboard">
+            <h3>Producción por Fecha</h3>
+            <table>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Rollos</th>
+                    <th>Total (kg)</th>
+                </tr>
+                <?php
+                $total_rollos = 0;
+                $total_peso = 0;
+                while($row = mysqli_fetch_assoc($res_tabla_fecha)){
+                    $total_rollos += $row['rollos'];
+                    $total_peso += $row['total'];
+                ?>
+                <tr>
+                    <td><?php echo date("d M Y", strtotime($row['fecha'])); ?></td>
+                    <td><?php echo number_format($row['rollos']); ?></td>
+                    <td><?php echo number_format($row['total'],2); ?></td>
+                </tr>
+                <?php } ?>
+                <!-- Fila de total -->
+                <tr class="fila-total">
+                    <td><strong>TOTAL</strong></td>
+                    <td><strong><?php echo number_format($total_rollos,2); ?></strong></td>
+                    <td><strong><?php echo number_format($total_peso,2); ?></strong></td>
+                </tr>
+            </table>
+        </div>
+        <!-- Tabla de producción por máquina -->
+        <div class="tabla-dashboard">
+            <h3>Producción por Máquina</h3>
+            <table>
+                <tr>
+                    <th>Máquina</th>
+                    <th>Rollos</th>
+                    <th>Total (kg)</th>
+                </tr>
+                <?php
+                $total_rollos = 0;
+                $total_peso = 0;
+                while($row = mysqli_fetch_assoc($res_tabla_maquina)){
+                    $total_rollos += $row['rollos'];
+                    $total_peso += $row['total'];
+                ?>
+                <tr>
+                    <td><?php echo $row['nombre_maquina']; ?></td>
+                    <td><?php echo number_format($row['rollos']); ?></td>
+                    <td><?php echo number_format($row['total'],2); ?></td>
+                </tr>
+                <?php } ?>
+                <!-- Fila de total -->
+                <tr class="fila-total">
+                    <td><strong>TOTAL</strong></td>
+                    <td><strong><?php echo number_format($total_rollos,2); ?></strong></td>
+                    <td><strong><?php echo number_format($total_peso,2); ?></strong></td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     <br><br><br>
@@ -394,7 +393,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
-<script src="<?= BASE_URL ?>/modules/extrusion/scripts/extrusion.js"></script>
+<script src="<?= BASE_URL ?>/modules/extrusion/scripts/dashboard.js"></script>
 
 <?php 
 // Importar footer.php

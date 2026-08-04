@@ -82,7 +82,14 @@ function obtenerRollosMesExtrusion($conexion,$mes){
             FROM PRODUCCION_EXTRUSION
             WHERE MONTH(fecha_extrusion) = $mes
             AND YEAR(fecha_extrusion)=YEAR(CURDATE())";
-    return obtenerTotalExtrusion($conexion, $sql);
+    $res = mysqli_query($conexion, $sql);
+    if($res){
+        $row = mysqli_fetch_assoc($res);
+        return [
+            'rollos' => $row['rollos'] ?? null,
+        ];
+    }
+    return ['rollos' => null];
 }
 
 /* =================================================
@@ -122,7 +129,7 @@ function obtenerTopMaquinaMesExtrusion($conexion,$mes){
     $sql = "SELECT m.nombre_maquina, 
             IFNULL(SUM(e.total_extrusion),0) total
             FROM PRODUCCION_EXTRUSION e
-            LEFT JOIN MAQUINA m 
+            LEFT JOIN MAQUINAS m 
             ON e.id_maquina = m.id_maquina
             WHERE MONTH(e.fecha_extrusion) = $mes
             AND YEAR(e.fecha_extrusion)=YEAR(CURDATE())
@@ -145,19 +152,22 @@ function obtenerTopMaquinaMesExtrusion($conexion,$mes){
 // Producción agrupada por fecha en un rango
 function obtenerTablaFechasExtrusion($conexion,$desde,$hasta){
     $sql = "SELECT 
-            DATE(fecha_extrusion) fecha, SUM(total_extrusion) total
-            FROM PRODUCCION_EXTRUSION
-            WHERE DATE(fecha_extrusion) BETWEEN '$desde' AND '$hasta'
-            GROUP BY DATE(fecha_extrusion)
+            DATE(fecha_extrusion) fecha, SUM(rollos_extrusion) rollos, SUM(total_extrusion) total
+            FROM PRODUCCION_EXTRUSION e
+            WHERE DATE(e.fecha_extrusion)
+            BETWEEN '$desde' AND '$hasta'
+            GROUP BY DATE(e.fecha_extrusion)
             ORDER BY fecha DESC";
     return mysqli_query($conexion, $sql);
 }
 // Producción agrupada por máquina en un rango
 function obtenerTablaMaquinasExtrusion($conexion,$desde,$hasta){
-    $sql = "SELECT m.nombre_maquina, SUM(e.total_extrusion) total
+    $sql = "SELECT m.nombre_maquina, SUM(rollos_extrusion) rollos, SUM(e.total_extrusion) total
             FROM PRODUCCION_EXTRUSION e
-            LEFT JOIN MAQUINAS m ON e.id_maquina = m.id_maquina
-            WHERE DATE(e.fecha_extrusion) BETWEEN '$desde' AND '$hasta'
+            LEFT JOIN MAQUINAS m
+            ON e.id_maquina = m.id_maquina
+            WHERE DATE(e.fecha_extrusion)
+            BETWEEN '$desde' AND '$hasta'
             GROUP BY m.id_maquina, m.nombre_maquina
             ORDER BY total DESC";
     return mysqli_query($conexion, $sql);

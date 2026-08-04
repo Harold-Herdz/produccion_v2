@@ -24,7 +24,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <div class="card">
 
             <!-- Formulario de edición -->
-            <form action="<?= BASE_URL ?>/modules/extrusion/controllers/actualizarController.php" method="POST">
+            <form action="<?= BASE_URL ?>/modules/extrusion/controllers/editarController.php" method="POST">
             <!-- ID del registro a actualizar -->
             <input type="hidden" name="id" value="<?php echo $fila['id']; ?>">
 
@@ -126,7 +126,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- Botones de navegación -->
     <div class="acciones">
-        <a class="btn" href="lista.php">Volver al Historial</a>
+        <a class="btn" href="historial.php">Volver al Historial</a>
         <a class="btn" href="dashboard.php">Volver al Dashboard</a>
     </div>
 </div>

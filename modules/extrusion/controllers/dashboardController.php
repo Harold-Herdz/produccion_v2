@@ -38,8 +38,10 @@ $top_maquina = obtenerTopMaquinaExtrusion($conexion);
 $total_mes1 = obtenerTotalMesExtrusion($conexion,$mes1);
 $total_mes2 = obtenerTotalMesExtrusion($conexion,$mes2);
 // Rollos de los meses
-$rollos_mes1 = obtenerRollosMesExtrusion($conexion,$mes1);
-$rollos_mes2 = obtenerRollosMesExtrusion($conexion,$mes2);
+$resumen_mes1 = obtenerRollosMesExtrusion($conexion,$mes1);
+$rollos_mes1 = $resumen_mes1['rollos'];
+$resumen_mes2 = obtenerRollosMesExtrusion($conexion,$mes2);
+$rollos_mes2 = $resumen_mes2['rollos'];
 
 // Mejor y peor día de los meses
 $dias_mes1 = obtenerMejorPeorDiaMesExtrusion($conexion,$mes1);
