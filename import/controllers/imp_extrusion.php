@@ -6,8 +6,8 @@ require_once dirname(__DIR__, 2) . '/includes/conexion.php';
 mysqli_set_charset($conexion, "utf8mb4");
 // Importar config.php
 require_once dirname(__DIR__, 2) . '/includes/config.php';
-// Importar importarModel.php
-require_once dirname(__DIR__) . '/importarModel.php';
+// Importar importModel.php
+require_once dirname(__DIR__) . '/importModel.php';
 
 // Parametros de importación
 $modo         = $_GET['modo'] ?? 'nuevos';
@@ -23,8 +23,8 @@ $volver_url = BASE_URL . "/modules/extrusion/views/dashboard.php";
 [$filas, $omitidas] = leerSheet($url, $modo, $ultimo_id_sheet);
 $total = count($filas);
 
-// Importar progreso.php
-include dirname(__DIR__) . '/views/progreso.php';
+// Importar import.php
+include dirname(__DIR__) . '/views/import.php';
 ?>
 
 <?php

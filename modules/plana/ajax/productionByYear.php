@@ -3,8 +3,8 @@
 
 // Restringir acceso solo a administradores
 $soloAdmin = true;
-// Importar proteger.php
-require_once dirname(__DIR__, 3) . '/auth/proteger.php';
+// Importar authMiddleware.php
+require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 // Importar conexion.php
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 

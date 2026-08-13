@@ -3,8 +3,8 @@
 
 // Restringir acceso solo a administradores
 $soloAdmin = true;
-// Importar proteger.php
-require_once dirname(__DIR__, 2) . '/auth/proteger.php';
+// Importar authMiddleware.php
+require_once dirname(__DIR__, 2) . '/auth/authMiddleware.php';
 // Importar config.php
 require_once dirname(__DIR__, 2) . '/includes/config.php';
 ?>
@@ -18,7 +18,7 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 <title>Importando <?php echo $titulo; ?></title>
     <!-- Fuente y estilos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/importar.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/import.css">
 
 </head>
 <body>

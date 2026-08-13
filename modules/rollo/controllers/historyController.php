@@ -3,6 +3,10 @@
 
 // Importar conexion.php
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
+// Importar config.php
+require_once dirname(__DIR__, 3) . '/includes/config.php';
+// Importar produccionModel.php
+require_once dirname(__DIR__) . '/models/historyModel.php';
 
 // Obtener y sanear filtros
 $busqueda = $_GET['buscar'] ?? '';
@@ -61,3 +65,44 @@ $sql = "SELECT r.*,
         LIMIT $inicio, $limite";
 
 $resultado = mysqli_query($conexion, $sql);
+
+if($_SERVER['REQUEST_METHOD']=="POST"){
+    // Obtener ID del registro a actualizar
+    $id = $_POST['id'];
+
+    // Recopilar datos del formulario
+    $datos = [
+        'fecha' => $_POST['fecha_rollo'],
+
+        'id_maquina' => $_POST['id_maquina'],
+
+        'id_referencia' => $_POST['id_referencia'],
+
+        'id_color' => $_POST['id_color'],
+
+        'peso_rollo' => $_POST['peso_rollo'],
+
+        'retal_rollo' => $_POST['retal_rollo'],
+
+        'total_rollo' => $_POST['total_rollo']
+    ];
+
+    // Actualizar registro
+    actualizarProduccion($conexion, $id, $datos);
+
+    // Redirigir al Historial
+    header("Location: " . BASE_URL . "/modules/rollo/views/history.php");
+    exit;
+}
+
+if(isset($_GET['id'])){
+    // Obtener ID del registro a eliminar
+    $id = intval($_GET['id'] ?? 0);
+
+    // Eliminar registro
+    eliminarProduccion($conexion, $id);
+
+    // Redirigir al Historial
+    header("Location: " . BASE_URL . "/modules/rollo/views/history.php");
+    exit;
+}

@@ -3,8 +3,8 @@
 
 // Restringir acceso solo a administradores
 $soloAdmin = true;
-// Importar proteger.php
-require_once dirname(__DIR__) . '/proteger.php';
+// Importar authMiddleware.php
+require_once dirname(__DIR__) . '/authMiddleware.php';
 // Importar conexion.php
 require_once dirname(__DIR__, 2) . '/includes/conexion.php';
 // Importar config.php
@@ -42,6 +42,6 @@ $sql = "INSERT INTO USUARIOS
 
 mysqli_query($conexion, $sql);
 
-// Redirigir al Usuarios
-header("Location: " . BASE_URL . "/auth/views/usuarios.php");
+// Redirigir al Users
+header("Location: " . BASE_URL . "/auth/views/users.php");
 exit;

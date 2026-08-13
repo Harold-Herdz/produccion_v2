@@ -23,7 +23,7 @@ body {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background: linear-gradient(var(--fondo)), url("../img/fondo1.jpg");
+  background: linear-gradient(var(--fondo)), url("../images/fondo1.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   overflow: hidden;

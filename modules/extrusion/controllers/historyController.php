@@ -5,8 +5,8 @@
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 // Importar config.php
 require_once dirname(__DIR__, 3) . '/includes/config.php';
-// Importar historialModel.php
-require_once dirname(__DIR__) . '/models/historialModel.php';
+// Importar historyModel.php
+require_once dirname(__DIR__) . '/models/historyModel.php';
 
 // ======================================================
 // LISTAR PRODUCCIÓN
@@ -95,7 +95,7 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
         'total_ext' => $_POST['total_extrusion']
     ];
     actualizarProduccion($conexion,$id,$datos);
-    header("Location: ".BASE_URL."/modules/extrusion/views/historial.php");
+    header("Location: ".BASE_URL."/modules/extrusion/views/history.php");
     exit;
 }
 
@@ -105,6 +105,6 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
 if(isset($_GET['eliminar'])){
     $id = intval($_GET['eliminar']);
     eliminarProduccion($conexion,$id);
-    header("Location: ".BASE_URL."/modules/extrusion/views/historial.php");
+    header("Location: ".BASE_URL."/modules/extrusion/views/history.php");
     exit;
 }

@@ -8,7 +8,7 @@ function cargarDatos(tipo){
     let mes    = document.getElementById("filtroMes").value;
     let semana = document.getElementById("filtroSemana").value;
 
-    fetch("../ajax/getProduccionExtrusion.php?tipo=" + tipo + "&mes=" + mes + "&semana=" + semana)
+    fetch("../ajax/productionByPeriod.php?tipo=" + tipo + "&mes=" + mes + "&semana=" + semana)
     .then(res => res.json())
     .then(data => {
 
@@ -139,7 +139,7 @@ actualizarFiltros();
 function cargarGraficoMeses(){
     let anio = document.getElementById("filtroAnioMes").value;
 
-    fetch(`../ajax/getProduccionMesesExtrusion.php?anio=${anio}`)
+    fetch(`../ajax/productionByMonth.php?anio=${anio}`)
     .then(res => res.json())
     .then(data => {
         if(chartMeses) chartMeses.destroy();
@@ -182,7 +182,7 @@ function cargarGraficoMeses(){
     });
 
     // Obtener y mostrar total del año en kg
-    fetch(`../ajax/getTotalAnioExtrusion.php?anio=${anio}`)
+    fetch(`../ajax/productionByYear.php?anio=${anio}`)
     .then(res => res.json())
     .then(data => {
         document.getElementById("totalAnio").innerText =

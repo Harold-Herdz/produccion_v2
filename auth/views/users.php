@@ -3,8 +3,8 @@
 
 // Restringir acceso solo a administradores
 $soloAdmin = true;
-// Importar proteger.php
-require_once dirname(__DIR__) . '/proteger.php';
+// Importar authMiddleware.php
+require_once dirname(__DIR__) . '/authMiddleware.php';
 // Importar conexion.php
 require_once dirname(__DIR__, 2) . '/includes/conexion.php';
 // Importar config.php
@@ -22,8 +22,8 @@ $res = mysqli_query($conexion, $sql);
 <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Usuarios</title>
     <!-- Ícono y estilos -->
-    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/img/logo-plastypetco.png">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/usuarios.css">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/images/logo.png">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/users.css">
 
 </head>
 <body>
@@ -101,7 +101,7 @@ $res = mysqli_query($conexion, $sql);
         <h2 class="titulo-modal">Crear Usuario</h2>
 
         <!-- Formulario de creación -->
-        <form action="<?= BASE_URL ?>/auth/controllers/guardarUsuario.php" method="POST">
+        <form action="<?= BASE_URL ?>/auth/controllers/saveUsers.php" method="POST">
             <!-- Campo usuario -->
             <label>Usuario</label>
             <input type="text" name="usuario" required>
@@ -139,7 +139,7 @@ $res = mysqli_query($conexion, $sql);
         <h2 class="titulo-modal">Editar Usuario</h2>
 
         <!-- Formulario de edición -->
-        <form action="<?= BASE_URL ?>/auth/controllers/actualizarUsuario.php" method="POST">
+        <form action="<?= BASE_URL ?>/auth/controllers/updateUsers.php" method="POST">
             <!-- ID del usuario a actualizar -->    
             <input type="hidden" id="edit_id" name="id_usuario">
 

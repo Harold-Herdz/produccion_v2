@@ -3,8 +3,8 @@
 
 // Restringir acceso solo a administradores
 $soloAdmin = true;
-// Importar proteger.php
-require_once dirname(__DIR__) . '/proteger.php';
+// Importar authMiddleware.php
+require_once dirname(__DIR__) . '/authMiddleware.php';
 // Importar conexion.php
 require_once dirname(__DIR__, 2) . '/includes/conexion.php';
 // Importar config.php
@@ -33,7 +33,7 @@ $usuario = mysqli_fetch_assoc($res);
     <h2 class="titulo-vista">Editar Usuario</h2>
 
     <!-- Formulario de edición -->
-    <form action="<?= BASE_URL ?>/auth/controllers/actualizarUsuario.php" method="POST">
+    <form action="<?= BASE_URL ?>/auth/controllers/updateUsers.php" method="POST">
         <!-- ID del usuario a actualizar -->    
         <input type="hidden" name="id_usuario"
             value="<?= $usuario['id_usuario'] ?>">
@@ -82,7 +82,7 @@ $usuario = mysqli_fetch_assoc($res);
                 Guardar Cambios
             </button>
 
-            <a class="btn" href="<?= BASE_URL ?>/auth/views/usuarios.php">
+            <a class="btn" href="<?= BASE_URL ?>/auth/views/users.php">
                 Cancelar
             </a>
         </div>

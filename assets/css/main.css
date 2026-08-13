@@ -24,7 +24,7 @@
 ============================================= */
 body {
   font-family: var(--fuente);
-  background: linear-gradient(var(--fondo)), url("../img/fondo2.png");
+  background: linear-gradient(var(--fondo)), url("../images/fondo2.png");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

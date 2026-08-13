@@ -8,7 +8,7 @@ function cargarDatos(tipo){
     let mes    = document.getElementById("filtroMes").value;
     let semana = document.getElementById("filtroSemana").value;
 
-    fetch("../ajax/getProduccionSellado.php?tipo=" + tipo + "&mes=" + mes + "&semana=" + semana)
+    fetch("../ajax/productionByPeriod.php?tipo=" + tipo + "&mes=" + mes + "&semana=" + semana)
     .then(res => res.json())
     .then(data => {
 
@@ -138,7 +138,7 @@ actualizarFiltros();
 function cargarGraficoMeses(){
     let anio = document.getElementById("filtroAnioMes").value;
 
-    fetch(`../ajax/getProduccionMesesSellado.php?anio=${anio}`)
+    fetch(`../ajax/productionByMonth.php?anio=${anio}`)
     .then(res => res.json())
     .then(data => {
 
@@ -150,7 +150,7 @@ function cargarGraficoMeses(){
         ];
 
         // Obtener y mostrar total del año
-        fetch(`../ajax/getTotalAnioSellado.php?anio=${anio}`)
+        fetch(`../ajax/productionByYear.php?anio=${anio}`)
         .then(res => res.json())
         .then(data => {
             document.getElementById("totalAnio").innerText =

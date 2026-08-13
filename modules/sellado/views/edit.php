@@ -6,12 +6,12 @@
 /** @var mysqli_result $colores */
 /** @var mysqli_result $turnos */
 
-// Importar proteger.php
-require_once dirname(__DIR__, 3) . '/auth/proteger.php';
+// Importar authMiddleware.php
+require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 // Importar config.php
 require_once dirname(__DIR__, 3) . '/includes/config.php';
-// Importar editarController.php
-require_once dirname(__DIR__) . '/controllers/editarController.php';
+// Importar editController.php
+require_once dirname(__DIR__) . '/controllers/editController.php';
 // Importar header.php
 include dirname(__DIR__, 3) . '/templates/header.php';
 ?>
@@ -25,7 +25,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <div class="card">
 
             <!-- Formulario de edición -->
-            <form action="<?= BASE_URL ?>/modules/sellado/controllers/actualizarController.php" method="POST">
+            <form action="<?= BASE_URL ?>/modules/sellado/controllers/historyController.php" method="POST">
             <!-- ID del registro a actualizar -->
             <input type="hidden" name="id" value="<?php echo $fila['id_sheet']; ?>">
 
@@ -186,7 +186,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     
     <!-- Botones de navegación -->
     <div class="acciones">
-        <a class="btn" href="lista.php">Volver al Historial</a>
+        <a class="btn" href="history.php">Volver al Historial</a>
         <a class="btn" href="dashboard.php">Volver al Dashboard</a>
     </div>
 </div>

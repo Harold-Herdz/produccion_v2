@@ -27,8 +27,8 @@
 
 // Restringir acceso solo a administradores
 $soloAdmin = true;
-// Importar proteger.php
-require_once dirname(__DIR__, 3) . '/auth/proteger.php';
+// Importar authMiddleware.php
+require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 // Importar config.php
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 // Importar dashboardController.php
@@ -362,8 +362,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- Botones de navegación -->
     <div class="acciones">
-        <!-- Redirigir al Lista -->
-        <a class="btn" href="lista.php">Ver Historial</a>
+        <!-- Redirigir al Historial -->
+        <a class="btn" href="history.php">Ver Historial</a>
         <!-- Redirigir al Index -->
         <a class="btn" href="<?= BASE_URL ?>/index.php">Volver al Menú</a>
     </div>

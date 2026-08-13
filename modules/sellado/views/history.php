@@ -5,12 +5,12 @@
 /** @var string $busqueda */
 /** @var string $fecha */
 
-// Importar proteger.php
-require_once dirname(__DIR__, 3) . '/auth/proteger.php';
+// Importar authMiddleware.php
+require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 // Importar config.php
 require_once dirname(__DIR__, 3) . '/includes/config.php';
-// Importar listaController.php
-include dirname(__DIR__) . '/controllers/listaController.php';
+// Importar historyController.php
+include dirname(__DIR__) . '/controllers/historyController.php';
 // Importar header.php
 include dirname(__DIR__, 3) . '/templates/header.php';
 ?>
@@ -38,7 +38,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <!-- Botón para filtrar -->
                 <button type="submit" class="btn" id="btnFiltrar">Filtrar</button>
                 <!-- Botón para limpiar el filtro -->
-                <a class="btn" href="lista.php">Limpiar</a>
+                <a class="btn" href="history.php">Limpiar</a>
             </form>
 
             <br>
@@ -80,12 +80,12 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <!-- Botones de editar o eliminar registros -->
                             <td>
                                 <a class="btn"
-                                href="editar.php?id=<?php echo $fila['id']; ?>">
+                                href="edit.php?id=<?php echo $fila['id']; ?>">
                                     Editar
                                 </a>
                                 <?php if($_SESSION['rol'] == 'admin'){ ?>
                                     <a class="btn btn-eliminar"
-                                    href="../controllers/eliminarController.php?id=<?php echo $fila['id']; ?>"
+                                    href="../controllers/historyController.php?id=<?php echo $fila['id']; ?>"
                                     onclick="return confirm('¿Deseas eliminar este registro?');">
                                         Eliminar
                                     </a>

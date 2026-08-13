@@ -4,8 +4,8 @@
 // Importar conexion.php
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 
-// Importar historialModel.php
-require_once dirname(__DIR__) . '/models/historialModel.php';
+// Importar historyModel.php
+require_once dirname(__DIR__) . '/models/historyModel.php';
 
 // Obtener ID del registro
 $id = $_GET['id'] ?? 0;

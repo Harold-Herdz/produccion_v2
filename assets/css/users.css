@@ -24,7 +24,7 @@
 body {
   font-family: var(--fuente);
   min-height: 100vh;
-  background: linear-gradient(var(--fondo)), url("../img/fondo1.jpg");
+  background: linear-gradient(var(--fondo)), url("../images/fondo1.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

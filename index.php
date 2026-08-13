@@ -1,8 +1,8 @@
 <?php
 // Iniciar sesión
 session_start();
-// Importar proteger.php
-require_once("auth/proteger.php");
+// Importar authMiddleware.php
+require_once("auth/authMiddleware.php");
 // Importar config.php
 require_once __DIR__ . '/includes/config.php';
 ?>
@@ -15,7 +15,7 @@ require_once __DIR__ . '/includes/config.php';
 <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Control de Producción</title>
     <!-- Ícono y estilos -->
-    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/img/logo-plastypetco.png">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/images/logo.png">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/index.css">
 
 </head>
@@ -34,7 +34,7 @@ require_once __DIR__ . '/includes/config.php';
             <a href="<?php 
                 echo ($_SESSION['rol'] == 'admin')
                     ? BASE_URL . '/modules/sellado/views/dashboard.php'
-                    : BASE_URL . '/modules/sellado/views/lista.php';
+                    : BASE_URL . '/modules/sellado/views/history.php';
             ?>" class="area-card">
                 <h2>Sellado</h2>
                 <p>Control de paquetes <br>producidos</p>
@@ -44,7 +44,7 @@ require_once __DIR__ . '/includes/config.php';
             <a href="<?php
                 echo ($_SESSION['rol'] == 'admin')
                     ? BASE_URL . '/modules/rollo/views/dashboard.php'
-                    : BASE_URL . '/modules/rollo/views/lista.php';
+                    : BASE_URL . '/modules/rollo/views/history.php';
             ?>" class="area-card">
                 <h2>Rollos</h2>
                 <p>Control de rollos <br>producidos</p>
@@ -54,7 +54,7 @@ require_once __DIR__ . '/includes/config.php';
             <a href="<?php
                 echo ($_SESSION['rol'] == 'admin')
                     ? BASE_URL . '/modules/plana/views/dashboard.php'
-                    : BASE_URL . '/modules/plana/views/lista.php';
+                    : BASE_URL . '/modules/plana/views/history.php';
             ?>" class="area-card">
                 <h2>Máquina Plana</h2>
                 <p>Control producción <br>de máquina plana</p>
@@ -64,7 +64,7 @@ require_once __DIR__ . '/includes/config.php';
             <a href="<?php
                 echo ($_SESSION['rol'] == 'admin')
                     ? BASE_URL . '/modules/extrusion/views/dashboard.php'
-                    : BASE_URL . '/modules/extrusion/views/lista.php';
+                    : BASE_URL . '/modules/extrusion/views/history.php';
             ?>" class="area-card">
                 <h2>Extrusión</h2>
                 <p>Control producción <br>de extrusoras</p>

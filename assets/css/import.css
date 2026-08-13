@@ -22,7 +22,7 @@
    BODY
 ============================================= */
 body {
-  background: linear-gradient(var(--fondo)), url("../img/fondo1.jpg");
+  background: linear-gradient(var(--fondo)), url("../images/fondo1.jpg");
   color: white;
   font-family: var(--fuente);
   min-height: 90vh;
