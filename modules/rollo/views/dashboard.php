@@ -441,10 +441,10 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
         <!-- Opciones de importación -->
         <div class="btn-row">
-            <a class="btn-nuevos" href="<?= BASE_URL ?>/importar/controllers/imp_rollo.php?modo=nuevos" >
+            <a class="btn-nuevos" href="<?= BASE_URL ?>/import/controllers/imp_rollo.php?modo=nuevos" >
                 <div class="btn-text"><span class="btn-icon">🗲</span>Importar Nuevos<span class="btn-arrow">›</span></div>
             </a>
-            <a class="btn-todo" href="<?= BASE_URL ?>/importar/controllers/imp_rollo.php?modo=todo" >
+            <a class="btn-todo" href="<?= BASE_URL ?>/import/controllers/imp_rollo.php?modo=todo" >
                 <div class="btn-text"><span class="btn-icon">⟳</span>Reimportar Todo<span class="btn-arrow">›</span></div>
             </a>
         </div>  

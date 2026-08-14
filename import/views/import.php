@@ -103,4 +103,4 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 
 <!-- URL de retorno y scripts -->
 <script>window.VOLVER_URL = '<?php echo $volver_url; ?>';</script>
-<script src="<?= BASE_URL ?>/importar/scripts/importar.js"></script>
+<script src="<?= BASE_URL ?>/import/scripts/import.js"></script>
