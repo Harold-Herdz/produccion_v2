@@ -26,22 +26,82 @@ require_once dirname(__DIR__) . '/includes/config.php';
             <a href="<?= BASE_URL ?>/index.php">
                 <img src="<?= BASE_URL ?>/assets/images/logo.png" alt="Logo Plastypetco">
             </a>
+            <!-- Botón de menú rápido -->
+            <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
-        
+
         <!-- Título -->
         <h1>Control Producción</h1>
 
-        <!-- Rol y botón de cerrar sesión -->
+        <!-- Rol -->
+        <div class="rol">
+            <a href="<?php
+                    echo ($_SESSION['rol'] == 'admin')
+                        ? BASE_URL . '/auth/views/users.php'
+                        : '';
+                ?>"><h2>Rol: <?php echo $rol ?></h2>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Menú lateral de acceso rápido -->
+    <nav class="side-menu" id="sideMenu">
+
+        <div class="side-menu-section">
+            <p class="side-menu-title">Módulos</p>
+
+            <div class="side-menu-module">
+                <span class="side-menu-module-name">Sellado</span>
+                <?php if($_SESSION['rol'] == 'admin'){ ?>
+                    <a href="<?= BASE_URL ?>/modules/sellado/views/dashboard.php">Dashboard</a>
+                <?php } ?>
+                <a href="<?= BASE_URL ?>/modules/sellado/views/history.php">Historial</a>
+            </div>
+
+            <div class="side-menu-module">
+                <span class="side-menu-module-name">Rollos</span>
+                <?php if($_SESSION['rol'] == 'admin'){ ?>
+                    <a href="<?= BASE_URL ?>/modules/rollo/views/dashboard.php">Dashboard</a>
+                <?php } ?>
+                <a href="<?= BASE_URL ?>/modules/rollo/views/history.php">Historial</a>
+            </div>
+
+            <div class="side-menu-module">
+                <span class="side-menu-module-name">Máquina Plana</span>
+                <?php if($_SESSION['rol'] == 'admin'){ ?>
+                    <a href="<?= BASE_URL ?>/modules/plana/views/dashboard.php">Dashboard</a>
+                <?php } ?>
+                <a href="<?= BASE_URL ?>/modules/plana/views/history.php">Historial</a>
+            </div>
+
+            <div class="side-menu-module">
+                <span class="side-menu-module-name">Extrusión</span>
+                <?php if($_SESSION['rol'] == 'admin'){ ?>
+                    <a href="<?= BASE_URL ?>/modules/extrusion/views/dashboard.php">Dashboard</a>
+                <?php } ?>
+                <a href="<?= BASE_URL ?>/modules/extrusion/views/history.php">Historial</a>
+            </div>
+        </div>
+
+        <!-- Botón de cerrar sesión -->
         <div class="cerrar-sesion">
-            <a id="btnRol" href="<?php
-                echo ($_SESSION['rol'] == 'admin')
-                    ? BASE_URL . '/auth/views/users.php'
-                    : '';
-            ?>"><h2>Rol: <?php echo $rol ?></h2></a>
             <a id="btnCerrar" href="<?= BASE_URL ?>/auth/controllers/logout.php">Cerrar Sesión</a>
         </div>
-        
-    </div>
+
+    </nav>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sideMenu').classList.toggle('open');
+            document.body.classList.toggle('menu-open');
+        }
+    </script>
+
     <?php if($_SESSION['rol'] == 'admin'){ ?>
 
 <?php } ?>

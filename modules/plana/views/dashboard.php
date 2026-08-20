@@ -481,14 +481,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <br><br><br>
 
-    <!-- Botones de navegación -->
-    <div class="acciones">
-        <!-- Redirigir al Historial -->
-        <a class="btn" href="history.php">Ver Historial</a>
-        <!-- Redirigir al Index -->
-        <a class="btn" href="<?= BASE_URL ?>/index.php">Volver al Menú</a>
-    </div>
-
 </div>
 
 <!-- Modal de importación -->

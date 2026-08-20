@@ -116,14 +116,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             
         </div>
     
-    <br><br>
-
-    <!-- Botones de navegación -->
-    <div class="acciones">
-        <a class="btn" href="history.php">Volver al Historial</a>
-        <a class="btn" href="dashboard.php">Volver al Dashboard</a>
-    </div>
-
 </div>
 
 <?php 

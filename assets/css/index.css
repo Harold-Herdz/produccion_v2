@@ -7,14 +7,12 @@
 
 /* PALETA DE COLORES */
 :root {
-  --fuente: "Poppins", sans-serif;
-  --fondo: rgba(0, 0, 0, 0.4), rgba(25, 25, 25, 0.6);
-  --fondo_azul: rgba(5, 133, 192, 0.25), rgba(82, 186, 218, 0.35);
-  --negro: rgba(0, 0, 0, 0.45);
-  --teal: rgba(1, 100, 100, 0.4);
-  --verde: #145a30;
-  --limon: #1ea353;
-  --cyan: #52bada;
+  --fuente: "Font Awesome 6 Free", sans-serif;
+  --fondo: rgb(54, 80, 95);
+  --fondo-box: rgb(4, 50, 63);
+  --azul: #209aca86;
+  --azul-hover: #176488;
+  --texto: #d7d7d7;
 }
 
 /* ===========================
@@ -26,24 +24,21 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(var(--fondo)), url("../images/fondo1.jpg");
+  background: var(--fondo);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   background-attachment: fixed;
 }
 .glass-container {
-  padding: 60px;
+  padding: 50px;
+  height: 350px;
   border-radius: 20px;
-  background: var(--negro);
+  background: var(--fondo-box);
   backdrop-filter: blur(20px);
-  border: 1px solid var(--negro);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
   text-align: center;
-  color: var(--cyan);
-}
-.glass-container a {
-  width: 300px;
+  color: var(--texto);
 }
 
 /* ===========================
@@ -55,17 +50,46 @@
   margin-top: 40px;
 }
 .area-card {
-  padding: 40px;
+  margin-top: 20px;
+  width: 260px;
+  height: 140px;
+  position: relative;
+  font-family: var(--fuente);
+  padding: 30px;
   border-radius: 18px;
   text-decoration: none;
-  backdrop-filter: blur(10px);
-  background: linear-gradient(var(--fondo_azul));
-  color: var(--cyan);
-  border: 1px solid var(--teal);
+  background: var(--azul);
+  color: var(--texto);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
   transition: 0.25s;
+  font-size: 17px;
+  align-content: center;
 }
 .area-card:hover {
   transform: translateY(-10px);
-  box-shadow: 6px 10px 40px rgba(25, 150, 200, 0.5);
+  background: var(--azul-hover);
+  box-shadow: 8px 12px 15px rgba(100, 202, 250, 0.15);
+}
+.area-card p {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  padding: 0 10px;
+  background: none;
+  border: none;
+  color: var(--texto);
+  font-size: 16px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: 0.25s;
+  pointer-events: none;
+}
+.area-card:hover p {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }

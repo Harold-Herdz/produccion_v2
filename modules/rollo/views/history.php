@@ -130,16 +130,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <br>
 
-    <!-- Botones de navegación -->
-    <div class="acciones">
-        <!-- Redirigir al Dashboard (solo Administradores) -->
-        <?php if($_SESSION['rol'] == 'admin'){ ?>
-            <a class="btn" href="dashboard.php">Volver al Dashboard</a>
-        <?php } ?>
-        <!-- Redirigir al Index -->
-        <a class="btn" href="<?= BASE_URL ?>/index.php">Volver al Menú</a>
-    </div>
-
 </div>
 
 <?php 

@@ -5,34 +5,32 @@
   box-sizing: border-box;
 }
 
+/* PALETA DE COLORES (misma paleta que main.css, users.css, login.css e index.css) */
 :root {
   --fuente: "Poppins", sans-serif;
-  --fondo: rgba(0, 0, 0, 0.4), rgba(25, 25, 25, 0.6);
-  --fondo-verde: rgba(12, 82, 15, 0.6), rgba(9, 66, 32, 0.8);
-  --fondo-azul: rgba(5, 130, 200, 0.25), rgba(80, 190, 220, 0.35);
-  --negro: rgba(0, 0, 0, 0.45);
-  --teal: rgba(1, 100, 100, 0.4);
-  --verde: #145a30;
+  --fondo: rgb(54, 80, 95);
+  --fondo-box: rgb(4, 42, 53);
+  --fondo-secundario: rgb(60, 82, 100);
+  --fondo-claro: rgb(79, 107, 129);
+  --verde: #1a693a;
   --limon: #1ea353;
-  --azul: #0585c0;
-  --cyan: #52bada;
+  --azul: #186192;
+  --azul-hover: #1970aa;
+  --texto: #d7d7d7;
 }
 
 /* =============================================
    BODY
 ============================================= */
 body {
-  background: linear-gradient(var(--fondo)), url("../images/fondo1.jpg");
-  color: white;
+  background: var(--fondo);
+  color: var(--texto);
   font-family: var(--fuente);
   min-height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
   overflow: hidden;
 }
 
@@ -43,38 +41,37 @@ body {
   width: 100%;
   max-width: 540px;
   border-radius: 14px;
-  background: var(--negro);
-  backdrop-filter: blur(20px);
+  background: var(--fondo-box);
   padding: 35px;
-  border: 1px solid var(--negro);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
 }
 
 /* ===========================
-   ENCABEZADO 
+   ENCABEZADO
 =========================== */
 .top {
-  background: linear-gradient(var(--fondo-azul));
-  color: var(--cyan);
+  background: var(--fondo-secundario);
+  color: var(--texto);
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 32px;
   border-radius: 14px;
   padding: 15px;
-  border: 1px solid var(--teal);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* ===========================
-   TARJETA 
+   TARJETA
 =========================== */
 .card {
-  background: linear-gradient(var(--fondo-verde));
+  background: var(--fondo-secundario);
   border-radius: 20px;
   padding: 30px 26px;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 .card::before {
   content: "";
@@ -101,21 +98,21 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #00ff84;
-  box-shadow: 0 0 8px #00ff84;
+  background: var(--limon);
+  box-shadow: 0 0 8px var(--limon);
   animation: blink 1.2s ease-in-out infinite;
   flex-shrink: 0;
 }
 .dot.idle {
-  background: #136991;
-  box-shadow: 0 0 8px #136991;
+  background: var(--azul);
+  box-shadow: 0 0 8px var(--azul);
   animation: none;
   width: 8px;
   height: 8px;
 }
 .dot.done {
-  background: #00ff84;
-  box-shadow: 0 0 8px #00cc6a;
+  background: var(--limon);
+  box-shadow: 0 0 8px var(--limon);
   animation: none;
   width: 8px;
   height: 8px;
@@ -159,7 +156,7 @@ body {
 .track {
   width: 100%;
   height: 8px;
-  background: rgba(26, 26, 26, 0.5);
+  background: var(--fondo-box);
   border-radius: 999px;
   overflow: hidden;
   margin-bottom: 10px;
@@ -168,7 +165,7 @@ body {
   height: 100%;
   width: 0%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--limon), green);
+  background: linear-gradient(90deg, var(--limon), var(--verde));
   box-shadow: 0 0 10px var(--verde);
   transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -191,18 +188,18 @@ body {
   font-family: var(--fuente);
   font-size: 2.2rem;
   font-weight: 500;
-  color: var(--azul);
+  color: var(--texto);
   line-height: 1;
 }
 .sign {
   font-family: var(--fuente);
   font-size: 1rem;
-  color: var(--azul);
+  color: var(--texto);
 }
 #counter {
   font-family: var(--fuente);
   font-size: 1rem;
-  color: var(--azul);
+  color: var(--texto);
 }
 
 /* ===========================
@@ -221,8 +218,8 @@ body {
   grid-column: span 3;
 }
 .st {
-  background: var(--negro);
-  border: 1px solid var(--negro);
+  background: var(--fondo-claro);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 14px 10px;
   text-align: center;
@@ -266,7 +263,7 @@ body {
   cursor: pointer;
   font-family: var(--fuente);
   font-size: 0.8rem;
-  color: white;
+  color: var(--texto);
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -284,8 +281,8 @@ body {
 #log {
   display: none;
   margin-top: 10px;
-  background: var(--negro);
-  border: 1px solid var(--negro);
+  background: var(--fondo-box);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 3px;
   max-height: 220px;
   overflow-y: auto;
@@ -309,7 +306,7 @@ body {
   padding: 5px 14px;
   font-family: var(--fuente);
   font-size: 0.8rem;
-  border-bottom: 1px solid #ff000004;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .lr:last-child {
   border-bottom: none;
@@ -323,7 +320,7 @@ body {
   color: var(--limon);
 }
 .lr.upd .t {
-  color: #24788d;
+  color: var(--cyan);
 }
 .lr.dup .t {
   color: #b16d07;
@@ -333,11 +330,11 @@ body {
    BOTÓN VOLVER
 =========================== */
 #btn-volver {
-  background: linear-gradient(var(--fondo-azul));
+  background: var(--azul);
   cursor: pointer;
   font-size: 18px;
   font-weight: 600;
-  color: var(--cyan);
+  color: white;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
   padding: 15px 21px;
   border-radius: 14px;
@@ -346,7 +343,11 @@ body {
   right: 35px;
   text-decoration: none;
   transition: 0.25s;
-  border: 1px solid var(--teal);
+  border: none;
+}
+#btn-volver:hover {
+  background: var(--azul-hover);
+  transform: translateY(-4px);
 }
 
 /* ===========================

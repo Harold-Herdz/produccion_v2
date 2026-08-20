@@ -25,7 +25,7 @@ require_once __DIR__ . '/includes/config.php';
     <div class="glass-container">
 
         <!-- Título -->
-        <h1>Control de Producción</h1>
+        <h1>Seleccionar Modulo</h1>
 
         <!-- Tarjetas de módulos — redirige según rol del usuario -->
         <div class="areas">
@@ -37,7 +37,7 @@ require_once __DIR__ . '/includes/config.php';
                     : BASE_URL . '/modules/sellado/views/history.php';
             ?>" class="area-card">
                 <h2>Sellado</h2>
-                <p>Control de paquetes <br>producidos</p>
+                <p>Control de producción <br>de las selladoras</p>
             </a>
 
             <!-- Módulo Rollos -->
@@ -47,7 +47,7 @@ require_once __DIR__ . '/includes/config.php';
                     : BASE_URL . '/modules/rollo/views/history.php';
             ?>" class="area-card">
                 <h2>Rollos</h2>
-                <p>Control de rollos <br>producidos</p>
+                <p>Control de peso de <br>rollos y retales</p>
             </a>
 
             <!-- Módulo Máquina Plana -->
@@ -56,8 +56,8 @@ require_once __DIR__ . '/includes/config.php';
                     ? BASE_URL . '/modules/plana/views/dashboard.php'
                     : BASE_URL . '/modules/plana/views/history.php';
             ?>" class="area-card">
-                <h2>Máquina Plana</h2>
-                <p>Control producción <br>de máquina plana</p>
+                <h2>Máquina <br>Plana</h2>
+                <p>Control de producción <br>de máquina plana</p>
             </a>
 
             <!-- Módulo Extrusión -->
@@ -67,7 +67,7 @@ require_once __DIR__ . '/includes/config.php';
                     : BASE_URL . '/modules/extrusion/views/history.php';
             ?>" class="area-card">
                 <h2>Extrusión</h2>
-                <p>Control producción <br>de extrusoras</p>
+                <p>Control de producción <br>de las extrusoras</p>
             </a>
 
         </div>
