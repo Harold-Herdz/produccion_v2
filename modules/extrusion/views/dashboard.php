@@ -366,7 +366,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 <div class="overlay" id="modalImportar">
     <div class="modal">
         <div class="modal-header">
-            <h2>Importar Extrusion</h2>
+            <h2>Importar Extrusión</h2>
             <p>Último ID Importado: <strong><?php echo $ultimo_id_sheet; ?></strong></p>
             <button id="cerrarBtn" onclick="cerrarModal('modalImportar')">X</button>
         </div>
