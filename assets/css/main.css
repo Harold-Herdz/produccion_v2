@@ -28,6 +28,11 @@
 body {
   font-family: var(--fuente);
   background: var(--fondo);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding-top: 50px;
 }
 
 /* ===========================
@@ -192,7 +197,7 @@ body {
 =========================== */
 .container {
   max-width: 1350px;
-  margin: 110px auto 50px auto;
+  margin: 100px auto 96px auto;
   padding: 50px;
   border-radius: 14px;
   background: var(--fondo-box);
@@ -722,9 +727,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    HISTORIAL
 =========================== */
 #containerHistorial {
+  margin-top: 100px;
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  margin-bottom: 96px;
 }
 #containerHistorial .card input {
   background: var(--fondo-claro);
@@ -807,6 +814,7 @@ input::placeholder {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   color: var(--texto);
+  margin-bottom: 96px;
 }
 #containerEditar .card label {
   margin-left: 120px;
@@ -895,7 +903,7 @@ input::placeholder {
 =========================== */
 .footer {
   width: 100%;
-  margin-top: 50px;
+  margin-top: auto;
   padding: 15px 25px;
   display: flex;
   justify-content: space-between;
