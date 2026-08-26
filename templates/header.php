@@ -50,11 +50,11 @@ require_once dirname(__DIR__) . '/includes/config.php';
     </div>
 
     <!-- Menú lateral de acceso rápido -->
-    <nav class="side-menu" id="sideMenu">
-
-        <div class="side-menu-section">
+    <nav id="sideMenu" class="side-menu">
+        <div class="side-menu-content">
             <p class="side-menu-title">Módulos</p>
-
+            
+            <!-- Modulo Sellado -->
             <div class="side-menu-module">
                 <span class="side-menu-module-name">Sellado</span>
                 <?php if($_SESSION['rol'] == 'admin'){ ?>
@@ -63,6 +63,7 @@ require_once dirname(__DIR__) . '/includes/config.php';
                 <a href="<?= BASE_URL ?>/modules/sellado/views/history.php">Historial</a>
             </div>
 
+            <!-- Modulo Rollos -->
             <div class="side-menu-module">
                 <span class="side-menu-module-name">Rollos</span>
                 <?php if($_SESSION['rol'] == 'admin'){ ?>
@@ -71,6 +72,7 @@ require_once dirname(__DIR__) . '/includes/config.php';
                 <a href="<?= BASE_URL ?>/modules/rollo/views/history.php">Historial</a>
             </div>
 
+            <!-- Modulo Máquina Plana -->
             <div class="side-menu-module">
                 <span class="side-menu-module-name">Máquina Plana</span>
                 <?php if($_SESSION['rol'] == 'admin'){ ?>
@@ -79,6 +81,7 @@ require_once dirname(__DIR__) . '/includes/config.php';
                 <a href="<?= BASE_URL ?>/modules/plana/views/history.php">Historial</a>
             </div>
 
+            <!-- Modulo Extrusión -->
             <div class="side-menu-module">
                 <span class="side-menu-module-name">Extrusión</span>
                 <?php if($_SESSION['rol'] == 'admin'){ ?>
@@ -88,11 +91,16 @@ require_once dirname(__DIR__) . '/includes/config.php';
             </div>
         </div>
 
-        <!-- Botón de cerrar sesión -->
-        <div class="cerrar-sesion">
-            <a id="btnCerrar" href="<?= BASE_URL ?>/auth/controllers/logout.php">Cerrar Sesión</a>
+        <div class="side-menu-bottom">
+            <!-- Botón de cerrar sesión -->
+            <div class="cerrar-sesion">
+                <a id="btnCerrar" href="<?= BASE_URL ?>/auth/controllers/logout.php">Cerrar Sesión</a>
+            </div>
+            <!-- Nombre de la empresa -->
+            <div class="footer-left">
+                <strong>Plastypetco</strong><span>&nbsp;&copy; 2026</span>
+            </div>
         </div>
-
     </nav>
 
     <script>
