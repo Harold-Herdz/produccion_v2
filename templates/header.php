@@ -89,6 +89,17 @@ require_once dirname(__DIR__) . '/includes/config.php';
                 <?php } ?>
                 <a href="<?= BASE_URL ?>/modules/extrusion/views/history.php">Historial</a>
             </div>
+
+            <?php if($_SESSION['rol'] == 'admin'){ ?>
+            <!-- Sección de Catálogos (solo administradores) -->
+            <p class="side-menu-title">Catálogos</p>
+
+            <!-- Módulo Catálogos -->
+            <div class="side-menu-module">
+                <span class="side-menu-module-name">Catálogos</span>
+                <a href="<?= BASE_URL ?>/modules/catalogs/views/catalogs.php">Administrar</a>
+            </div>
+            <?php } ?>
         </div>
 
         <div class="side-menu-bottom">
