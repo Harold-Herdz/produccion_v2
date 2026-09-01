@@ -1,0 +1,378 @@
+/* =================================================
+   REGISTER · PLANILLA DIGITAL DE SELLADO
+   Usa las variables y el lenguaje visual de main.css
+================================================= */
+
+/* ===========================
+   CONTENEDOR
+=========================== */
+#containerRegister {
+  margin-top: 100px;
+  margin-bottom: 96px;
+  color: var(--texto);
+}
+
+/* ===========================
+   ESTADO 1: INICIAR PLANILLA
+=========================== */
+.card-inicio {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 30px;
+}
+.inicio-texto {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--texto);
+}
+.form-inicio .campo {
+  margin-bottom: 16px;
+}
+.form-inicio label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+.form-inicio input,
+.form-inicio select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 2px solid var(--cyan);
+  background: var(--fondo-claro);
+  color: var(--texto);
+  font-size: 14px;
+}
+.form-inicio input[readonly] {
+  border-color: rgba(255, 255, 255, 0.14);
+  opacity: 0.85;
+}
+.form-inicio #btnIniciar {
+  width: 100%;
+  display: block;
+  font-size: 16px;
+}
+
+/* ===========================
+   ENCABEZADO DEL TURNO
+=========================== */
+.encabezado-turno {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 26px;
+  padding: 18px 22px;
+}
+.dato-turno {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dato-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.55);
+}
+.dato-valor {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+/* Indicador de guardado */
+.indicador-guardado {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--fondo-secundario);
+  font-size: 13px;
+  font-weight: 600;
+}
+.indicador-guardado .punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+}
+.indicador-guardado.pendiente .punto { background: #e0a10c; }
+.indicador-guardado.guardando .punto { background: var(--cyan); }
+.indicador-guardado.ok        .punto { background: var(--limon); }
+.indicador-guardado.error     .punto { background: #e05a5a; }
+.indicador-guardado.error { color: #ffb4b4; }
+
+/* ===========================
+   AVISOS
+=========================== */
+.aviso {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+.aviso-info {
+  background: rgba(82, 186, 218, 0.15);
+  border: 1px solid rgba(82, 186, 218, 0.35);
+  color: var(--cyan);
+}
+.aviso-error {
+  background: rgba(224, 90, 90, 0.15);
+  border: 1px solid rgba(224, 90, 90, 0.35);
+  color: #ffb4b4;
+}
+
+/* ===========================
+   PLANILLA
+=========================== */
+.planilla-scroll {
+  margin-top: 20px;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.planilla {
+  width: 100%;
+  min-width: 1150px;
+  border-collapse: collapse;
+  background: var(--fondo-box);
+}
+.planilla thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--fondo-secundario);
+  color: white;
+  font-size: 13px;
+  padding: 10px 8px;
+  border: 1px solid var(--fondo-box);
+  white-space: nowrap;
+}
+.planilla td {
+  padding: 6px 8px;
+  border: 1px solid var(--fondo-secundario);
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+/* Columna Máquina fija al hacer scroll horizontal */
+.planilla .col-maquina {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--fondo-secundario);
+  color: var(--texto);
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 96px;
+  text-align: center;
+}
+.planilla thead .col-maquina {
+  z-index: 4;
+}
+
+/* Grupo de cada máquina */
+.grupo-maquina {
+  border-bottom: 3px solid var(--fondo-box);
+}
+.grupo-maquina + .grupo-maquina {
+  border-top: 3px solid var(--fondo-box);
+}
+
+/* Fila de datos compartidos de la máquina */
+.fila-info td {
+  background: var(--fondo-claro);
+}
+.fila-info .col-maquina {
+  background: var(--fondo-claro);
+}
+.maq-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-end;
+}
+.maq-datos label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto);
+}
+.maq-datos select,
+.maq-datos input {
+  min-width: 190px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: var(--fondo-secundario);
+  color: var(--texto);
+  font-size: 13px;
+}
+.fila-info.usa-otro .f-operario {
+  opacity: 0.45;
+}
+.fila-info.usa-otro .f-otro-operario {
+  border-color: var(--cyan);
+}
+
+/* Filas de entrada */
+.fila-entrada input,
+.fila-entrada select {
+  width: 100%;
+  min-width: 74px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--fondo-claro);
+  color: var(--texto);
+  font-size: 13px;
+}
+.fila-entrada select { min-width: 130px; }
+.fila-entrada .f-obs { min-width: 160px; }
+.fila-entrada input:focus,
+.fila-entrada select:focus,
+.maq-datos input:focus,
+.maq-datos select:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(27, 112, 168, 0.3);
+}
+.fila-entrada:nth-of-type(even) td:not(.col-maquina) {
+  background: var(--teal);
+}
+
+.celda-acciones {
+  text-align: center;
+}
+.btn-quitar {
+  border: none;
+  background: transparent;
+  color: #e05a5a;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+.btn-quitar:hover {
+  background: rgba(224, 90, 90, 0.15);
+}
+
+/* Botón + Entrada */
+.fila-add td {
+  background: var(--fondo-box);
+}
+.btn-entrada {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1px dashed var(--cyan);
+  background: transparent;
+  color: var(--cyan);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-entrada:hover {
+  background: rgba(82, 186, 218, 0.12);
+}
+.tope-entradas {
+  display: none;
+  margin-left: 12px;
+  font-size: 12px;
+  color: #e0a10c;
+}
+.grupo-maquina.tope .btn-entrada {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.grupo-maquina.tope .tope-entradas {
+  display: inline;
+}
+
+/* ===========================
+   ACCIONES FINALES
+=========================== */
+.acciones-planilla {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 26px;
+}
+.btn-finalizar {
+  background: var(--verde);
+}
+.btn-finalizar:hover {
+  background: var(--limon);
+}
+.btn-finalizar:disabled,
+#btnConfirmarFinalizar:disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ===========================
+   MODALES
+=========================== */
+#modalFinalizar .modal,
+#modalResultado .modal {
+  background: var(--fondo-secundario);
+}
+.modal-texto {
+  color: var(--texto);
+  margin: 18px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.modal .btn-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.modal-header button {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+}
+.btn-cancelar {
+  background: var(--fondo-claro);
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 900px) {
+  #containerRegister {
+    padding: 24px;
+  }
+  .encabezado-turno {
+    gap: 16px;
+  }
+  .indicador-guardado {
+    margin-left: 0;
+  }
+}
+@media (max-width: 700px) {
+  .acciones-planilla {
+    justify-content: stretch;
+  }
+  .acciones-planilla .btn {
+    flex: 1;
+    text-align: center;
+  }
+}

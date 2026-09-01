@@ -20,8 +20,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <!-- Título -->
     <h2 class="titulo-vista">Historial Producción Sellado</h2>
 
-        <!-- Botón para registrar producción en Google Forms -->
-        <a class="btn" id="btnRegistrar" href="https://docs.google.com/spreadsheets/d/1RZUG-KrzDnf1Pnq7PIEAGz1prrV7DeM_UWNEIZ0LGCw/edit?gid=0#gid=0" target="_blank">
+        <!-- Botón para abrir la planilla de registro de producción -->
+        <a class="btn" id="btnRegistrar" href="<?= BASE_URL ?>/modules/sellado/views/register.php">
             Registrar Producción
         </a>
 
