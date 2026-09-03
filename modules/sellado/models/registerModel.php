@@ -28,6 +28,7 @@ function asegurarTablaPlanillas($conexion){
             estado            ENUM('abierta','finalizada') NOT NULL DEFAULT 'abierta',
             ruta_pdf          VARCHAR(255) DEFAULT NULL,
             total_registros   INT(11) NOT NULL DEFAULT 0,
+            filas             TEXT DEFAULT NULL,
             creado_en         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             finalizado_en     DATETIME DEFAULT NULL,
             PRIMARY KEY (id_planilla),
@@ -35,6 +36,41 @@ function asegurarTablaPlanillas($conexion){
             KEY idx_estado (estado)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
     ");
+    // Migración: agregar la columna 'filas' si la tabla ya existía sin ella
+    $col = $conexion->query("SHOW COLUMNS FROM sellado_planillas LIKE 'filas'");
+    if($col && $col->num_rows === 0){
+        $conexion->query("ALTER TABLE sellado_planillas ADD COLUMN filas TEXT DEFAULT NULL AFTER total_registros");
+    }
+}
+
+/* =================================================
+   VÍNCULO PLANILLA ↔ FILAS
+   La planilla guarda en 'filas' un mapa JSON
+   { "maquina-posicion": "id_sheet" } con los id_sheet
+   secuenciales (S02651, S02652...) de sus registros.
+================================================= */
+// Mapa slot => id_sheet de una planilla
+function mapaFilas($planilla){
+    $m = json_decode($planilla['filas'] ?? '', true);
+    return is_array($m) ? $m : [];
+}
+// Lista de id_sheet que pertenecen a la planilla
+function idSheetsDe($planilla){
+    return array_values(mapaFilas($planilla));
+}
+// Cláusula IN ('S..','S..') escapada; '' si no hay filas
+function inIdSheets($conexion, $ids){
+    if(empty($ids)){
+        return '';
+    }
+    return implode(',', array_map(function($s) use ($conexion){
+        return "'" . $conexion->real_escape_string($s) . "'";
+    }, $ids));
+}
+// id_sheet del borrador de una entrada (prefijo BORR-, nunca choca con los S##### del Sheet).
+// Al finalizar, estas filas se envían a REGISTROS y se borran; vuelven al importar con su S##### real.
+function idSheetBorrador($planilla, $numMaq, $pos){
+    return 'BORR-' . $planilla['id_planilla'] . '-' . $numMaq . '-' . $pos;
 }
 
 /* =================================================
@@ -54,6 +90,16 @@ function construirCodigoPlanilla($fecha, $bloque){
     $bloques = bloquesTurno();
     $cod = $bloques[$bloque]['codigo'] ?? '000';
     return 'S' . date('Ymd', strtotime($fecha)) . '_T' . $cod;
+}
+
+// Validar una fecha 'Y-m-d'; devuelve la fecha normalizada o null
+function validarFechaPlanilla($fecha){
+    $fecha = trim((string) $fecha);
+    $d = DateTime::createFromFormat('Y-m-d', $fecha);
+    if($d && $d->format('Y-m-d') === $fecha){
+        return $fecha;
+    }
+    return null;
 }
 
 /* =================================================
@@ -110,6 +156,48 @@ function finalizarPlanillaSobre($conexion, $codigo, $total){
 function guardarRutaPdfPlanilla($conexion, $codigo, $ruta){
     $stmt = $conexion->prepare("UPDATE sellado_planillas SET ruta_pdf = ? WHERE codigo = ?");
     $stmt->bind_param('ss', $ruta, $codigo);
+    $stmt->execute();
+}
+
+// Cambiar la fecha de una planilla abierta: recalcula el código y actualiza sus filas.
+// Devuelve [planilla_actualizada, error|null].
+function recodificarPlanilla($conexion, $planilla, $fechaNueva){
+    if($fechaNueva === $planilla['fecha_planilla']){
+        return [$planilla, null];
+    }
+    $codigoNuevo = construirCodigoPlanilla($fechaNueva, $planilla['bloque']);
+
+    // No pisar una planilla ya finalizada con ese mismo código
+    $otra = obtenerPlanillaPorCodigo($conexion, $codigoNuevo);
+    if($otra && $otra['id_planilla'] != $planilla['id_planilla']){
+        return [$planilla, "El turno {$codigoNuevo} ya existe para esa fecha."];
+    }
+
+    // Los id_sheet no cambian: solo se ajusta la fecha de las filas ya guardadas
+    $lista = inIdSheets($conexion, idSheetsDe($planilla));
+    if($lista !== ''){
+        $fe = $conexion->real_escape_string($fechaNueva);
+        $conexion->query("UPDATE produccion_sellado SET fecha_sellado = '{$fe}' WHERE id_sheet IN ({$lista})");
+    }
+
+    // Actualizar el sobre
+    $stmt = $conexion->prepare("UPDATE sellado_planillas SET codigo = ?, fecha_planilla = ? WHERE id_planilla = ?");
+    $stmt->bind_param('ssi', $codigoNuevo, $fechaNueva, $planilla['id_planilla']);
+    $stmt->execute();
+
+    $planilla['codigo']         = $codigoNuevo;
+    $planilla['fecha_planilla'] = $fechaNueva;
+    return [$planilla, null];
+}
+
+// Cancelar (descartar) una planilla abierta: borra sus filas y el sobre
+function cancelarPlanilla($conexion, $planilla){
+    $lista = inIdSheets($conexion, idSheetsDe($planilla));
+    if($lista !== ''){
+        $conexion->query("DELETE FROM produccion_sellado WHERE id_sheet IN ({$lista})");
+    }
+    $stmt = $conexion->prepare("DELETE FROM sellado_planillas WHERE id_planilla = ? AND estado = 'abierta'");
+    $stmt->bind_param('i', $planilla['id_planilla']);
     $stmt->execute();
 }
 
@@ -223,15 +311,19 @@ function entradaVacia($ent){
     return true;
 }
 
-// Guardar toda la planilla: cada entrada no vacía se vuelve una fila en PRODUCCION_SELLADO.
-// Es idempotente: reejecutarla con los mismos datos no crea duplicados (UPSERT por id_sheet).
+// Guardar el BORRADOR de la planilla: cada entrada no vacía se vuelve una fila
+// en PRODUCCION_SELLADO con id_sheet 'BORR-...'. El vínculo entrada↔id_sheet se guarda
+// en el mapa 'filas' del sobre. Al finalizar, estas filas se envían a la hoja REGISTROS
+// y se borran (vuelven al Historial solo tras "Importar").
 function guardarPlanilla($conexion, $planilla, $maquinas){
     $codigo  = $planilla['codigo'];
     $bloque  = $planilla['bloque'];
     $fecha   = $planilla['fecha_planilla'];
     $avisos  = [];
     $guardados = 0;
-    $idSheetsVigentes = [];
+
+    $mapaViejo = mapaFilas($planilla);   // slot => id_sheet actuales
+    $mapaNuevo = [];
 
     // Sentencia de inserción/actualización por entrada
     $sql = "INSERT INTO produccion_sellado
@@ -279,18 +371,22 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
         $jornada = trim($m['jornada'] ?? '');
         $idTurno = ($jornada !== '') ? obtenerIdTurno($conexion, $bloque, $jornada) : null;
 
-        // Recorrer las entradas de la máquina (máximo 5)
+        // Recorrer las entradas de la máquina (máximo 6); la posición cuenta solo las no vacías
         $entradas = $m['entradas'] ?? [];
+        $pos = 0;
         foreach(array_values($entradas) as $e => $ent){
-            if($e > 4){
+            if($e > 5){
                 break;
             }
             if(entradaVacia($ent)){
                 continue;
             }
+            $pos++;
+            $slot = $numMaq . '-' . $pos;
 
-            $idSheet = $codigo . '-' . $maqEtiqueta . '-' . ($e + 1);
-            $idSheetsVigentes[] = $idSheet;
+            // id_sheet de borrador (BORR-...); estable por slot, se envía a REGISTROS al finalizar
+            $idSheet = $mapaViejo[$slot] ?? idSheetBorrador($planilla, $numMaq, $pos);
+            $mapaNuevo[$slot] = $idSheet;
 
             $idReferencia = valorEnteroONulo($ent['id_referencia'] ?? '');
             $idColor      = valorEnteroONulo($ent['id_color'] ?? '');
@@ -314,16 +410,18 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
         }
     }
 
-    // Borrar las entradas que quedaron vacías o se eliminaron en la interfaz
-    $like = $conexion->real_escape_string($codigo) . '-%';
-    if(!empty($idSheetsVigentes)){
-        $lista = implode(',', array_map(function($s) use ($conexion){
-            return "'" . $conexion->real_escape_string($s) . "'";
-        }, $idSheetsVigentes));
-        $conexion->query("DELETE FROM produccion_sellado WHERE id_sheet LIKE '{$like}' AND id_sheet NOT IN ({$lista})");
-    } else {
-        $conexion->query("DELETE FROM produccion_sellado WHERE id_sheet LIKE '{$like}'");
+    // Borrar las filas cuyo slot ya no existe (entrada vaciada o eliminada)
+    $borrar = array_values(array_diff(array_values($mapaViejo), array_values($mapaNuevo)));
+    $listaBorrar = inIdSheets($conexion, $borrar);
+    if($listaBorrar !== ''){
+        $conexion->query("DELETE FROM produccion_sellado WHERE id_sheet IN ({$listaBorrar})");
     }
+
+    // Guardar el mapa actualizado en el sobre
+    $json = json_encode($mapaNuevo);
+    $upd = $conexion->prepare("UPDATE sellado_planillas SET filas = ? WHERE codigo = ?");
+    $upd->bind_param('ss', $json, $codigo);
+    $upd->execute();
 
     return [
         'guardados' => $guardados,
@@ -334,17 +432,18 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
 /* =================================================
    RECUPERACIÓN DE LA PLANILLA
 ================================================= */
-// Contar las filas ya guardadas de una planilla
+// Contar las filas ya guardadas de una planilla (por su código)
 function contarRegistrosPlanilla($conexion, $codigo){
-    $like = $conexion->real_escape_string($codigo) . '-%';
-    $res = $conexion->query("SELECT COUNT(*) total FROM produccion_sellado WHERE id_sheet LIKE '{$like}'");
-    $fila = $res->fetch_assoc();
-    return (int) $fila['total'];
+    $p = obtenerPlanillaPorCodigo($conexion, $codigo);
+    return $p ? count(idSheetsDe($p)) : 0;
 }
 
 // Reconstruir la planilla guardada como estructura por máquina para la vista / JS
-function obtenerPlanillaEstructurada($conexion, $codigo){
-    $like = $conexion->real_escape_string($codigo) . '-%';
+function obtenerPlanillaEstructurada($conexion, $planilla){
+    $lista = inIdSheets($conexion, idSheetsDe($planilla));
+    if($lista === ''){
+        return [];
+    }
     $res = $conexion->query("
         SELECT s.id_sheet, s.id_maquina, s.id_operario, s.id_referencia, s.id_color,
                s.paquetes_x70, s.paquetes_x90, s.paquetes_x98,
@@ -352,8 +451,8 @@ function obtenerPlanillaEstructurada($conexion, $codigo){
                s.obs_sellado, t.jornada
         FROM produccion_sellado s
         LEFT JOIN turnos t ON s.id_turno = t.id_turno
-        WHERE s.id_sheet LIKE '{$like}'
-        ORDER BY s.id_maquina, s.id_sheet
+        WHERE s.id_sheet IN ({$lista})
+        ORDER BY s.id_maquina, s.id
     ");
 
     $maquinas = [];
@@ -385,7 +484,9 @@ function obtenerPlanillaEstructurada($conexion, $codigo){
 
 // Datos completos de las entradas (con nombres) para el PDF
 function obtenerEntradasPlanillaPdf($conexion, $codigo){
-    $like = $conexion->real_escape_string($codigo) . '-%';
+    $p = obtenerPlanillaPorCodigo($conexion, $codigo);
+    $lista = inIdSheets($conexion, $p ? idSheetsDe($p) : []);
+    $filtro = ($lista === '') ? '1 = 0' : "s.id_sheet IN ({$lista})";
     return $conexion->query("
         SELECT s.id_maquina, m.nombre_maquina,
                o.nombre_operario, t.jornada,
@@ -399,7 +500,83 @@ function obtenerEntradasPlanillaPdf($conexion, $codigo){
         LEFT JOIN referencias r ON s.id_referencia = r.id_referencia
         LEFT JOIN colores c     ON s.id_color      = c.id_color
         LEFT JOIN turnos t      ON s.id_turno      = t.id_turno
-        WHERE s.id_sheet LIKE '{$like}'
-        ORDER BY s.id_maquina, s.id_sheet
+        WHERE {$filtro}
+        ORDER BY s.id_maquina, s.id
     ");
+}
+
+/* =================================================
+   ENVÍO A GOOGLE SHEETS (hoja REGISTROS / LOGS)
+================================================= */
+// Número o cadena vacía (para celdas numéricas del Sheet)
+function numSheet($v){
+    return ($v === null || $v === '') ? '' : $v + 0;
+}
+
+// Filas para la hoja REGISTROS: 17 columnas B..R por cada entrada del turno.
+// Col A (id_sheet) la genera la fórmula del Sheet.
+function construirFilasRegistros($conexion, $planilla, $maquinasPayload){
+    // Texto de "otro operario" por número de máquina (viene del formulario)
+    $otros = [];
+    foreach($maquinasPayload as $m){
+        $n = (int) ($m['maquina'] ?? 0);
+        $t = trim((string) ($m['otro_operario'] ?? ''));
+        if($t !== ''){
+            $otros[$n] = $t;
+        }
+    }
+
+    $bloques  = bloquesTurno();
+    $horario  = $bloques[$planilla['bloque']]['horario'] ?? $planilla['bloque'];
+    $fechaIso = $planilla['fecha_planilla'];
+
+    $res   = obtenerEntradasPlanillaPdf($conexion, $planilla['codigo']);
+    $filas = [];
+    while($f = $res->fetch_assoc()){
+        $num = (int) $f['id_maquina'];
+        $filas[] = [
+            $fechaIso,
+            $horario,
+            'Máquina ' . str_pad($num, 2, '0', STR_PAD_LEFT),
+            $f['nombre_operario'] ?? '',
+            $f['jornada'] ?? '',
+            $f['nombre_referencia'] ?? '',
+            $f['nombre_color'] ?? '',
+            numSheet($f['paquetes_x70']),
+            numSheet($f['paquetes_x90']),
+            numSheet($f['paquetes_x98']),
+            numSheet($f['peso_hora1']),
+            numSheet($f['peso_hora2']),
+            numSheet($f['peso_hora3']),
+            numSheet($f['peso_hora4']),
+            numSheet($f['peso_hora5']),
+            $f['obs_sellado'] ?? '',
+            $otros[$num] ?? '',
+        ];
+    }
+    return $filas;
+}
+
+// Fila para la hoja LOGS
+function construirLogPlanilla($planilla, $numRegistros){
+    $bloques = bloquesTurno();
+    $horario = $bloques[$planilla['bloque']]['horario'] ?? $planilla['bloque'];
+    return [
+        $planilla['codigo'],                 // ID DEL TURNO (S20260701_T001)
+        $planilla['fecha_planilla'],          // FECHA
+        $horario,                             // TURNO
+        $planilla['supervisor_nombre'] ?? '', // SUPERVISOR
+        $planilla['creado_en'] ?? date('Y-m-d H:i:s'), // INICIO (apertura del turno)
+        date('Y-m-d H:i:s'),                  // FIN (finalización)
+        $numRegistros,                        // REGISTROS
+        'COMPLETADO',                         // ESTADO
+    ];
+}
+
+// Borrar las filas de borrador de una planilla (deja el sobre)
+function borrarFilasPlanilla($conexion, $planilla){
+    $lista = inIdSheets($conexion, idSheetsDe($planilla));
+    if($lista !== ''){
+        $conexion->query("DELETE FROM produccion_sellado WHERE id_sheet IN ({$lista})");
+    }
 }

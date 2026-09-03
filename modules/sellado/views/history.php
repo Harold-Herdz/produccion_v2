@@ -13,17 +13,43 @@ require_once dirname(__DIR__, 3) . '/includes/config.php';
 include dirname(__DIR__) . '/controllers/historyController.php';
 // Importar header.php
 include dirname(__DIR__, 3) . '/templates/header.php';
+
+/* =================================================
+   MODAL "REGISTRAR PRODUCCIÓN" (inicio de turno)
+================================================= */
+// Datos para el modal
+$regError   = $_GET['reg_error'] ?? '';
+$regHoy     = date('Y-m-d');
+$regUsuario = $_SESSION['usuario'] ?? 'Sin usuario';
+$regTurnos  = ['Día' => '6am - 2pm', 'Tarde' => '2pm - 10pm', 'Noche' => '10pm - 6am'];
+
+// ¿Ya hay un turno abierto? (si la tabla existe)
+$regAbierta = null;
+try {
+    $q = $conexion->query("SELECT codigo FROM sellado_planillas WHERE estado = 'abierta' ORDER BY id_planilla DESC LIMIT 1");
+    $regAbierta = $q ? $q->fetch_assoc() : null;
+} catch (Throwable $e) {
+    // La planilla nunca se ha abierto y la tabla aún no existe
+}
 ?>
+
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
 
 <!-- Contenedor del Historial -->
 <div class="container" id="containerHistorial">
     <!-- Título -->
     <h2 class="titulo-vista">Historial Producción Sellado</h2>
 
-        <!-- Botón para abrir la planilla de registro de producción -->
-        <a class="btn" id="btnRegistrar" href="<?= BASE_URL ?>/modules/sellado/views/register.php">
-            Registrar Producción
-        </a>
+        <!-- Botón para registrar producción: abre el modal, o continúa el turno abierto -->
+        <?php if($regAbierta): ?>
+            <a class="btn" id="btnRegistrar" href="<?= BASE_URL ?>/modules/sellado/views/register.php">
+                Continuar planilla
+            </a>
+        <?php else: ?>
+            <a class="btn" id="btnRegistrar" onclick="abrirModal('modalRegistrar')">
+                Registrar Producción
+            </a>
+        <?php endif; ?>
 
         <br> <br>
 
@@ -137,7 +163,56 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
 </div>
 
-<?php 
+<!-- ============================================
+     MODAL: NUEVA PLANILLA (inicio de turno)
+============================================ -->
+<div class="overlay" id="modalRegistrar">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Nueva planilla · Sellado</h2>
+            <button type="button" onclick="cerrarModal('modalRegistrar')">X</button>
+        </div>
+
+        <?php if($regError): ?>
+            <p class="aviso aviso-error"><?= htmlspecialchars($regError) ?></p>
+        <?php endif; ?>
+
+        <!-- El formulario envía a register.php, que crea el turno y abre la planilla -->
+        <form class="form-inicio" method="POST"
+              action="<?= BASE_URL ?>/modules/sellado/views/register.php">
+            <input type="hidden" name="accion" value="iniciar">
+
+            <div class="campo">
+                <label>Fecha</label>
+                <input type="date" name="fecha" value="<?= htmlspecialchars($regHoy) ?>" required>
+            </div>
+
+            <div class="campo">
+                <label>Turno</label>
+                <select name="bloque" required>
+                    <option value="">Seleccione el turno...</option>
+                    <?php foreach($regTurnos as $nombre => $horario): ?>
+                        <option value="<?= $nombre ?>"><?= $nombre ?> (<?= $horario ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>Supervisor</label>
+                <input type="text" value="<?= htmlspecialchars($regUsuario) ?>" readonly>
+            </div>
+
+            <button type="submit" class="btn" id="btnIniciar">Iniciar planilla</button>
+        </form>
+    </div>
+</div>
+
+<script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
+<?php if($regError): ?>
+<script>abrirModal('modalRegistrar');</script>
+<?php endif; ?>
+
+<?php
 // Importar footer.php
 include dirname(__DIR__, 3) . '/templates/footer.php';
 ?>

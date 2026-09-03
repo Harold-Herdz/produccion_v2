@@ -13,17 +13,17 @@
 }
 
 /* ===========================
-   ESTADO 1: INICIAR PLANILLA
+   MODAL "NUEVA PLANILLA" (inicio de turno, en el historial)
 =========================== */
-.card-inicio {
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 30px;
+#modalRegistrar .modal {
+  background: var(--fondo-secundario);
+  text-align: left;
 }
-.inicio-texto {
+#modalRegistrar .modal-header {
   text-align: center;
-  margin-bottom: 20px;
-  color: var(--texto);
+}
+#modalRegistrar .aviso-error {
+  margin-top: 14px;
 }
 .form-inicio .campo {
   margin-bottom: 16px;
@@ -40,9 +40,20 @@
   padding: 12px 14px;
   border-radius: 10px;
   border: 2px solid var(--cyan);
-  background: var(--fondo-claro);
+  background-color: var(--fondo-claro);
   color: var(--texto);
   font-size: 14px;
+}
+/* Flecha del menú desplegable en el formulario de inicio */
+.form-inicio select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d7d7d7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
 }
 .form-inicio input[readonly] {
   border-color: rgba(255, 255, 255, 0.14);
@@ -52,6 +63,10 @@
   width: 100%;
   display: block;
   font-size: 16px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5) sepia(1) saturate(500%) hue-rotate(150deg);
+  cursor: pointer;
 }
 
 /* ===========================
@@ -79,6 +94,15 @@
   font-size: 16px;
   font-weight: 600;
   color: var(--texto);
+}
+#fechaPlanilla {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--cyan);
+  background: var(--fondo-claro);
+  color: var(--texto);
+  font-size: 15px;
+  font-weight: 600;
 }
 
 /* Indicador de guardado */
@@ -138,182 +162,220 @@
 }
 .planilla {
   width: 100%;
-  min-width: 1150px;
+  min-width: 900px;        /* debajo de esto la tabla se desplaza (responsive) */
+  table-layout: fixed;
   border-collapse: collapse;
   background: var(--fondo-box);
+  font-size: 12px;
 }
+
+/* Anchos de columna: el resto va para OBSERVACIONES */
+.c-maq   { width: 58px; }
+.c-op    { width: 134px; }
+.c-ref   { width: 108px; }
+.c-color { width: 86px; }
+.c-x     { width: 54px; }
+.c-p     { width: 52px; }
+.c-obs   { width: auto; }
+.c-del   { width: 36px; }
+
 .planilla thead th {
-  position: sticky;
-  top: 0;
-  z-index: 3;
   background: var(--fondo-secundario);
   color: white;
-  font-size: 13px;
-  padding: 10px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px 4px;
   border: 1px solid var(--fondo-box);
+  text-align: center;
   white-space: nowrap;
 }
 .planilla td {
-  padding: 6px 8px;
+  padding: 1px 3px;
   border: 1px solid var(--fondo-secundario);
-  font-size: 13px;
   vertical-align: middle;
 }
 
-/* Columna Máquina fija al hacer scroll horizontal */
-.planilla .col-maquina {
-  position: sticky;
-  left: 0;
-  z-index: 2;
+/* Inputs y selects: compactos, ocupan la celda sin forzar scroll */
+.planilla input,
+.planilla select {
+  width: 100%;
+  min-width: 0;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background-color: var(--fondo-claro);
+  color: var(--texto);
+  font-size: 11px;
+}
+.planilla input:focus,
+.planilla select:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 2px rgba(27, 112, 168, 0.35);
+}
+
+/* Selects: flecha hacia abajo siempre visible a la derecha (estilo Spreadsheet) */
+.planilla select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d7d7d7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  background-size: 11px;
+}
+
+/* Campos numéricos sin flechas de subir/bajar (se conservan las validaciones) */
+.planilla input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.planilla input[type="number"]::-webkit-outer-spin-button,
+.planilla input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Columna MÁQUINA: solo el número, centrado y agrupando todas las entradas */
+.col-maquina {
   background: var(--fondo-secundario);
   color: var(--texto);
-  font-weight: 600;
-  white-space: nowrap;
-  min-width: 96px;
+  font-weight: 700;
+  font-size: 15px;
   text-align: center;
-}
-.planilla thead .col-maquina {
-  z-index: 4;
+  vertical-align: middle;
 }
 
-/* Grupo de cada máquina */
-.grupo-maquina {
-  border-bottom: 3px solid var(--fondo-box);
-}
-.grupo-maquina + .grupo-maquina {
-  border-top: 3px solid var(--fondo-box);
-}
-
-/* Fila de datos compartidos de la máquina */
-.fila-info td {
+/* Bloque OPERARIO / OTRO OPERARIO / JORNADA de cada máquina */
+.col-operario {
   background: var(--fondo-claro);
+  vertical-align: middle;
+  padding: 4px !important;
 }
-.fila-info .col-maquina {
-  background: var(--fondo-claro);
-}
-.maq-datos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  align-items: flex-end;
-}
-.maq-datos label {
+.op-bloque {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 12px;
+}
+/* Subtítulos de "Otro operario" y "Jornada" (el de operario NO lleva subtítulo) */
+.op-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 9px;
   font-weight: 600;
-  color: var(--texto);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.6);
 }
-.maq-datos select,
-.maq-datos input {
-  min-width: 190px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: var(--fondo-secundario);
-  color: var(--texto);
-  font-size: 13px;
-}
-.fila-info.usa-otro .f-operario {
-  opacity: 0.45;
-}
-.fila-info.usa-otro .f-otro-operario {
-  border-color: var(--cyan);
+.op-bloque.usa-otro .f-operario { opacity: 0.4; }
+.op-bloque.usa-otro .f-otro-operario { border-color: var(--cyan); }
+
+/* Separación entre máquinas */
+.grupo-maquina {
+  border-bottom: 3px solid var(--fondo-box);
 }
 
-/* Filas de entrada */
-.fila-entrada input,
-.fila-entrada select {
-  width: 100%;
-  min-width: 74px;
-  padding: 7px 8px;
-  border-radius: 7px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: var(--fondo-claro);
-  color: var(--texto);
-  font-size: 13px;
-}
-.fila-entrada select { min-width: 130px; }
-.fila-entrada .f-obs { min-width: 160px; }
-.fila-entrada input:focus,
-.fila-entrada select:focus,
-.maq-datos input:focus,
-.maq-datos select:focus {
-  outline: none;
-  border-color: var(--azul);
-  box-shadow: 0 0 0 3px rgba(27, 112, 168, 0.3);
-}
-.fila-entrada:nth-of-type(even) td:not(.col-maquina) {
+/* Zebra suave por entrada */
+.fila-entrada:nth-of-type(even) td:not(.col-maquina):not(.col-operario) {
   background: var(--teal);
 }
 
-.celda-acciones {
-  text-align: center;
-}
+.celda-acciones { text-align: center; }
 .btn-quitar {
   border: none;
   background: transparent;
   color: #e05a5a;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 1px 4px;
   border-radius: 6px;
   transition: 0.2s;
 }
-.btn-quitar:hover {
-  background: rgba(224, 90, 90, 0.15);
-}
+.btn-quitar:hover { background: rgba(224, 90, 90, 0.15); }
 
-/* Botón + Entrada */
+/* Fila con el botón "+ Entrada" */
 .fila-add td {
   background: var(--fondo-box);
+  text-align: left;
+  padding: 3px 8px;
 }
 .btn-entrada {
-  padding: 7px 16px;
+  padding: 3px 12px;
   border-radius: 8px;
   border: 1px dashed var(--cyan);
   background: transparent;
   color: var(--cyan);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 11px;
   cursor: pointer;
   transition: 0.2s;
 }
-.btn-entrada:hover {
-  background: rgba(82, 186, 218, 0.12);
-}
+.btn-entrada:hover { background: rgba(82, 186, 218, 0.12); }
 .tope-entradas {
   display: none;
   margin-left: 12px;
-  font-size: 12px;
+  font-size: 11px;
   color: #e0a10c;
 }
-.grupo-maquina.tope .btn-entrada {
-  opacity: 0.4;
-  pointer-events: none;
+.grupo-maquina.tope .btn-entrada { opacity: 0.4; pointer-events: none; }
+.grupo-maquina.tope .tope-entradas { display: inline; }
+
+/* ===========================
+   NOTA GENERAL
+=========================== */
+.nota-general {
+  margin-top: 20px;
 }
-.grupo-maquina.tope .tope-entradas {
-  display: inline;
+.nota-general label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--texto);
+}
+.nota-general textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: var(--fondo-claro);
+  color: var(--texto);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+.nota-general textarea:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(27, 112, 168, 0.3);
 }
 
 /* ===========================
-   ACCIONES FINALES
+   ACCIONES (Cancelar / Finalizar)
 =========================== */
 .acciones-planilla {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  margin-top: 26px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+.form-cancelar { margin: 0; }
+.btn-cancelar-turno {
+  background: var(--fondo-claro);
+}
+.btn-cancelar-turno:hover {
+  background: var(--fondo-secundario);
 }
 .btn-finalizar {
   background: var(--verde);
+  font-size: 16px;
+  padding: 14px 28px;
 }
-.btn-finalizar:hover {
-  background: var(--limon);
-}
+.btn-finalizar:hover { background: var(--limon); }
 .btn-finalizar:disabled,
 #btnConfirmarFinalizar:disabled {
   opacity: 0.55;
@@ -349,30 +411,18 @@
   color: white;
   cursor: pointer;
 }
-.btn-cancelar {
-  background: var(--fondo-claro);
-}
+.btn-cancelar { background: var(--fondo-claro); }
 
 /* ===========================
    RESPONSIVE
 =========================== */
 @media (max-width: 900px) {
-  #containerRegister {
-    padding: 24px;
-  }
-  .encabezado-turno {
-    gap: 16px;
-  }
-  .indicador-guardado {
-    margin-left: 0;
-  }
+  #containerRegister { padding: 24px; }
+  .encabezado-turno { gap: 16px; }
+  .indicador-guardado { margin-left: 0; }
 }
 @media (max-width: 700px) {
-  .acciones-planilla {
-    justify-content: stretch;
-  }
-  .acciones-planilla .btn {
-    flex: 1;
-    text-align: center;
-  }
+  .acciones-planilla { flex-direction: column-reverse; align-items: stretch; }
+  .acciones-planilla .form-cancelar,
+  .acciones-planilla .btn { width: 100%; text-align: center; }
 }

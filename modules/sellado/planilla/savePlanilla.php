@@ -13,8 +13,8 @@ require_once dirname(__DIR__) . '/models/registerModel.php';
 header('Content-Type: application/json');
 
 // Leer el cuerpo JSON
-$entrada = json_decode(file_get_contents('php://input'), true) ?: [];
-$codigo  = $entrada['codigo'] ?? '';
+$entrada  = json_decode(file_get_contents('php://input'), true) ?: [];
+$codigo   = $entrada['codigo'] ?? '';
 $maquinas = $entrada['maquinas'] ?? [];
 
 // Verificar que la planilla exista y siga abierta
@@ -27,6 +27,16 @@ if(!$planilla || $planilla['estado'] !== 'abierta'){
     exit;
 }
 
+// Si el supervisor cambió la fecha, recodificar la planilla
+$fecha = validarFechaPlanilla($entrada['fecha'] ?? '');
+if($fecha){
+    [$planilla, $errFecha] = recodificarPlanilla($conexion, $planilla, $fecha);
+    if($errFecha){
+        echo json_encode(['ok' => false, 'error' => $errFecha]);
+        exit;
+    }
+}
+
 // Guardar los datos recibidos
 try {
     $resultado = guardarPlanilla($conexion, $planilla, $maquinas);
@@ -37,6 +47,7 @@ try {
 
 echo json_encode([
     'ok'          => true,
+    'codigo'      => $planilla['codigo'],
     'guardado_en' => date('H:i:s'),
     'guardados'   => $resultado['guardados'],
     'avisos'      => $resultado['avisos'],

@@ -2,8 +2,6 @@
 /backups
 *.sql
 
-# PDFs generados por la planilla de sellado
-/pdfs
 
 # logs
 /logs
