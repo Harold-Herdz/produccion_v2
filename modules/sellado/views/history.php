@@ -1,4 +1,5 @@
 <?php
+/** @var mysqli $conexion */
 /** @var mysqli_result $resultado */
 /** @var int $pagina */
 /** @var int $total_paginas */
@@ -14,10 +15,7 @@ include dirname(__DIR__) . '/controllers/historyController.php';
 // Importar header.php
 include dirname(__DIR__, 3) . '/templates/header.php';
 
-/* =================================================
-   MODAL "REGISTRAR PRODUCCIÓN" (inicio de turno)
-================================================= */
-// Datos para el modal
+// Modal "Registrar Producción" (inicio de turno)
 $regError   = $_GET['reg_error'] ?? '';
 $regHoy     = date('Y-m-d');
 $regUsuario = $_SESSION['usuario'] ?? 'Sin usuario';
@@ -163,9 +161,7 @@ try {
 
 </div>
 
-<!-- ============================================
-     MODAL: NUEVA PLANILLA (inicio de turno)
-============================================ -->
+<!-- Modal: nueva planilla (inicio de turno) -->
 <div class="overlay" id="modalRegistrar">
     <div class="modal">
         <div class="modal-header">

@@ -2,22 +2,16 @@
 /** @var mysqli $conexion */
 
 // Guardado progresivo de la planilla (AJAX, JSON)
-
-// Importar authMiddleware.php (valida sesión)
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
-// Importar conexion.php
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
-// Importar registerModel.php
 require_once dirname(__DIR__) . '/models/registerModel.php';
 
 header('Content-Type: application/json');
 
-// Leer el cuerpo JSON
 $entrada  = json_decode(file_get_contents('php://input'), true) ?: [];
 $codigo   = $entrada['codigo'] ?? '';
 $maquinas = $entrada['maquinas'] ?? [];
 
-// Verificar que la planilla exista y siga abierta
 $planilla = obtenerPlanillaPorCodigo($conexion, $codigo);
 if(!$planilla || $planilla['estado'] !== 'abierta'){
     echo json_encode([
@@ -27,7 +21,7 @@ if(!$planilla || $planilla['estado'] !== 'abierta'){
     exit;
 }
 
-// Si el supervisor cambió la fecha, recodificar la planilla
+// Fecha cambiada: recodificar antes de guardar
 $fecha = validarFechaPlanilla($entrada['fecha'] ?? '');
 if($fecha){
     [$planilla, $errFecha] = recodificarPlanilla($conexion, $planilla, $fecha);
@@ -37,7 +31,6 @@ if($fecha){
     }
 }
 
-// Guardar los datos recibidos
 try {
     $resultado = guardarPlanilla($conexion, $planilla, $maquinas);
 } catch (Throwable $e) {

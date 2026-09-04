@@ -1,15 +1,6 @@
 <?php
-/* =================================================
-   MODELO REGISTER · PLANILLA DIGITAL DE SELLADO
-   -------------------------------------------------
-   Reemplaza la antigua planilla de Google Sheets.
-   - Cada entrada real termina como una fila normal
-     en PRODUCCION_SELLADO (una entrada = un registro).
-   - El "sobre" del turno (estado, supervisor, PDF) se
-     guarda en la tabla aislada SELLADO_PLANILLAS.
-================================================= */
+// Modelo de Register: planilla digital de turno de Sellado
 
-// Zona horaria del proyecto (Colombia, GMT-5) para fecha/código del turno
 date_default_timezone_set('America/Bogota');
 
 /* =================================================
@@ -44,10 +35,7 @@ function asegurarTablaPlanillas($conexion){
 }
 
 /* =================================================
-   VÍNCULO PLANILLA ↔ FILAS
-   La planilla guarda en 'filas' un mapa JSON
-   { "maquina-posicion": "id_sheet" } con los id_sheet
-   secuenciales (S02651, S02652...) de sus registros.
+   VÍNCULO PLANILLA ↔ FILAS ('filas' = mapa slot => id_sheet)
 ================================================= */
 // Mapa slot => id_sheet de una planilla
 function mapaFilas($planilla){
@@ -67,8 +55,7 @@ function inIdSheets($conexion, $ids){
         return "'" . $conexion->real_escape_string($s) . "'";
     }, $ids));
 }
-// id_sheet del borrador de una entrada (prefijo BORR-, nunca choca con los S##### del Sheet).
-// Al finalizar, estas filas se envían a REGISTROS y se borran; vuelven al importar con su S##### real.
+// id_sheet de borrador (BORR-...), nunca choca con los S##### del Sheet
 function idSheetBorrador($planilla, $numMaq, $pos){
     return 'BORR-' . $planilla['id_planilla'] . '-' . $numMaq . '-' . $pos;
 }
@@ -159,8 +146,7 @@ function guardarRutaPdfPlanilla($conexion, $codigo, $ruta){
     $stmt->execute();
 }
 
-// Cambiar la fecha de una planilla abierta: recalcula el código y actualiza sus filas.
-// Devuelve [planilla_actualizada, error|null].
+// Cambiar la fecha de una planilla abierta: recalcula el código y actualiza sus filas
 function recodificarPlanilla($conexion, $planilla, $fechaNueva){
     if($fechaNueva === $planilla['fecha_planilla']){
         return [$planilla, null];
@@ -267,8 +253,7 @@ function obtenerIdTurno($conexion, $bloque, $jornada){
     return $conexion->insert_id;
 }
 
-// Obtener el id de un operario por nombre exacto; se crea si no está en el catálogo
-// Devuelve [id_operario, fue_creado]
+// Id de operario por nombre; lo crea si no existe. Devuelve [id_operario, fue_creado]
 function obtenerOperarioIdPorNombre($conexion, $nombre){
     $nombre = trim($nombre);
     $stmt = $conexion->prepare("SELECT id_operario FROM operarios WHERE nombre_operario = ? LIMIT 1");
@@ -311,10 +296,7 @@ function entradaVacia($ent){
     return true;
 }
 
-// Guardar el BORRADOR de la planilla: cada entrada no vacía se vuelve una fila
-// en PRODUCCION_SELLADO con id_sheet 'BORR-...'. El vínculo entrada↔id_sheet se guarda
-// en el mapa 'filas' del sobre. Al finalizar, estas filas se envían a la hoja REGISTROS
-// y se borran (vuelven al Historial solo tras "Importar").
+// Guarda el borrador: cada entrada no vacía se vuelve una fila BORR-... en produccion_sellado
 function guardarPlanilla($conexion, $planilla, $maquinas){
     $codigo  = $planilla['codigo'];
     $bloque  = $planilla['bloque'];
@@ -347,12 +329,14 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
                 peso_hora5    = VALUES(peso_hora5),
                 obs_sellado   = VALUES(obs_sellado)";
     $stmt = $conexion->prepare($sql);
+    $maquinasEnviadas = []; // solo se borran filas de máquinas que vinieron en el payload
 
     foreach($maquinas as $m){
         $numMaq = (int) ($m['maquina'] ?? 0);
         if($numMaq < 1 || $numMaq > 17){
             continue;
         }
+        $maquinasEnviadas[$numMaq] = true;
         $maqEtiqueta = str_pad($numMaq, 2, '0', STR_PAD_LEFT);
 
         // Resolver operario: el texto libre de "Otro operario" tiene prioridad
@@ -407,6 +391,15 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
             );
             $stmt->execute();
             $guardados++;
+        }
+    }
+
+    // Conservar los slots de máquinas ausentes del payload (protege contra payloads parciales:
+    // si una máquina no vino en $maquinas, sus filas ni se borran ni se pierden del mapa)
+    foreach($mapaViejo as $slot => $idSheet){
+        $numSlot = (int) strtok($slot, '-');
+        if(!isset($maquinasEnviadas[$numSlot]) && !isset($mapaNuevo[$slot])){
+            $mapaNuevo[$slot] = $idSheet;
         }
     }
 
@@ -513,10 +506,9 @@ function numSheet($v){
     return ($v === null || $v === '') ? '' : $v + 0;
 }
 
-// Filas para la hoja REGISTROS: 17 columnas B..R por cada entrada del turno.
-// Col A (id_sheet) la genera la fórmula del Sheet.
+// Filas para REGISTROS: 17 columnas B..R por entrada (A la genera la fórmula del Sheet)
 function construirFilasRegistros($conexion, $planilla, $maquinasPayload){
-    // Texto de "otro operario" por número de máquina (viene del formulario)
+    // Otro operario por número de máquina
     $otros = [];
     foreach($maquinasPayload as $m){
         $n = (int) ($m['maquina'] ?? 0);

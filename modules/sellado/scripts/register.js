@@ -1,8 +1,4 @@
-/* =================================================
-   REGISTER · PLANILLA DIGITAL DE SELLADO
-   Interacción: entradas, guardado progresivo,
-   recuperación, nota general y finalización del turno.
-================================================= */
+// Register: planilla digital de turno (entradas, autoguardado, finalizar)
 
 const planilla = document.getElementById("planilla");
 
@@ -111,7 +107,7 @@ if (planilla) {
         setIndicador("guardando", "Guardando…");
 
         try {
-            const res  = await fetch("../planilla/savePlanilla.php", {
+            const res  = await fetch("../spreadsheet/saveSpreadsheet.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(recolectar())
@@ -228,7 +224,7 @@ if (planilla) {
         btnConfirmar.textContent = "Procesando…";
 
         try {
-            const res  = await fetch("../planilla/finalizarPlanilla.php", {
+            const res  = await fetch("../spreadsheet/finalizeSpreadsheet.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(recolectar())
@@ -276,8 +272,7 @@ if (planilla) {
     /* =========================================
        PROTECCIONES
     ========================================= */
-    // Al confirmar el "Cancelar" del turno: no volver a avisar de cambios sin guardar
-    // (si el usuario rechaza el confirm, onsubmit ya hizo preventDefault y no se marca)
+    // No avisar de cambios sin guardar tras confirmar "Cancelar"
     const formCancelar = document.getElementById("formCancelarTurno");
     if (formCancelar) {
         formCancelar.addEventListener("submit", e => {

@@ -35,8 +35,7 @@ body {
   padding-top: 50px;
 }
 
-/* Envoltura del contenido: crece para empujar el footer al fondo
-   cuando la página es más corta que la pantalla */
+/* Empuja el footer al fondo cuando la página es corta */
 .contenido {
   flex: 1 0 auto;
   display: flex;

@@ -1,0 +1,29 @@
+/* Register Rollos: formulario simple, reutiliza .form-inicio/.aviso de register.css */
+
+#containerRegisterRollo {
+  margin-top: 100px;
+  margin-bottom: 96px;
+  color: var(--texto);
+}
+#containerRegisterRollo .card {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 30px;
+  background: var(--fondo-box);
+  border-radius: 14px;
+}
+#containerRegisterRollo .aviso {
+  margin-bottom: 16px;
+}
+.campo-doble {
+  display: flex;
+  gap: 16px;
+}
+.campo-doble .campo {
+  flex: 1;
+}
+#btnRegistrarRollo {
+  width: 100%;
+  display: block;
+  font-size: 16px;
+}

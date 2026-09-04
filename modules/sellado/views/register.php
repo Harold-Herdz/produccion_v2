@@ -8,13 +8,9 @@
 /** @var array      $bloques        Bloques de turno disponibles */
 /** @var string     $horarioTurno   Etiqueta horaria del turno abierto */
 
-// Importar authMiddleware.php
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
-// Importar config.php
 require_once dirname(__DIR__, 3) . '/includes/config.php';
-// Importar registerController.php
 require_once dirname(__DIR__) . '/controllers/registerController.php';
-// Importar header.php
 include dirname(__DIR__, 3) . '/templates/header.php';
 
 // Ayudante: opciones <option> de un catálogo
@@ -65,11 +61,6 @@ if(!function_exists('celdasEntradaPlanilla')){
 <div class="container" id="containerRegister">
 
     <h2 class="titulo-vista">Planilla de Producción · Sellado</h2>
-
-    <!-- ============================================
-         TURNO ABIERTO → PLANILLA DE TRABAJO
-         (El inicio de turno se hace desde el modal del historial)
-    ============================================ -->
 
     <!-- Encabezado del turno -->
     <div class="card encabezado-turno">
@@ -242,7 +233,4 @@ if(!function_exists('celdasEntradaPlanilla')){
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
 <script src="<?= BASE_URL ?>/modules/sellado/scripts/register.js"></script>
 
-<?php
-// Importar footer.php
-include dirname(__DIR__, 3) . '/templates/footer.php';
-?>
+<?php include dirname(__DIR__, 3) . '/templates/footer.php'; ?>

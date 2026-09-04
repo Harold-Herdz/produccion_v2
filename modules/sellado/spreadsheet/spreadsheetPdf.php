@@ -1,16 +1,6 @@
 <?php
-/* =================================================
-   GENERACIÓN DEL PDF DE LA PLANILLA DE SELLADO
-   -------------------------------------------------
-   Se genera al finalizar el turno y se devuelve como
-   cadena binaria. finalizarPlanilla.php lo envía en
-   base64 al Apps Script, que lo guarda en Drive:
-     PDFs Sellado/MM-yyyy/dd-MM-yyyy/Produccion_{codigo}.pdf
-   La NOTA GENERAL se recibe por parámetro y se imprime
-   en el PDF, pero NO se guarda en la base de datos.
-================================================= */
-
-require_once __DIR__ . '/fpdf/fpdf.php';
+// Genera el PDF de la planilla (bytes en memoria; se envía a Drive vía Apps Script)
+require_once dirname(__DIR__, 2) . '/shared/fpdf/fpdf.php';
 require_once dirname(__DIR__) . '/models/registerModel.php';
 
 // Pasar texto UTF-8 a la codificación de las fuentes base de FPDF
