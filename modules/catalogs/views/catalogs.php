@@ -19,20 +19,12 @@ $catalogos = catalogosDisponibles();
 
 // Número de columnas de la tabla (turnos muestra 2 columnas extra)
 $totalColumnas = ($clave === 'turnos') ? 5 : 4;
+
+// Importar header.php
+include dirname(__DIR__, 3) . '/templates/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-
-<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogos</title>
-    <!-- Ícono y estilos -->
-    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/images/logo.png">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/catalogs.css">
-
-</head>
-<body>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/catalogs.css">
 
     <!-- Contenedor de Catálogos -->
     <div class="container">
@@ -192,5 +184,4 @@ $totalColumnas = ($clave === 'turnos') ? 5 : 4;
 
     <script src="<?= BASE_URL ?>/modules/catalogs/scripts/catalogs.js"></script>
 
-</body>
-</html>
+<?php include dirname(__DIR__, 3) . '/templates/footer.php'; ?>

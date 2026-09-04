@@ -31,8 +31,9 @@ $total = obtenerTotalHistoricoSellado($conexion);
 // Producción de la semana y del mes actual
 $semana = obtenerProduccionSemanaSellado($conexion);
 $mes = obtenerProduccionMesSellado($conexion);
-// Top operario del mes actual
+// Top máquina y top operario (año actual)
 $top_maquina = obtenerTopMaquinaSellado($conexion);
+$top_operario = obtenerTopOperarioSellado($conexion);
 
 // Totales de los meses
 $total_mes1 = obtenerTotalMesSellado($conexion,$mes1);

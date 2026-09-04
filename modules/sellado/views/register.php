@@ -15,15 +15,30 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
 // Ayudante: opciones <option> de un catálogo
 if(!function_exists('opcionesCatalogo')){
-    function opcionesCatalogo($lista, $idKey, $nombreKey, $seleccionado){
+    function opcionesCatalogo($lista, $idKey, $nombreKey, $seleccionado, $incluirVacio = true){
         // Primera opción realmente vacía (sin "-" ni guion)
-        $html = '<option value=""></option>';
+        $html = $incluirVacio ? '<option value=""></option>' : '';
         foreach($lista as $item){
             $sel = ((string) $item[$idKey] === (string) $seleccionado) ? ' selected' : '';
             $html .= '<option value="' . $item[$idKey] . '"' . $sel . '>'
                    . htmlspecialchars($item[$nombreKey]) . '</option>';
         }
         return $html;
+    }
+}
+
+// Ayudante: select de catálogo + "Otro" (al elegirlo, el mismo campo se
+// convierte en texto libre; ver .tiene-otro/.campo-libre en register.js)
+if(!function_exists('campoCatalogoConOtro')){
+    function campoCatalogoConOtro($lista, $idKey, $nombreKey, $seleccionado, $clase, $titulo = ''){
+        ob_start(); ?>
+        <select class="<?= $clase ?> tiene-otro" <?= $titulo ? 'title="' . htmlspecialchars($titulo) . '"' : '' ?>>
+            <option value=""></option>
+            <option value="otro">Otro</option>
+            <?= opcionesCatalogo($lista, $idKey, $nombreKey, $seleccionado, false) ?>
+        </select>
+        <input type="text" class="<?= $clase ?> campo-libre" hidden autocomplete="off" placeholder="Escribe...">
+        <?php return ob_get_clean();
     }
 }
 
@@ -38,8 +53,8 @@ if(!function_exists('valPlanilla')){
 if(!function_exists('celdasEntradaPlanilla')){
     function celdasEntradaPlanilla($ent, $referencias, $colores){
         ob_start(); ?>
-        <td><select class="f-ref"><?= opcionesCatalogo($referencias, 'id_referencia', 'nombre_referencia', $ent['id_referencia'] ?? '') ?></select></td>
-        <td><select class="f-color"><?= opcionesCatalogo($colores, 'id_color', 'nombre_color', $ent['id_color'] ?? '') ?></select></td>
+        <td><?= campoCatalogoConOtro($referencias, 'id_referencia', 'nombre_referencia', $ent['id_referencia'] ?? '', 'f-ref') ?></td>
+        <td><?= campoCatalogoConOtro($colores, 'id_color', 'nombre_color', $ent['id_color'] ?? '', 'f-color') ?></td>
         <td><input type="number" class="f-x70" min="0" step="1" value="<?= valPlanilla($ent['x70'] ?? '') ?>"></td>
         <td><input type="number" class="f-x90" min="0" step="1" value="<?= valPlanilla($ent['x90'] ?? '') ?>"></td>
         <td><input type="number" class="f-x98" min="0" step="1" value="<?= valPlanilla($ent['x98'] ?? '') ?>"></td>
@@ -66,8 +81,8 @@ if(!function_exists('celdasEntradaPlanilla')){
     <div class="card encabezado-turno">
         <div class="dato-turno">
             <span class="dato-label">Fecha</span>
-            <!-- Editable: al cambiarla se recodifica la planilla -->
-            <input type="date" id="fechaPlanilla" value="<?= htmlspecialchars($planilla['fecha_planilla']) ?>">
+            <!-- Solo se puede elegir al iniciar el turno, no mientras se llena la planilla -->
+            <input type="date" id="fechaPlanilla" value="<?= htmlspecialchars($planilla['fecha_planilla']) ?>" disabled>
         </div>
         <div class="dato-turno">
             <span class="dato-label">Turno</span>
@@ -136,22 +151,20 @@ if(!function_exists('celdasEntradaPlanilla')){
                     <?php if($i === 0): ?>
                         <!-- Número de máquina agrupando visualmente todas sus entradas -->
                         <td class="col-maquina" rowspan="<?= $span ?>"><?= $etq ?></td>
-                        <!-- Bloque de operario / otro operario / jornada de la máquina -->
+                        <!-- Bloque de operario / jornada de la máquina -->
                         <td class="col-operario" rowspan="<?= $span ?>">
                             <div class="op-bloque">
-                                <!-- Operario: sin subtítulo -->
-                                <select class="f-operario" title="Operario"><?= opcionesCatalogo($operarios, 'id_operario', 'nombre_operario', $datos['id_operario'] ?? '') ?></select>
-                                <!-- Otro operario: conserva subtítulo y placeholder -->
-                                <label class="op-sub">Otro operario
-                                    <input type="text" class="f-otro-operario" autocomplete="off" placeholder="Si no esta en la lista">
-                                </label>
-                                <!-- Jornada: conserva subtítulo -->
+                                <!-- Operario: sin subtítulo; "Otro" se vuelve texto libre en el mismo campo -->
+                                <?= campoCatalogoConOtro($operarios, 'id_operario', 'nombre_operario', $datos['id_operario'] ?? '', 'f-operario', 'Operario') ?>
+                                <!-- Jornada: conserva subtítulo; también admite "Otro" -->
                                 <label class="op-sub">Jornada
-                                    <select class="f-jornada">
+                                    <select class="f-jornada tiene-otro">
                                         <option value=""></option>
+                                        <option value="otro">Otro</option>
                                         <option value="8 Horas"  <?= (($datos['jornada'] ?? '') === '8 Horas')  ? 'selected' : '' ?>>8 Horas</option>
                                         <option value="12 Horas" <?= (($datos['jornada'] ?? '') === '12 Horas') ? 'selected' : '' ?>>12 Horas</option>
                                     </select>
+                                    <input type="text" class="f-jornada campo-libre" hidden autocomplete="off" placeholder="Escribe...">
                                 </label>
                             </div>
                         </td>
@@ -200,17 +213,12 @@ if(!function_exists('celdasEntradaPlanilla')){
 <div class="overlay" id="modalFinalizar">
     <div class="modal">
         <div class="modal-header">
-            <h2>Finalizar turno</h2>
+            <h2>Confirmar finalización de turno</h2>
             <button type="button" onclick="cerrarModal('modalFinalizar')">X</button>
         </div>
-        <p class="modal-texto">
-            Se enviarán todos los registros a la hoja REGISTROS y el PDF (con la nota general) a Drive.<br>
-            Luego deberás <strong>importar</strong> desde el Dashboard para verlos en el Historial.<br>
-            Esta acción no se puede deshacer.
-        </p>
         <div class="btn-row">
-            <button type="button" class="btn" id="btnConfirmarFinalizar">Finalizar</button>
-            <button type="button" class="btn btn-cancelar" onclick="cerrarModal('modalFinalizar')">Cancelar</button>
+            <button type="button" class="btn" id="btnConfirmarFinalizar">Sí</button>
+            <button type="button" class="btn btn-cancelar" onclick="cerrarModal('modalFinalizar')">No</button>
         </div>
     </div>
 </div>
@@ -219,9 +227,8 @@ if(!function_exists('celdasEntradaPlanilla')){
 <div class="overlay" id="modalResultado">
     <div class="modal">
         <div class="modal-header">
-            <h2>Turno finalizado</h2>
+            <h2 id="resultadoTexto">Turno finalizado correctamente</h2>
         </div>
-        <p class="modal-texto" id="resultadoTexto"></p>
         <div class="btn-row">
             <a class="btn" id="btnVerPdf" href="#" target="_blank">Ver PDF</a>
             <a class="btn" id="btnNuevaPlanilla" href="<?= BASE_URL ?>/modules/sellado/views/register.php">Nueva planilla</a>

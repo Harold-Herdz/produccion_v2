@@ -4,9 +4,8 @@
 // URL de export CSV de la hoja REGISTROS (misma que usa el importador de Rollos)
 define('ROLLO_REGISTROS_CSV_URL', 'https://docs.google.com/spreadsheets/d/1LtibtaYF6GEsXE5Mxgq6uq8BR_ZEQ1idlqFUof5mgRo/export?format=csv&gid=46026898');
 
-// >>> REEMPLAZAR estos dos valores tras desplegar el Apps Script de Rollos <<<
-define('ROLLO_APPSCRIPT_URL',   'https://TU-URL-DEL-WEB-APP-ROLLOS/exec');
-define('ROLLO_APPSCRIPT_TOKEN', 'TU-TOKEN-SECRETO-ROLLOS');
+define('ROLLO_APPSCRIPT_URL',   'https://script.google.com/macros/s/AKfycbzpR6Rc_sZllpDZQwwnFWq2So-1h0nokfjsZddODkyvYpppTnI7XJnyGQmHRBnBVXHm/exec');
+define('ROLLO_APPSCRIPT_TOKEN', 'PLASTYPETCO_BODEGA1');
 
 // Valida solo la forma (no compara contra placeholders)
 function appScriptConfiguradoRollo(){

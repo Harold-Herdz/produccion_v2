@@ -1,4 +1,4 @@
-/* Register: planilla digital de Sellado (variables de main.css) */
+/* Register: formularios de producción */
 
 /* ===========================
    CONTENEDOR
@@ -13,7 +13,7 @@
    MODAL "NUEVA PLANILLA" (inicio de turno, en el historial)
 =========================== */
 #modalRegistrar .modal {
-  background: var(--fondo-secundario);
+  background: var(--fondo-superficie);
   text-align: left;
 }
 #modalRegistrar .modal-header {
@@ -30,40 +30,39 @@
   margin-bottom: 6px;
   font-weight: 600;
   font-size: 14px;
+  color: var(--texto);
 }
-.form-inicio input,
-.form-inicio select {
+/* Especificidad reforzada ante .modal form de main.css */
+.form-inicio.form-inicio input,
+.form-inicio.form-inicio select {
   width: 100%;
   padding: 12px 14px;
-  border-radius: 10px;
-  border: 2px solid var(--cyan);
-  background-color: var(--fondo-claro);
+  border-radius: var(--radio-m);
+  border: 2px solid var(--azul);
+  background-color: var(--fondo-superficie);
   color: var(--texto);
   font-size: 14px;
+  margin: 0;
 }
-/* Flecha del menú desplegable en el formulario de inicio */
+/* Flecha del select */
 .form-inicio select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   padding-right: 38px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d7d7d7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a4a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 14px;
 }
 .form-inicio input[readonly] {
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: var(--borde-fuerte);
   opacity: 0.85;
 }
 .form-inicio #btnIniciar {
   width: 100%;
   display: block;
   font-size: 16px;
-}
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.5) sepia(1) saturate(500%) hue-rotate(150deg);
-  cursor: pointer;
 }
 
 /* ===========================
@@ -85,7 +84,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--texto-tenue);
 }
 .dato-valor {
   font-size: 16px;
@@ -94,12 +93,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 #fechaPlanilla {
   padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--cyan);
-  background: var(--fondo-claro);
+  border-radius: var(--radio-s);
+  border: 1px solid var(--azul);
+  background: var(--fondo-superficie);
   color: var(--texto);
   font-size: 15px;
   font-weight: 600;
+}
+#fechaPlanilla:disabled {
+  border-color: var(--borde-fuerte);
+  opacity: 0.85;
 }
 
 /* Indicador de guardado */
@@ -109,8 +112,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  border-radius: 10px;
+  border-radius: var(--radio-m);
   background: var(--fondo-secundario);
+  border: 1px solid var(--borde);
   font-size: 13px;
   font-weight: 600;
 }
@@ -118,32 +122,32 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--borde-fuerte);
 }
-.indicador-guardado.pendiente .punto { background: #e0a10c; }
-.indicador-guardado.guardando .punto { background: var(--cyan); }
-.indicador-guardado.ok        .punto { background: var(--limon); }
-.indicador-guardado.error     .punto { background: #e05a5a; }
-.indicador-guardado.error { color: #ffb4b4; }
+.indicador-guardado.pendiente .punto { background: var(--warning); }
+.indicador-guardado.guardando .punto { background: var(--azul); }
+.indicador-guardado.ok        .punto { background: var(--success); }
+.indicador-guardado.error     .punto { background: var(--danger); }
+.indicador-guardado.error { color: var(--danger); }
 
 /* ===========================
    AVISOS
 =========================== */
 .aviso {
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: var(--radio-m);
   margin: 10px 0;
   font-size: 14px;
 }
 .aviso-info {
-  background: rgba(82, 186, 218, 0.15);
-  border: 1px solid rgba(82, 186, 218, 0.35);
-  color: var(--cyan);
+  background: var(--info-bg);
+  border: 1px solid var(--azul);
+  color: var(--azul-oscuro);
 }
 .aviso-error {
-  background: rgba(224, 90, 90, 0.15);
-  border: 1px solid rgba(224, 90, 90, 0.35);
-  color: #ffb4b4;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  color: var(--danger);
 }
 
 /* ===========================
@@ -154,19 +158,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radio-m);
+  border: 1px solid var(--borde);
 }
 .planilla {
   width: 100%;
   min-width: 900px;        /* debajo de esto la tabla se desplaza (responsive) */
   table-layout: fixed;
   border-collapse: collapse;
-  background: var(--fondo-box);
+  background: var(--fondo-superficie);
   font-size: 12px;
 }
 
-/* Anchos de columna: el resto va para OBSERVACIONES */
+/* Anchos de columna */
 .c-maq   { width: 58px; }
 .c-op    { width: 134px; }
 .c-ref   { width: 108px; }
@@ -177,53 +181,53 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .c-del   { width: 36px; }
 
 .planilla thead th {
-  background: var(--fondo-secundario);
-  color: white;
+  background: var(--azul-oscuro);
+  color: var(--texto-claro);
   font-size: 11px;
   font-weight: 600;
   padding: 8px 4px;
-  border: 1px solid var(--fondo-box);
+  border: 1px solid var(--azul-oscuro);
   text-align: center;
   white-space: nowrap;
 }
 .planilla td {
   padding: 1px 3px;
-  border: 1px solid var(--fondo-secundario);
+  border: 1px solid var(--borde);
   vertical-align: middle;
 }
 
-/* Inputs y selects: compactos, ocupan la celda sin forzar scroll */
+/* Inputs y selects compactos */
 .planilla input,
 .planilla select {
   width: 100%;
   min-width: 0;
   padding: 3px 6px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background-color: var(--fondo-claro);
+  border: 1px solid var(--borde-fuerte);
+  background-color: var(--fondo-superficie);
   color: var(--texto);
   font-size: 11px;
 }
 .planilla input:focus,
 .planilla select:focus {
   outline: none;
-  border-color: var(--azul);
-  box-shadow: 0 0 0 2px rgba(27, 112, 168, 0.35);
+  border-color: var(--azul-oscuro);
+  box-shadow: 0 0 0 2px var(--azul-claro);
 }
 
-/* Selects: flecha hacia abajo siempre visible a la derecha (estilo Spreadsheet) */
+/* Flecha del select */
 .planilla select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   padding-right: 20px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d7d7d7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a4a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 5px center;
   background-size: 11px;
 }
 
-/* Campos numéricos sin flechas de subir/bajar (se conservan las validaciones) */
+/* Sin flechas de número */
 .planilla input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
@@ -234,9 +238,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   margin: 0;
 }
 
-/* Columna MÁQUINA: solo el número, centrado y agrupando todas las entradas */
+/* Columna máquina */
 .col-maquina {
-  background: var(--fondo-secundario);
+  background: var(--verde-claro);
   color: var(--texto);
   font-weight: 700;
   font-size: 15px;
@@ -244,9 +248,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   vertical-align: middle;
 }
 
-/* Bloque OPERARIO / OTRO OPERARIO / JORNADA de cada máquina */
+/* Bloque operario/jornada */
 .col-operario {
-  background: var(--fondo-claro);
+  background: var(--fondo-secundario);
   vertical-align: middle;
   padding: 4px !important;
 }
@@ -255,7 +259,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   flex-direction: column;
   gap: 4px;
 }
-/* Subtítulos de "Otro operario" y "Jornada" (el de operario NO lleva subtítulo) */
+/* Subtítulo de jornada */
 .op-sub {
   display: flex;
   flex-direction: column;
@@ -264,58 +268,56 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--texto-tenue);
 }
-.op-bloque.usa-otro .f-operario { opacity: 0.4; }
-.op-bloque.usa-otro .f-otro-operario { border-color: var(--cyan); }
 
 /* Separación entre máquinas */
 .grupo-maquina {
-  border-bottom: 3px solid var(--fondo-box);
+  border-bottom: 3px solid var(--borde);
 }
 
 /* Zebra suave por entrada */
 .fila-entrada:nth-of-type(even) td:not(.col-maquina):not(.col-operario) {
-  background: var(--teal);
+  background: var(--fondo-secundario);
 }
 
 .celda-acciones { text-align: center; }
 .btn-quitar {
   border: none;
   background: transparent;
-  color: #e05a5a;
+  color: var(--danger);
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
   padding: 1px 4px;
   border-radius: 6px;
-  transition: 0.2s;
+  transition: var(--transicion);
 }
-.btn-quitar:hover { background: rgba(224, 90, 90, 0.15); }
+.btn-quitar:hover { background: var(--danger-bg); }
 
 /* Fila con el botón "+ Entrada" */
 .fila-add td {
-  background: var(--fondo-box);
+  background: var(--fondo-secundario);
   text-align: left;
   padding: 3px 8px;
 }
 .btn-entrada {
   padding: 3px 12px;
-  border-radius: 8px;
-  border: 1px dashed var(--cyan);
+  border-radius: var(--radio-s);
+  border: 1px dashed var(--azul);
   background: transparent;
-  color: var(--cyan);
+  color: var(--azul-oscuro);
   font-weight: 600;
   font-size: 11px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: var(--transicion);
 }
-.btn-entrada:hover { background: rgba(82, 186, 218, 0.12); }
+.btn-entrada:hover { background: var(--azul-claro); }
 .tope-entradas {
   display: none;
   margin-left: 12px;
   font-size: 11px;
-  color: #e0a10c;
+  color: var(--warning);
 }
 .grupo-maquina.tope .btn-entrada { opacity: 0.4; pointer-events: none; }
 .grupo-maquina.tope .tope-entradas { display: inline; }
@@ -336,9 +338,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .nota-general textarea {
   width: 100%;
   padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: var(--fondo-claro);
+  border-radius: var(--radio-m);
+  border: 1px solid var(--borde-fuerte);
+  background: var(--fondo-superficie);
   color: var(--texto);
   font-family: inherit;
   font-size: 14px;
@@ -346,8 +348,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .nota-general textarea:focus {
   outline: none;
-  border-color: var(--azul);
-  box-shadow: 0 0 0 3px rgba(27, 112, 168, 0.3);
+  border-color: var(--azul-oscuro);
+  box-shadow: 0 0 0 3px var(--azul-claro);
 }
 
 /* ===========================
@@ -362,17 +364,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .form-cancelar { margin: 0; }
 .btn-cancelar-turno {
-  background: var(--fondo-claro);
+  background: var(--fondo-secundario);
+  color: var(--texto);
+  border: 1px solid var(--borde-fuerte);
 }
 .btn-cancelar-turno:hover {
-  background: var(--fondo-secundario);
+  background: var(--borde);
 }
 .btn-finalizar {
-  background: var(--verde);
+  background: var(--verde-oscuro);
   font-size: 16px;
   padding: 14px 28px;
 }
-.btn-finalizar:hover { background: var(--limon); }
+.btn-finalizar:hover { background: var(--verde); }
 .btn-finalizar:disabled,
 #btnConfirmarFinalizar:disabled {
   opacity: 0.55;
@@ -384,7 +388,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 =========================== */
 #modalFinalizar .modal,
 #modalResultado .modal {
-  background: var(--fondo-secundario);
+  background: var(--fondo-superficie);
 }
 .modal-texto {
   color: var(--texto);
@@ -405,10 +409,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border: none;
   background: transparent;
   font-size: 20px;
-  color: white;
+  color: var(--texto-secundario);
   cursor: pointer;
 }
-.btn-cancelar { background: var(--fondo-claro); }
+.btn-cancelar { background: var(--fondo-secundario); color: var(--texto); border: 1px solid var(--borde-fuerte); }
 
 /* ===========================
    RESPONSIVE
@@ -422,4 +426,53 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   .acciones-planilla { flex-direction: column-reverse; align-items: stretch; }
   .acciones-planilla .form-cancelar,
   .acciones-planilla .btn { width: 100%; text-align: center; }
+}
+
+/* ===========================
+   REGISTER ROLLOS
+=========================== */
+#containerRegisterRollo {
+  margin-top: 100px;
+  margin-bottom: 96px;
+  color: var(--texto);
+}
+#containerRegisterRollo .card {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 30px;
+  background: var(--fondo-superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-l);
+  box-shadow: var(--sombra-card);
+}
+#containerRegisterRollo .aviso {
+  margin-bottom: 16px;
+}
+.campo-doble {
+  display: flex;
+  gap: 16px;
+}
+.campo-doble .campo {
+  flex: 1;
+}
+.acciones-rollo {
+  display: flex;
+  gap: 12px;
+}
+.acciones-rollo .btn-cancelar {
+  background: var(--fondo-secundario);
+  color: var(--texto);
+  border: 1px solid var(--borde-fuerte);
+}
+#btnRegistrarRollo {
+  flex: 1;
+  font-size: 16px;
+  background: var(--verde-oscuro);
+}
+#btnRegistrarRollo:hover {
+  background: var(--verde);
+}
+#btnRegistrarRollo:disabled {
+  opacity: 0.65;
+  pointer-events: none;
 }

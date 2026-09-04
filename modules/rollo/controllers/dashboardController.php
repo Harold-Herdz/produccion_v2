@@ -31,8 +31,9 @@ $total = obtenerTotalHistoricoRollo($conexion);
 // Producción de la semana y del mes actual
 $semana = obtenerProduccionSemanaRollo($conexion);
 $mes = obtenerProduccionMesRollo($conexion);
-// Top máquina del mes actual
+// Top máquina y top operario (año actual)
 $top_maquina = obtenerTopMaquinaRollo($conexion);
+$top_operario = obtenerTopOperarioRollo($conexion);
 
 // Totales de los meses
 $total_mes1 = obtenerTotalMesRollo($conexion,$mes1);

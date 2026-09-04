@@ -81,6 +81,30 @@ function obtenerTopMaquinaSellado($conexion){
 }
 
 /* =================================================
+   TOP OPERARIO
+================================================= */
+// Operario con más producción
+function obtenerTopOperarioSellado($conexion){
+    $sql = "SELECT o.nombre_operario,
+            IFNULL(SUM(s.paquetes_total),0) total
+            FROM PRODUCCION_SELLADO s
+            LEFT JOIN OPERARIOS o
+            ON s.id_operario = o.id_operario
+            WHERE YEAR(s.fecha_sellado)=YEAR(CURDATE())
+            GROUP BY s.id_operario
+            ORDER BY total DESC
+            LIMIT 1";
+    $res = mysqli_query($conexion,$sql);
+    if($res && mysqli_num_rows($res) > 0){
+        return mysqli_fetch_assoc($res);
+    }
+    return [
+        "nombre_operario" => "Sin datos",
+        "total" => 0
+    ];
+}
+
+/* =================================================
    TOTAL MES
 ================================================= */
 // Total de paquetes del mes

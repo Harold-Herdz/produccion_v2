@@ -33,7 +33,7 @@ function cargarDatos(tipo){
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { labels: { color: 'white' } },
+                    legend: { labels: { color: '#4a4a4a' } },
                     tooltip: {
                         enabled: true,
                         bodyFont:  { size: 12 },
@@ -44,12 +44,12 @@ function cargarDatos(tipo){
                 },
                 scales: {
                     x: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     },
                     y: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     }
                 }
             }
@@ -80,7 +80,7 @@ function cargarDatos(tipo){
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { labels: { color: 'white' } },
+                    legend: { labels: { color: '#4a4a4a' } },
                     tooltip: {
                         enabled: true,
                         bodyFont:  { size: 12 },
@@ -91,12 +91,12 @@ function cargarDatos(tipo){
                 },
                 scales: {
                     x: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     },
                     y: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     }
                 }
             }
@@ -164,17 +164,17 @@ function cargarGraficoMeses(){
                 maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend:  { labels: { font: { size: 12 }, color: 'white' } },
+                    legend:  { labels: { font: { size: 12 }, color: '#4a4a4a' } },
                     tooltip: { bodyFont: { size: 12 }, titleFont: { size: 12 } }
                 },
                 scales: {
                     x: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     },
                     y: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     }
                 }
             }

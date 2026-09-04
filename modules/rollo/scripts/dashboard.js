@@ -31,18 +31,18 @@ function cargarDatos(tipo){
             },
             options: {
                 plugins: {
-                    legend: { labels: { color: 'white' } },
+                    legend: { labels: { color: '#4a4a4a' } },
                 },
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
                     x: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     },
                     y: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     }
                 }
             }
@@ -72,18 +72,18 @@ function cargarDatos(tipo){
             },
             options: {
                 plugins: {
-                    legend: { labels: { color: 'white' } },
+                    legend: { labels: { color: '#4a4a4a' } },
                 },
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
                     x: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     },
                     y: {
-                        ticks:  { color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     }
                 }
             }
@@ -151,17 +151,17 @@ function cargarGraficoMeses(){
                 maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend:  { labels: { font: { size: 12 }, color: 'white' } },
+                    legend:  { labels: { font: { size: 12 }, color: '#4a4a4a' } },
                     tooltip: { bodyFont: { size: 12 }, titleFont: { size: 12 } }
                 },
                 scales: {
                     x: {
-                        ticks:  { font: { size: 13 }, color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { font: { size: 13 }, color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     },
                     y: {
-                        ticks:  { font: { size: 13 }, color: 'white' },
-                        border: { color: 'white' }
+                        ticks:  { font: { size: 13 }, color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
                     }
                 }
             }

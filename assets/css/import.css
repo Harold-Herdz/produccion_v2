@@ -1,29 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import url("root.css");
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* PALETA DE COLORES (misma paleta que main.css, users.css, login.css e index.css) */
-:root {
-  --fuente: "Poppins", sans-serif;
-  --fondo: rgb(54, 80, 95);
-  --fondo-box: rgb(4, 42, 53);
-  --fondo-secundario: rgb(60, 82, 100);
-  --fondo-claro: rgb(79, 107, 129);
-  --verde: #1a693a;
-  --limon: #1ea353;
-  --azul: rgb(3, 142, 235);
-  --azul-hover: #1970aa;
-  --texto: #d7d7d7;
-}
-
 /* =============================================
    BODY
 ============================================= */
 body {
-  background: var(--fondo);
+  background: var(--fondo-app);
   color: var(--texto);
   font-family: var(--fuente);
   min-height: 90vh;
@@ -40,26 +26,26 @@ body {
 .wrapper {
   width: 100%;
   max-width: 540px;
-  border-radius: 14px;
-  background: var(--fondo-box);
+  border-radius: var(--radio-l);
+  background: var(--fondo-superficie);
   padding: 35px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra-card);
 }
 
 /* ===========================
    ENCABEZADO
 =========================== */
 .top {
-  background: var(--fondo-secundario);
+  background: var(--verde-claro);
   color: var(--texto);
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 32px;
-  border-radius: 14px;
+  border-radius: var(--radio-l);
   padding: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--borde);
 }
 
 /* ===========================
@@ -67,11 +53,11 @@ body {
 =========================== */
 .card {
   background: var(--fondo-secundario);
-  border-radius: 20px;
+  border-radius: var(--radio-l);
   padding: 30px 26px;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--borde);
 }
 .card::before {
   content: "";
@@ -81,8 +67,8 @@ body {
   transform: translateX(-50%);
   width: 55%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--limon), transparent);
-  opacity: 0.4;
+  background: linear-gradient(90deg, transparent, var(--verde), transparent);
+  opacity: 0.6;
 }
 
 /* ===========================
@@ -98,28 +84,28 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--limon);
-  box-shadow: 0 0 8px var(--limon);
+  background: var(--verde-oscuro);
+  box-shadow: 0 0 8px var(--verde);
   animation: blink 1.2s ease-in-out infinite;
   flex-shrink: 0;
 }
 .dot.idle {
-  background: var(--azul);
+  background: var(--azul-oscuro);
   box-shadow: 0 0 8px var(--azul);
   animation: none;
   width: 8px;
   height: 8px;
 }
 .dot.done {
-  background: var(--limon);
-  box-shadow: 0 0 8px var(--limon);
+  background: var(--verde-oscuro);
+  box-shadow: 0 0 8px var(--verde);
   animation: none;
   width: 8px;
   height: 8px;
 }
 .dot.error {
-  background: red;
-  box-shadow: 0 0 8px red;
+  background: var(--danger);
+  box-shadow: 0 0 8px var(--danger);
   animation: none;
   width: 12px;
   height: 12px;
@@ -136,7 +122,7 @@ body {
 #status-lbl {
   font-family: var(--fuente);
   font-size: 0.8rem;
-  color: var(--limon);
+  color: var(--verde-oscuro);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -147,7 +133,7 @@ body {
   letter-spacing: -0.02em;
   margin-bottom: 24px;
   min-height: 1.5em;
-  color: var(--limon);
+  color: var(--verde-oscuro);
 }
 
 /* ===========================
@@ -156,7 +142,7 @@ body {
 .track {
   width: 100%;
   height: 8px;
-  background: var(--fondo-box);
+  background: var(--borde);
   border-radius: 999px;
   overflow: hidden;
   margin-bottom: 10px;
@@ -165,7 +151,7 @@ body {
   height: 100%;
   width: 0%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--limon), var(--verde));
+  background: linear-gradient(90deg, var(--verde), var(--verde-oscuro));
   box-shadow: 0 0 10px var(--verde);
   transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -218,9 +204,9 @@ body {
   grid-column: span 3;
 }
 .st {
-  background: var(--fondo-claro);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  background: var(--fondo-superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-m);
   padding: 14px 10px;
   text-align: center;
 }
@@ -233,22 +219,22 @@ body {
 }
 .st .l {
   font-size: 0.7rem;
-  color: var(--azul);
+  color: var(--azul-oscuro);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 .st.ok .v {
-  color: var(--azul);
+  color: var(--azul-oscuro);
 }
 .st.upd .v {
-  color: var(--azul);
+  color: var(--azul-oscuro);
 }
 .st.dup .v {
-  color: var(--azul);
+  color: var(--azul-oscuro);
 }
 .st.tot .v,
 .st.tot .l {
-  color: var(--limon);
+  color: var(--verde-oscuro);
 }
 
 /* ===========================
@@ -263,13 +249,13 @@ body {
   cursor: pointer;
   font-family: var(--fuente);
   font-size: 0.8rem;
-  color: var(--texto);
+  color: var(--texto-secundario);
   align-items: center;
   justify-content: center;
   gap: 6px;
 }
 #toggle-btn:hover {
-  color: white;
+  color: var(--texto);
   text-decoration: underline;
 }
 #toggle-btn.show {
@@ -281,8 +267,8 @@ body {
 #log {
   display: none;
   margin-top: 10px;
-  background: var(--fondo-box);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--fondo-superficie);
+  border: 1px solid var(--borde);
   border-radius: 3px;
   max-height: 220px;
   overflow-y: auto;
@@ -306,47 +292,47 @@ body {
   padding: 5px 14px;
   font-family: var(--fuente);
   font-size: 0.8rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--borde);
 }
 .lr:last-child {
   border-bottom: none;
 }
 .lr .n {
-  color: var(--limon);
+  color: var(--verde-oscuro);
   min-width: 26px;
   text-align: right;
 }
 .lr.ok .t {
-  color: var(--limon);
+  color: var(--verde-oscuro);
 }
 .lr.upd .t {
-  color: var(--cyan);
+  color: var(--azul-oscuro);
 }
 .lr.dup .t {
-  color: #b16d07;
+  color: var(--warning);
 }
 
 /* ===========================
    BOTÓN VOLVER
 =========================== */
 #btn-volver {
-  background: var(--azul);
+  background: var(--azul-oscuro);
   cursor: pointer;
   font-size: 18px;
   font-weight: 600;
-  color: white;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  color: var(--texto-claro);
+  box-shadow: var(--sombra-card);
   padding: 15px 21px;
-  border-radius: 14px;
+  border-radius: var(--radio-l);
   position: fixed;
   bottom: 25px;
   right: 35px;
   text-decoration: none;
-  transition: 0.25s;
+  transition: var(--transicion);
   border: none;
 }
 #btn-volver:hover {
-  background: var(--azul-hover);
+  background: var(--azul-oscuro-hover);
   transform: translateY(-4px);
 }
 

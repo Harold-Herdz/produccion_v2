@@ -5,23 +5,14 @@ session_start();
 require_once("auth/authMiddleware.php");
 // Importar config.php
 require_once __DIR__ . '/includes/config.php';
+// Importar header.php
+include __DIR__ . '/templates/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/index.css">
 
-<head>
-
-<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control de Producción</title>
-    <!-- Ícono y estilos -->
-    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/images/logo.png">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/index.css">
-
-</head>
-
-<body class="index-body">
-    <!-- Contenedor principal -->
+<!-- Contenedor principal -->
+<div class="index-centro">
     <div class="glass-container">
 
         <!-- Título -->
@@ -73,8 +64,7 @@ require_once __DIR__ . '/includes/config.php';
         </div>
 
     </div>
+</div>
 
-</body>
-</html>
-
+<?php include __DIR__ . '/templates/footer.php'; ?>
 

@@ -12,6 +12,8 @@ require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 // Importar historyController.php
 include dirname(__DIR__) . '/controllers/historyController.php';
+// Importar registerModel.php (asegurarTablaPlanillas)
+require_once dirname(__DIR__) . '/models/registerModel.php';
 // Importar header.php
 include dirname(__DIR__, 3) . '/templates/header.php';
 
@@ -21,14 +23,10 @@ $regHoy     = date('Y-m-d');
 $regUsuario = $_SESSION['usuario'] ?? 'Sin usuario';
 $regTurnos  = ['Día' => '6am - 2pm', 'Tarde' => '2pm - 10pm', 'Noche' => '10pm - 6am'];
 
-// ¿Ya hay un turno abierto? (si la tabla existe)
-$regAbierta = null;
-try {
-    $q = $conexion->query("SELECT codigo FROM sellado_planillas WHERE estado = 'abierta' ORDER BY id_planilla DESC LIMIT 1");
-    $regAbierta = $q ? $q->fetch_assoc() : null;
-} catch (Throwable $e) {
-    // La planilla nunca se ha abierto y la tabla aún no existe
-}
+// ¿Ya hay un turno abierto?
+asegurarTablaPlanillas($conexion);
+$q = $conexion->query("SELECT codigo FROM sellado_planilla WHERE estado = 'abierta' ORDER BY id_planilla DESC LIMIT 1");
+$regAbierta = $q ? $q->fetch_assoc() : null;
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
@@ -195,7 +193,7 @@ try {
 
             <div class="campo">
                 <label>Supervisor</label>
-                <input type="text" value="<?= htmlspecialchars($regUsuario) ?>" readonly>
+                <input type="text" name="supervisor" value="<?= htmlspecialchars($regUsuario) ?>" autocomplete="off">
             </div>
 
             <button type="submit" class="btn" id="btnIniciar">Iniciar planilla</button>

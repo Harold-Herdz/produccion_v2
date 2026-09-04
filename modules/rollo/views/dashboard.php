@@ -66,21 +66,37 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
     </div>
 
-    <!-- Top máquina -->
+    <!-- Top máquina y top operario -->
     <div class="top-container">
-        <div class="card-kpi top-card" id="top-card">
-            <p>Top maquina</p>
-            <h2>
-                <?php 
-                if(!empty($top_maquina)){
-                    echo $top_maquina['nombre_maquina'] . "<br><span style='font-size:14px'>(".$top_maquina['total']." kg)</span>";
-                }else{
-                    echo "Sin datos";
-                }
-                ?>
-            </h2>
+        <div class="kpis-top">
+            <div class="card-kpi" id="top-card">
+                <p>Top máquina</p>
+                <h2>
+                    <?php
+                    if(!empty($top_maquina)){
+                        echo $top_maquina['nombre_maquina'] . "<br><span style='font-size:14px'>(".$top_maquina['total']." kg)</span>";
+                    }else{
+                        echo "Sin datos";
+                    }
+                    ?>
+                </h2>
+            </div>
+            <div class="card-kpi" id="top-operario-card">
+                <p>Top operario</p>
+                <h2>
+                    <?php
+                    if(!empty($top_operario)){
+                        echo $top_operario['nombre_operario'] . "<br><span style='font-size:14px'>(".$top_operario['total']." kg)</span>";
+                    }else{
+                        echo "Sin datos";
+                    }
+                    ?>
+                </h2>
+            </div>
         </div>
     </div>
+
+    <hr class="seccion-divisor">
 
     <!-- Comparativo mes 1 y mes 2 -->
     <div class="resumenes">
@@ -257,6 +273,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
     </div>
 
+    <hr class="seccion-divisor">
+
     <!-- Botón para abrir modal de importación -->
     <a class="btn" id="btnImportar" onclick="abrirModal('modalImportar')">Importar Producción</a>
 
@@ -312,8 +330,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     </div>
 
-    <br><br><br>
-
     <!-- Gráfico de producción mensual por año -->
     <div class="contenedor-grafico">
         <h3>Producción por año (Rollo)</h3>
@@ -331,7 +347,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <canvas id="graficoMeses"></canvas>
     </div>
 
-    <br> <br> <br>
+    <hr class="seccion-divisor">
 
     <!-- Tablas -->
     <form class="filtro-fechas" method="GET">
@@ -382,8 +398,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </table>
     </div>
 
-    <br><br>
-
     <!-- Tabla de producción por operario -->
     <div class="tabla-dashboard">
         <h3>Producción por Máquina</h3>
@@ -418,8 +432,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </tr>
         </table>
     </div>
-
-    <br><br><br>
 
 </div>
 

@@ -62,6 +62,30 @@ function obtenerTopMaquinaExtrusion($conexion){
 }
 
 /* =================================================
+   TOP OPERARIO
+================================================= */
+// Operador con más producción (catálogo propio de Extrusión)
+function obtenerTopOperarioExtrusion($conexion){
+    $sql = "SELECT o.nombre_operador_ext AS nombre_operario,
+            IFNULL(SUM(e.total_extrusion),0) total
+            FROM PRODUCCION_EXTRUSION e
+            LEFT JOIN OPERADORES_EXTRUSION o
+            ON e.id_operador_ext = o.id_operador_ext
+            WHERE YEAR(e.fecha_extrusion)=YEAR(CURDATE())
+            GROUP BY e.id_operador_ext
+            ORDER BY total DESC
+            LIMIT 1";
+    $res = mysqli_query($conexion, $sql);
+    if($res && mysqli_num_rows($res) > 0){
+        return mysqli_fetch_assoc($res);
+    }
+    return [
+        'nombre_operario' => 'Sin datos',
+        'total' => 0
+    ];
+}
+
+/* =================================================
    TOTAL MES
 ================================================= */
 // Total de paquetes del mes

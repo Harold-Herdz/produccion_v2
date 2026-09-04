@@ -1,259 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* PALETA DE COLORES (misma paleta que main.css, login.css e index.css) */
-:root {
-  --fuente: "Font Awesome 6 Free", sans-serif;
-  --fondo: rgb(54, 80, 95);
-  --fondo-box: rgb(4, 42, 53);
-  --fondo-secundario: rgb(60, 82, 100);
-  --fondo-claro: rgb(79, 107, 129);
-  --teal: rgba(1, 85, 100, 0.4);
-  --verde: #1a693a;
-  --limon: #1ea353;
-  --azul: #1b70a8;
-  --azul-hover: #1970aa;
-  --cyan: #52bada;
-  --texto: #d7d7d7;
-}
-
-/* =============================================
-   BODY
-============================================= */
-body {
-  font-family: var(--fuente);
-  min-height: 100vh;
-  background: var(--fondo);
-  color: var(--texto);
-  padding: 40px;
-}
+/* Usuarios: componentes específicos (el resto viene de main.css) */
 
 /* ===========================
-   CONTENEDOR PRINCIPAL
+   MODAL: FORMULARIO
 =========================== */
-.container {
-  max-width: 1200px;
-  margin: auto;
-  margin-top: 80px;
-  background: var(--fondo-box);
-  border-radius: 24px;
-  padding: 35px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
-}
-
-/* ===========================
-   TITULOS
-=========================== */
-.titulo-vista {
-  text-align: center;
-  color: var(--texto);
-  padding: 15px;
-  margin-bottom: 25px;
-  border-radius: 10px;
-  background: var(--fondo-secundario);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  font-weight: 600;
-}
-
-/* ===========================
-   BOTON CREAR
-=========================== */
-.acciones {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 25px;
-}
-.btn {
-  text-decoration: none;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  color: white;
-  background: var(--azul);
-  transition: 0.25s;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-}
-.btn:hover {
-  transform: translateY(-1.5px);
-  background: var(--azul-hover);
-  box-shadow: 8px 12px 15px rgba(100, 202, 250, 0.15);
-}
-
-/* ===========================
-   SELECTS (mismo estilo que main.css)
-=========================== */
-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: var(--fondo-claro);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d7d7d7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 13px;
-  color: var(--texto);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  padding: 8px 32px 8px 12px;
-  font-family: var(--fuente);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.2s;
-}
-select:hover {
-  border-color: var(--cyan);
-}
-select:focus {
-  outline: none;
-  border-color: var(--azul);
-  box-shadow: 0 0 0 3px rgba(27, 112, 168, 0.3);
-}
-select option {
-  background: var(--fondo-box);
-  color: var(--texto);
-}
-
-/* ===========================
-   TABLA
-=========================== */
-#containerHistorial {
-  overflow-x: auto;
-}
-.tabla {
-  width: 100%;
-  min-width: 800px;
-  border-collapse: collapse;
-  overflow: hidden;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-}
-.tabla thead {
-  background: var(--fondo-secundario);
-  border: 1px solid var(--fondo-secundario);
-}
-.tabla th {
-  color: white;
-  padding: 18px;
-  font-size: 14px;
-  font-weight: 600;
-}
-.tabla td {
-  color: var(--texto);
-  padding: 12px;
-  text-align: center;
-  border: 1px solid var(--fondo-secundario);
-}
-.tabla tbody tr {
-  transition: 0.25s;
-  font-size: 14px;
-  font-weight: 600;
-}
-.tabla tbody tr:hover {
-  background: var(--teal);
-}
-
-/* ===========================
-   ESTADOS
-=========================== */
-.estado {
-  display: inline-block;
-  min-width: 90px;
-  padding: 8px 14px;
-  border-radius: 30px;
-  font-size: 13px;
-  font-weight: 600;
-}
-.estado.activo {
-  background: rgba(74, 222, 128, 0.3);
-  color: rgb(8, 190, 105);
-  border: 1px solid rgba(74, 222, 128, 0.25);
-}
-.estado.inactivo {
-  background: rgba(248, 113, 113, 0.3);
-  color: rgb(230, 93, 88);
-  border: 1px solid rgba(248, 113, 113, 0.25);
-}
-
-/* ===========================
-   BOTON EDITAR
-=========================== */
-.tabla .btn {
-  padding: 8px 18px;
-  border-radius: 10px;
-  font-size: 13px;
-  background: var(--azul);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-  color: white;
-}
-.tabla .btn:hover {
-  background: var(--azul-hover);
-}
-
-/* ===========================
-   BOTÓN VOLVER
-=========================== */
-#btn-volver {
-  background: var(--azul);
-  cursor: pointer;
-  font-family: var(--fuente);
-  font-size: 18px;
-  font-weight: 600;
-  color: white;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
-  padding: 15px 21px;
-  border-radius: 14px;
-  position: fixed;
-  bottom: 25px;
-  right: 35px;
-  text-decoration: none;
-  transition: 0.25s;
-  border: none;
-}
-#btn-volver:hover {
-  background: var(--azul-hover);
-  transform: translateY(-4px);
-}
-
-/* ===========================
-   MODALES
-=========================== */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 20;
-}
-.modal {
-  background: var(--fondo-secundario);
-  padding: 20px;
-  border-radius: 10px;
-  width: 400px;
-  max-width: 90%;
-}
 .titulo-modal {
-  font-size: 34px;
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 600;
   color: var(--texto);
   margin-bottom: 30px;
   justify-self: center;
 }
 .modal form {
-  background: var(--fondo-box);
-  border-radius: 10px;
+  background: var(--fondo-secundario);
+  border-radius: var(--radio-m);
+  border: 1px solid var(--borde);
   color: var(--texto);
   display: grid;
   padding: 15px 40px;
@@ -265,14 +25,14 @@ select option {
 .modal input,
 .modal select,
 .modal textarea {
-  border: 2px solid var(--cyan);
-  background-color: var(--fondo-box);
-  color: white;
+  border: 1px solid var(--borde-fuerte);
+  background-color: var(--fondo-superficie);
+  color: var(--texto);
   width: 100%;
   padding: 12px 14px;
   margin: 5px auto 15px auto;
-  border-radius: 10px;
-  transition: 0.25s;
+  border-radius: var(--radio-m);
+  transition: var(--transicion);
   font-size: 14px;
   display: flex;
   text-align: left;
@@ -283,49 +43,19 @@ select option {
 .modal input:hover,
 .modal select:hover,
 .modal textarea:hover {
-  box-shadow: 8px 12px 15px rgba(100, 202, 250, 0.15);
+  border-color: var(--azul);
 }
 .accionesModal .btn {
   padding: 10px 18px;
-  border-radius: 10px;
+  border-radius: var(--radio-m);
   font-size: 16px;
-  background: var(--azul);
-  transition: 0.25s;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
   margin: 15px;
-}
-.accionesModal .btn:hover {
-  background: var(--azul-hover);
-  transform: translateY(-1.5px);
 }
 
 /* ===========================
    RESPONSIVE
 =========================== */
 @media (max-width: 768px) {
-  body {
-    padding: 15px;
-  }
-  .container {
-    padding: 20px;
-  }
-  .titulo-vista {
-    font-size: 26px;
-  }
-  .acciones {
-    justify-content: center;
-  }
-  .acciones .btn {
-    width: 100%;
-    text-align: center;
-  }
-  #btn-volver {
-    top: 20px;
-    right: 20px;
-    bottom: auto;
-    padding: 12px 18px;
-    font-size: 16px;
-  }
   .modal {
     padding: 15px;
   }

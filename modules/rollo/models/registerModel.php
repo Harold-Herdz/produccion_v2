@@ -3,6 +3,10 @@
 
 date_default_timezone_set('America/Bogota');
 
+require_once __DIR__ . '/../spreadsheet/spreadsheetPdf.php';
+require_once dirname(__DIR__, 3) . '/import/importModel.php';
+require_once dirname(__DIR__, 2) . '/shared/catalogosModel.php';
+
 /* =================================================
    TABLA DE LOGS POR DÍA (local; espejo del LOGS del Sheet)
 ================================================= */
@@ -91,6 +95,46 @@ function cerrarDia($conexion, $id_dia, $total, $rutaPdf){
 }
 
 /* =================================================
+   CIERRE DE DÍA (lee REGISTROS del Sheet y arma PDF + fila de LOGS)
+================================================= */
+// Filas de REGISTROS que corresponden a una fecha dada
+function filasDelDiaRollo($fechaObjetivo){
+    [$filas] = leerSheet(ROLLO_REGISTROS_CSV_URL, 'todo', null);
+    $delDia = [];
+    foreach($filas as $data){
+        if(convertirFecha($data[1] ?? '') === $fechaObjetivo){
+            $delDia[] = [
+                'operario'    => limpiarNombre($data[2] ?? ''),
+                'maquina'     => limpiarNombre($data[3] ?? ''),
+                'referencia'  => limpiarNombre($data[4] ?? ''),
+                'color'       => limpiarNombre($data[5] ?? ''),
+                'peso_rollo'  => $data[6] ?? '',
+                'peso_retal'  => $data[7] ?? '',
+                'peso_total'  => $data[8] ?? '',
+            ];
+        }
+    }
+    return $delDia;
+}
+
+// Arma el paquete de cierre (PDF + fila de LOGS) para un día ya presente en el Sheet
+function prepararCierreRollo($logDia){
+    $filas = filasDelDiaRollo($logDia['fecha']);
+    $pdfBytes = generarPdfDiaRollo($logDia['fecha'], $filas);
+    $total = count($filas);
+    return [
+        'id_dia' => $logDia['id_dia'],
+        'total'  => $total,
+        'log'    => [$logDia['id_dia'], $logDia['fecha'], $logDia['inicio'], date('Y-m-d H:i:s'), $total, 'COMPLETADO'],
+        'pdf'    => [
+            'nombre' => nombrePdfDiaRollo($logDia['id_dia']),
+            'mes'    => date('m-Y', strtotime($logDia['fecha'])),
+            'base64' => base64_encode($pdfBytes),
+        ],
+    ];
+}
+
+/* =================================================
    CATÁLOGOS DEL FORMULARIO
 ================================================= */
 function obtenerOperariosActivosRollo($conexion){
@@ -99,12 +143,7 @@ function obtenerOperariosActivosRollo($conexion){
 function obtenerMaquinasActivasRollo($conexion){
     return $conexion->query("SELECT id_maquina, nombre_maquina FROM maquinas WHERE estado = 1 ORDER BY id_maquina");
 }
-function obtenerReferenciasActivasRollo($conexion){
-    return $conexion->query("SELECT id_referencia, nombre_referencia FROM referencias WHERE estado = 1 ORDER BY nombre_referencia");
-}
-function obtenerColoresActivosRollo($conexion){
-    return $conexion->query("SELECT id_color, nombre_color FROM colores WHERE estado = 1 ORDER BY nombre_color");
-}
+// Referencias y colores: ver obtenerReferenciasOrdenadas()/obtenerColoresOrdenados() en shared/catalogosModel.php
 
 // Nombre de un catálogo por id; null si no existe
 function nombreCatalogo($conexion, $tabla, $columnaId, $columnaNombre, $id){

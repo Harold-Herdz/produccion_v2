@@ -12,18 +12,31 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
 // Opciones <option> de un catálogo
 if(!function_exists('opcionesCatalogoRollo')){
-    function opcionesCatalogoRollo($lista, $idKey, $nombreKey){
-        $html = '<option value=""></option>';
+    function opcionesCatalogoRollo($lista, $idKey, $nombreKey, $incluirVacio = true){
+        $html = $incluirVacio ? '<option value=""></option>' : '';
         foreach($lista as $item){
             $html .= '<option value="' . $item[$idKey] . '">' . htmlspecialchars($item[$nombreKey]) . '</option>';
         }
         return $html;
     }
 }
+
+// Select de catálogo + "Otro" (al elegirlo, el mismo campo se vuelve texto libre)
+if(!function_exists('campoConOtroRollo')){
+    function campoConOtroRollo($lista, $idKey, $nombreKey, $id, $nombre){
+        ob_start(); ?>
+        <select name="<?= $nombre ?>" id="<?= $id ?>" class="tiene-otro" required>
+            <option value=""></option>
+            <option value="otro">Otro</option>
+            <?= opcionesCatalogoRollo($lista, $idKey, $nombreKey, false) ?>
+        </select>
+        <input type="text" class="campo-libre" id="<?= $id ?>Texto" hidden autocomplete="off" placeholder="Escribe el nombre">
+        <?php return ob_get_clean();
+    }
+}
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
-<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/registerRollo.css">
 
 <!-- Contenedor de Register Rollos -->
 <div class="container" id="containerRegisterRollo">
@@ -40,9 +53,7 @@ if(!function_exists('opcionesCatalogoRollo')){
 
             <div class="campo">
                 <label>Operario</label>
-                <select name="id_operario" id="operarioRollo" required>
-                    <?= opcionesCatalogoRollo($operarios, 'id_operario', 'nombre_operario') ?>
-                </select>
+                <?= campoConOtroRollo($operarios, 'id_operario', 'nombre_operario', 'operarioRollo', 'id_operario') ?>
             </div>
 
             <div class="campo">
@@ -77,7 +88,10 @@ if(!function_exists('opcionesCatalogoRollo')){
                 </div>
             </div>
 
-            <button type="submit" class="btn" id="btnRegistrarRollo">Registrar</button>
+            <div class="acciones-rollo">
+                <a class="btn btn-cancelar" href="<?= BASE_URL ?>/modules/rollo/views/history.php">Volver</a>
+                <button type="submit" class="btn" id="btnRegistrarRollo">Registrar</button>
+            </div>
         </form>
     </div>
 </div>

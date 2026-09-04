@@ -61,6 +61,29 @@ function obtenerTopMaquinaPlana($conexion){
 }
 
 /* =================================================
+   TOP OPERARIO
+================================================= */
+// Operario con más producción
+function obtenerTopOperarioPlana($conexion){
+    $sql = "SELECT o.nombre_operario,
+            IFNULL(SUM(p.total_plana),0) total
+            FROM PRODUCCION_PLANA p
+            LEFT JOIN OPERARIOS o ON p.id_operario = o.id_operario
+            WHERE YEAR(p.fecha_plana)=YEAR(CURDATE())
+            GROUP BY p.id_operario
+            ORDER BY total DESC
+            LIMIT 1";
+    $res = mysqli_query($conexion, $sql);
+    if($res && mysqli_num_rows($res) > 0){
+        return mysqli_fetch_assoc($res);
+    }
+    return [
+        'nombre_operario' => 'Sin datos',
+        'total' => 0
+    ];
+}
+
+/* =================================================
    TOTAL MES
 ================================================= */
 // Total de paquetes del mes

@@ -3,13 +3,15 @@
 
 date_default_timezone_set('America/Bogota');
 
+require_once dirname(__DIR__, 2) . '/shared/catalogosModel.php';
+
 /* =================================================
    TABLA DEL SOBRE DEL TURNO
 ================================================= */
 // Crear la tabla de planillas si aún no existe (auto-despliegue)
 function asegurarTablaPlanillas($conexion){
     $conexion->query("
-        CREATE TABLE IF NOT EXISTS sellado_planillas (
+        CREATE TABLE IF NOT EXISTS sellado_planilla (
             id_planilla       INT(11) NOT NULL AUTO_INCREMENT,
             codigo            VARCHAR(20) NOT NULL,
             fecha_planilla    DATE NOT NULL,
@@ -28,9 +30,9 @@ function asegurarTablaPlanillas($conexion){
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
     ");
     // Migración: agregar la columna 'filas' si la tabla ya existía sin ella
-    $col = $conexion->query("SHOW COLUMNS FROM sellado_planillas LIKE 'filas'");
+    $col = $conexion->query("SHOW COLUMNS FROM sellado_planilla LIKE 'filas'");
     if($col && $col->num_rows === 0){
-        $conexion->query("ALTER TABLE sellado_planillas ADD COLUMN filas TEXT DEFAULT NULL AFTER total_registros");
+        $conexion->query("ALTER TABLE sellado_planilla ADD COLUMN filas TEXT DEFAULT NULL AFTER total_registros");
     }
 }
 
@@ -95,7 +97,7 @@ function validarFechaPlanilla($fecha){
 // Obtener la planilla abierta actual (solo puede haber una a la vez)
 function obtenerPlanillaAbierta($conexion){
     $res = $conexion->query("
-        SELECT * FROM sellado_planillas
+        SELECT * FROM sellado_planilla
         WHERE estado = 'abierta'
         ORDER BY id_planilla DESC
         LIMIT 1
@@ -105,7 +107,7 @@ function obtenerPlanillaAbierta($conexion){
 
 // Obtener una planilla por su código
 function obtenerPlanillaPorCodigo($conexion, $codigo){
-    $stmt = $conexion->prepare("SELECT * FROM sellado_planillas WHERE codigo = ? LIMIT 1");
+    $stmt = $conexion->prepare("SELECT * FROM sellado_planilla WHERE codigo = ? LIMIT 1");
     $stmt->bind_param('s', $codigo);
     $stmt->execute();
     return $stmt->get_result()->fetch_assoc();
@@ -116,7 +118,7 @@ function crearPlanilla($conexion, $fecha, $bloque, $id_supervisor, $supervisor_n
     $codigo = construirCodigoPlanilla($fecha, $bloque);
     try {
         $stmt = $conexion->prepare("
-            INSERT INTO sellado_planillas (codigo, fecha_planilla, bloque, id_supervisor, supervisor_nombre)
+            INSERT INTO sellado_planilla (codigo, fecha_planilla, bloque, id_supervisor, supervisor_nombre)
             VALUES (?, ?, ?, ?, ?)
         ");
         $stmt->bind_param('sssis', $codigo, $fecha, $bloque, $id_supervisor, $supervisor_nombre);
@@ -130,7 +132,7 @@ function crearPlanilla($conexion, $fecha, $bloque, $id_supervisor, $supervisor_n
 // Marcar la planilla como finalizada
 function finalizarPlanillaSobre($conexion, $codigo, $total){
     $stmt = $conexion->prepare("
-        UPDATE sellado_planillas
+        UPDATE sellado_planilla
         SET estado = 'finalizada', total_registros = ?, finalizado_en = NOW()
         WHERE codigo = ? AND estado = 'abierta'
     ");
@@ -141,7 +143,7 @@ function finalizarPlanillaSobre($conexion, $codigo, $total){
 
 // Guardar la ruta del PDF generado
 function guardarRutaPdfPlanilla($conexion, $codigo, $ruta){
-    $stmt = $conexion->prepare("UPDATE sellado_planillas SET ruta_pdf = ? WHERE codigo = ?");
+    $stmt = $conexion->prepare("UPDATE sellado_planilla SET ruta_pdf = ? WHERE codigo = ?");
     $stmt->bind_param('ss', $ruta, $codigo);
     $stmt->execute();
 }
@@ -167,7 +169,7 @@ function recodificarPlanilla($conexion, $planilla, $fechaNueva){
     }
 
     // Actualizar el sobre
-    $stmt = $conexion->prepare("UPDATE sellado_planillas SET codigo = ?, fecha_planilla = ? WHERE id_planilla = ?");
+    $stmt = $conexion->prepare("UPDATE sellado_planilla SET codigo = ?, fecha_planilla = ? WHERE id_planilla = ?");
     $stmt->bind_param('ssi', $codigoNuevo, $fechaNueva, $planilla['id_planilla']);
     $stmt->execute();
 
@@ -182,7 +184,7 @@ function cancelarPlanilla($conexion, $planilla){
     if($lista !== ''){
         $conexion->query("DELETE FROM produccion_sellado WHERE id_sheet IN ({$lista})");
     }
-    $stmt = $conexion->prepare("DELETE FROM sellado_planillas WHERE id_planilla = ? AND estado = 'abierta'");
+    $stmt = $conexion->prepare("DELETE FROM sellado_planilla WHERE id_planilla = ? AND estado = 'abierta'");
     $stmt->bind_param('i', $planilla['id_planilla']);
     $stmt->execute();
 }
@@ -210,25 +212,7 @@ function obtenerOperariosActivos($conexion){
     ");
 }
 
-// Referencias activas
-function obtenerReferenciasActivas($conexion){
-    return $conexion->query("
-        SELECT id_referencia, nombre_referencia
-        FROM referencias
-        WHERE estado = 1
-        ORDER BY nombre_referencia
-    ");
-}
-
-// Colores activos
-function obtenerColoresActivos($conexion){
-    return $conexion->query("
-        SELECT id_color, nombre_color
-        FROM colores
-        WHERE estado = 1
-        ORDER BY nombre_color
-    ");
-}
+// Referencias y colores: ver obtenerReferenciasOrdenadas()/obtenerColoresOrdenados() en shared/catalogosModel.php
 
 /* =================================================
    RESOLUCIÓN DE TURNO Y OPERARIO
@@ -255,18 +239,7 @@ function obtenerIdTurno($conexion, $bloque, $jornada){
 
 // Id de operario por nombre; lo crea si no existe. Devuelve [id_operario, fue_creado]
 function obtenerOperarioIdPorNombre($conexion, $nombre){
-    $nombre = trim($nombre);
-    $stmt = $conexion->prepare("SELECT id_operario FROM operarios WHERE nombre_operario = ? LIMIT 1");
-    $stmt->bind_param('s', $nombre);
-    $stmt->execute();
-    $fila = $stmt->get_result()->fetch_assoc();
-    if($fila){
-        return [(int) $fila['id_operario'], false];
-    }
-    $stmt = $conexion->prepare("INSERT INTO operarios (nombre_operario) VALUES (?)");
-    $stmt->bind_param('s', $nombre);
-    $stmt->execute();
-    return [$conexion->insert_id, true];
+    return resolverCatalogoIdONuevo($conexion, 'operarios', 'id_operario', 'nombre_operario', $nombre);
 }
 
 /* =================================================
@@ -339,20 +312,17 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
         $maquinasEnviadas[$numMaq] = true;
         $maqEtiqueta = str_pad($numMaq, 2, '0', STR_PAD_LEFT);
 
-        // Resolver operario: el texto libre de "Otro operario" tiene prioridad
-        $idOperario = null;
-        $otro = trim($m['otro_operario'] ?? '');
-        if($otro !== ''){
-            [$idOperario, $fueCreado] = obtenerOperarioIdPorNombre($conexion, $otro);
-            if($fueCreado){
-                $avisos[] = "Se agregó «{$otro}» como nuevo operario (Máquina {$maqEtiqueta}). Falta verificarlo en Catálogos.";
-            }
-        } elseif(!empty($m['id_operario'])){
-            $idOperario = (int) $m['id_operario'];
-        }
+        // Resolver operario (el select se convierte en texto libre al elegir "Otro")
+        [$idOperario, $avisoOp] = resolverValorCatalogo(
+            $conexion, 'operarios', 'id_operario', 'nombre_operario',
+            $m['id_operario'] ?? '', 'nuevo operario', "Máquina {$maqEtiqueta}"
+        );
+        if($avisoOp){ $avisos[] = $avisoOp; }
 
         // Resolver turno con el bloque del encabezado + la jornada de la máquina
+        // (jornada es texto libre desde siempre; "otro" sin escribir nada cuenta como vacío)
         $jornada = trim($m['jornada'] ?? '');
+        if($jornada === 'otro'){ $jornada = ''; }
         $idTurno = ($jornada !== '') ? obtenerIdTurno($conexion, $bloque, $jornada) : null;
 
         // Recorrer las entradas de la máquina (máximo 6); la posición cuenta solo las no vacías
@@ -372,8 +342,16 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
             $idSheet = $mapaViejo[$slot] ?? idSheetBorrador($planilla, $numMaq, $pos);
             $mapaNuevo[$slot] = $idSheet;
 
-            $idReferencia = valorEnteroONulo($ent['id_referencia'] ?? '');
-            $idColor      = valorEnteroONulo($ent['id_color'] ?? '');
+            [$idReferencia, $avisoRef] = resolverValorCatalogo(
+                $conexion, 'referencias', 'id_referencia', 'nombre_referencia',
+                $ent['id_referencia'] ?? '', 'nueva referencia', "Máquina {$maqEtiqueta}"
+            );
+            if($avisoRef){ $avisos[] = $avisoRef; }
+            [$idColor, $avisoColor] = resolverValorCatalogo(
+                $conexion, 'colores', 'id_color', 'nombre_color',
+                $ent['id_color'] ?? '', 'nuevo color', "Máquina {$maqEtiqueta}"
+            );
+            if($avisoColor){ $avisos[] = $avisoColor; }
             $x70 = valorEnteroONulo($ent['x70'] ?? '');
             $x90 = valorEnteroONulo($ent['x90'] ?? '');
             $x98 = valorEnteroONulo($ent['x98'] ?? '');
@@ -412,7 +390,7 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
 
     // Guardar el mapa actualizado en el sobre
     $json = json_encode($mapaNuevo);
-    $upd = $conexion->prepare("UPDATE sellado_planillas SET filas = ? WHERE codigo = ?");
+    $upd = $conexion->prepare("UPDATE sellado_planilla SET filas = ? WHERE codigo = ?");
     $upd->bind_param('ss', $json, $codigo);
     $upd->execute();
 
@@ -508,13 +486,13 @@ function numSheet($v){
 
 // Filas para REGISTROS: 17 columnas B..R por entrada (A la genera la fórmula del Sheet)
 function construirFilasRegistros($conexion, $planilla, $maquinasPayload){
-    // Otro operario por número de máquina
+    // Otro operario por número de máquina (id_operario no numérico = texto libre escrito a mano)
     $otros = [];
     foreach($maquinasPayload as $m){
         $n = (int) ($m['maquina'] ?? 0);
-        $t = trim((string) ($m['otro_operario'] ?? ''));
-        if($t !== ''){
-            $otros[$n] = $t;
+        $valor = trim((string) ($m['id_operario'] ?? ''));
+        if($valor !== '' && $valor !== 'otro' && !is_numeric($valor)){
+            $otros[$n] = $valor;
         }
     }
 

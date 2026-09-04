@@ -9,7 +9,7 @@ require_once dirname(__DIR__) . '/models/registerModel.php';
 // Asegurar la tabla del sobre del turno
 asegurarTablaPlanillas($conexion);
 
-// Supervisor desde la sesión (no se edita a mano)
+// Supervisor: id siempre del usuario en sesión; el nombre se puede editar a mano al iniciar el turno
 $id_supervisor      = $_SESSION['id_usuario'] ?? null;
 $supervisor_nombre  = $_SESSION['usuario'] ?? 'Sin usuario';
 
@@ -26,6 +26,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
 
     $bloque = $_POST['bloque'] ?? '';
     $fecha  = validarFechaPlanilla($_POST['fecha'] ?? '') ?: $hoy;
+
+    $supervisorManual = trim($_POST['supervisor'] ?? '');
+    if($supervisorManual !== ''){
+        $supervisor_nombre = $supervisorManual;
+    }
 
     if(!isset($bloques[$bloque])){
         header('Location: ' . $rutaHistory . '?reg_error=' . urlencode('Selecciona un turno válido.'));
@@ -76,7 +81,7 @@ if(!$planilla){
 // Catálogos y datos ya guardados del turno
 $maquinas    = mysqli_fetch_all(obtenerMaquinasSellado($conexion), MYSQLI_ASSOC);
 $operarios   = mysqli_fetch_all(obtenerOperariosActivos($conexion), MYSQLI_ASSOC);
-$referencias = mysqli_fetch_all(obtenerReferenciasActivas($conexion), MYSQLI_ASSOC);
-$colores     = mysqli_fetch_all(obtenerColoresActivos($conexion), MYSQLI_ASSOC);
+$referencias = obtenerReferenciasOrdenadas($conexion);
+$colores     = obtenerColoresOrdenados($conexion);
 $datosMaquinas = obtenerPlanillaEstructurada($conexion, $planilla);
 $horarioTurno  = $bloques[$planilla['bloque']]['horario'] ?? '';

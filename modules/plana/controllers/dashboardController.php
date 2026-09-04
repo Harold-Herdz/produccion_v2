@@ -31,8 +31,9 @@ $total = obtenerTotalHistoricoPlana($conexion);
 // Producción de la semana y del mes actual
 $semana = obtenerProduccionSemanaPlana($conexion);
 $mes = obtenerProduccionMesPlana($conexion);
-// Top operario del mes actual
+// Top máquina y top operario (año actual)
 $top_maquina = obtenerTopMaquinaPlana($conexion);
+$top_operario = obtenerTopOperarioPlana($conexion);
 
 // Totales de los meses
 $total_mes1 = obtenerTotalMesPlana($conexion,$mes1);

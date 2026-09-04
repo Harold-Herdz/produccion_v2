@@ -13,20 +13,13 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 // Obtener todos los usuarios ordenados
 $sql = "SELECT * FROM USUARIOS ORDER BY usuario";
 $res = mysqli_query($conexion, $sql);
+
+// Importar header.php
+include dirname(__DIR__, 2) . '/templates/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/users.css">
 
-<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Usuarios</title>
-    <!-- Ícono y estilos -->
-    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/images/logo.png">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/users.css">
-
-</head>
-<body>
     <!-- Contenedor de Usuarios -->
     <div class="container">
         <!-- Título -->
@@ -90,9 +83,6 @@ $res = mysqli_query($conexion, $sql);
         </div>
 
     </div>
-
-</body>
-
 
 <!-- Modal de Crear -->
 <div class="overlay" id="modalCrear">
@@ -186,4 +176,4 @@ $res = mysqli_query($conexion, $sql);
 
 <script src="<?= BASE_URL ?>/auth/shared/auth.js"></script>
 
-</html>
+<?php include dirname(__DIR__, 2) . '/templates/footer.php'; ?>

@@ -14,15 +14,38 @@ if (formRollo) {
         aviso.hidden = false;
     }
 
+    // "Otro": el select se convierte en texto libre en el mismo lugar
+    formRollo.addEventListener("change", e => {
+        if (e.target.classList.contains("tiene-otro") && e.target.value === "otro") {
+            const libre = e.target.nextElementSibling;
+            e.target.hidden = true;
+            libre.hidden = false;
+            libre.focus();
+        }
+    });
+
+    // Valor activo de un campo con "Otro": el select o, si ya se convirtió, el input
+    function valorConOtro(idSelect) {
+        const select = document.getElementById(idSelect);
+        return select.hidden ? select.nextElementSibling.value.trim() : select.value;
+    }
+
     // Limpiar los campos de un registro, manteniendo la fecha
     function limpiarFormulario() {
-        document.getElementById("operarioRollo").selectedIndex = 0;
+        const operario = document.getElementById("operarioRollo");
+        if (operario.hidden) {
+            const libre = operario.nextElementSibling;
+            libre.hidden = true;
+            libre.value = "";
+            operario.hidden = false;
+        }
+        operario.selectedIndex = 0;
         document.getElementById("maquinaRollo").selectedIndex = 0;
         document.getElementById("referenciaRollo").selectedIndex = 0;
         document.getElementById("colorRollo").selectedIndex = 0;
         document.getElementById("pesoRolloInput").value = "";
         document.getElementById("pesoRetalInput").value = "";
-        document.getElementById("operarioRollo").focus();
+        operario.focus();
     }
 
     formRollo.addEventListener("submit", async e => {
@@ -30,11 +53,12 @@ if (formRollo) {
         if (enviando) return;
         enviando = true;
         btnRegistrar.disabled = true;
+        btnRegistrar.textContent = "Registrando…";
         aviso.hidden = true;
 
         const payload = {
             fecha:         campoFecha.value,
-            id_operario:   document.getElementById("operarioRollo").value,
+            id_operario:   valorConOtro("operarioRollo"),
             id_maquina:    document.getElementById("maquinaRollo").value,
             id_referencia: document.getElementById("referenciaRollo").value,
             id_color:      document.getElementById("colorRollo").value,
@@ -43,7 +67,7 @@ if (formRollo) {
         };
 
         try {
-            const res  = await fetch("../spreadsheet/saveRegistro.php", {
+            const res  = await fetch("../spreadsheet/saveSpreadsheet.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -54,7 +78,7 @@ if (formRollo) {
                 mostrarAviso(data.error || "No se pudo registrar.", "error");
                 return;
             }
-            mostrarAviso("Registro guardado" + (data.dia_cerrado ? " · día anterior cerrado y PDF generado" : ""), "info");
+            mostrarAviso("Registrado correctamente" + (data.aviso ? " · " + data.aviso : ""), "info");
             limpiarFormulario();
 
         } catch (err) {
@@ -62,6 +86,7 @@ if (formRollo) {
         } finally {
             enviando = false;
             btnRegistrar.disabled = false;
+            btnRegistrar.textContent = "Registrar";
         }
     });
 }

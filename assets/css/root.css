@@ -1,0 +1,74 @@
+/* ROOT — variables globales de diseño */
+:root {
+  /* Tipografía */
+  --fuente: "Poppins", sans-serif;
+
+  /* Verdes */
+  --verde-claro: #e3f3e6;
+  --verde: #3f9d5c;
+  --verde-oscuro: #1f6b40;
+
+  /* Azules */
+  --azul-claro: #e3eef9;
+  --azul: #2f7ec2;
+  --azul-oscuro: #164a7d;
+
+  /* Texto */
+  --texto: #000000;
+  --texto-secundario: #4a4a4a;
+  --texto-tenue: #767676;
+  --texto-claro: #ffffff;
+
+  /* Fondos */
+  --fondo-app: #f3f8f5;
+  --fondo-superficie: #ffffff;
+  --fondo-secundario: #f8fbf9;
+  --fondo-hover: var(--azul-claro);
+  --fondo-oscuro: #163a24;
+
+  /* Bordes */
+  --borde: #e0e9e3;
+  --borde-fuerte: #c7d8cd;
+
+  /* Sombras */
+  --sombra-card: 0 2px 10px rgba(20, 40, 30, 0.06);
+  --sombra-card-hover: 0 8px 20px rgba(20, 40, 30, 0.12);
+  --sombra-boton: 0 2px 6px rgba(20, 40, 30, 0.15);
+  --sombra-modal: 0 16px 40px rgba(20, 40, 30, 0.18);
+  --sombra-navbar: 0 2px 10px rgba(20, 40, 30, 0.1);
+  --sombra-overlay: rgba(20, 40, 30, 0.45);
+
+  /* Hover */
+  --azul-oscuro-hover: #1d5c96;
+  --verde-oscuro-hover: #26814e;
+  --danger-hover: #a8362a;
+
+  /* Estado */
+  --success: var(--verde-oscuro);
+  --success-bg: var(--verde-claro);
+  --info: var(--azul-oscuro);
+  --info-bg: var(--azul-claro);
+  --warning: #a9720a;
+  --warning-bg: #fbf1da;
+  --danger: #c0392b;
+  --danger-bg: #fbe9e7;
+
+  /* Radios */
+  --radio-s: 6px;
+  --radio-m: 10px;
+  --radio-l: 16px;
+
+  /* Espaciado */
+  --espacio-xs: 4px;
+  --espacio-s: 8px;
+  --espacio-m: 16px;
+  --espacio-l: 24px;
+  --espacio-xl: 40px;
+
+  /* Transición */
+  --transicion: 0.2s ease;
+
+  /* Layout */
+  --navbar-alto: 90px;
+  --sidebar-ancho: 260px;
+}

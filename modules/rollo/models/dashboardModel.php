@@ -62,6 +62,30 @@ function obtenerTopMaquinaRollo($conexion){
 }
 
 /* =================================================
+   TOP OPERARIO
+================================================= */
+// Operario con más producción
+function obtenerTopOperarioRollo($conexion){
+    $sql = "SELECT o.nombre_operario,
+            IFNULL(SUM(r.total_rollo),0) total
+            FROM PRODUCCION_ROLLO r
+            LEFT JOIN OPERARIOS o
+                ON r.id_operario = o.id_operario
+            WHERE YEAR(r.fecha_rollo)=YEAR(CURDATE())
+            GROUP BY r.id_operario
+            ORDER BY total DESC
+            LIMIT 1";
+    $res = mysqli_query($conexion, $sql);
+    if($res && mysqli_num_rows($res) > 0){
+        return mysqli_fetch_assoc($res);
+    }
+    return [
+        "nombre_operario" => "Sin datos",
+        "total" => 0
+    ];
+}
+
+/* =================================================
    TOTAL MES
 ================================================= */
 // Total de rollos del mes

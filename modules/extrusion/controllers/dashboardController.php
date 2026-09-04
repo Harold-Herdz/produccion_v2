@@ -31,8 +31,9 @@ $total = obtenerTotalHistoricoExtrusion($conexion);
 // Producción de la semana y del mes actual
 $semana = obtenerProduccionSemanaExtrusion($conexion);
 $mes = obtenerProduccionMesExtrusion($conexion);
-// Top máquina
+// Top máquina y top operario (año actual)
 $top_maquina = obtenerTopMaquinaExtrusion($conexion);
+$top_operario = obtenerTopOperarioExtrusion($conexion);
 
 // Totales de los meses
 $total_mes1 = obtenerTotalMesExtrusion($conexion,$mes1);

@@ -41,19 +41,27 @@ if (planilla) {
     }
 
     /* =========================================
+       CAMPOS "OTRO" (el select se vuelve texto libre en el mismo lugar)
+    ========================================= */
+    // Valor activo de un campo con "Otro": el select o, si ya se convirtió, el input
+    function valorConOtro(contenedor, clase) {
+        const el = contenedor.querySelector("." + clase + ":not([hidden])");
+        return el ? el.value.trim() : "";
+    }
+
+    /* =========================================
        CONSTRUIR EL PAYLOAD DE LA PLANILLA
     ========================================= */
     function recolectar() {
         const maquinas = [...planilla.querySelectorAll(".grupo-maquina")].map(tb => {
             const op = tb.querySelector(".col-operario");
             return {
-                maquina:       Number(tb.dataset.maquina),
-                id_operario:   op.querySelector(".f-operario").value,
-                otro_operario: op.querySelector(".f-otro-operario").value.trim(),
-                jornada:       op.querySelector(".f-jornada").value,
+                maquina:     Number(tb.dataset.maquina),
+                id_operario: valorConOtro(op, "f-operario"),
+                jornada:     valorConOtro(op, "f-jornada"),
                 entradas: [...tb.querySelectorAll(".fila-entrada")].map(tr => ({
-                    id_referencia: tr.querySelector(".f-ref").value,
-                    id_color:      tr.querySelector(".f-color").value,
+                    id_referencia: valorConOtro(tr, "f-ref"),
+                    id_color:      valorConOtro(tr, "f-color"),
                     x70: tr.querySelector(".f-x70").value,
                     x90: tr.querySelector(".f-x90").value,
                     x98: tr.querySelector(".f-x98").value,
@@ -152,20 +160,17 @@ if (planilla) {
     /* =========================================
        EVENTOS DE LA PLANILLA
     ========================================= */
-    planilla.addEventListener("input", e => {
-        // Resaltar cuando se usa "Otro operario"
-        if (e.target.classList.contains("f-otro-operario")) {
-            const bloque = e.target.closest(".col-operario");
-            const usa = e.target.value.trim() !== "";
-            bloque.querySelector(".f-operario").disabled = usa;
-            bloque.classList.toggle("usa-otro", usa);
+    planilla.addEventListener("input", marcarCambio);
+    planilla.addEventListener("change", e => {
+        // "Otro": el select se convierte en texto libre en el mismo lugar
+        if (e.target.classList.contains("tiene-otro") && e.target.value === "otro") {
+            const libre = e.target.nextElementSibling;
+            e.target.hidden = true;
+            libre.hidden = false;
+            libre.focus();
         }
         marcarCambio();
     });
-    planilla.addEventListener("change", marcarCambio);
-
-    // Cambiar la fecha del turno (recodifica la planilla al guardar)
-    inputFecha.addEventListener("change", marcarCambio);
 
     // Agregar / quitar entradas
     planilla.addEventListener("click", e => {
@@ -222,6 +227,12 @@ if (planilla) {
         btnConfirmar.disabled = true;
         btnFinalizar.disabled = true;
         btnConfirmar.textContent = "Procesando…";
+        const restaurarBoton = () => {
+            finalizando = false;
+            btnConfirmar.disabled = false;
+            btnFinalizar.disabled = false;
+            btnConfirmar.textContent = "Sí";
+        };
 
         try {
             const res  = await fetch("../spreadsheet/finalizeSpreadsheet.php", {
@@ -233,10 +244,7 @@ if (planilla) {
 
             if (!data.ok) {
                 alert(data.error || "No se pudo finalizar el turno.");
-                finalizando = false;
-                btnConfirmar.disabled = false;
-                btnFinalizar.disabled = false;
-                btnConfirmar.textContent = "Sí, finalizar";
+                restaurarBoton();
                 return;
             }
 
@@ -254,18 +262,16 @@ if (planilla) {
             }
             document.getElementById("resultadoTexto").textContent =
                 data.yaHecho
-                    ? "Este turno ya estaba exportado a Google Sheets."
-                    : "Turno finalizado: " + data.total + " registros enviados a REGISTROS y PDF guardado en Drive. " +
-                      "Impórtalos desde el Dashboard para verlos en el Historial.";
+                    ? "Este turno ya estaba exportado"
+                    : "Turno finalizado correctamente";
             mostrarAvisos(data.avisos);
             abrirModal("modalResultado");
+            // No se reactivan los botones: el turno ya quedó finalizado,
+            // el usuario debe salir por "Ver PDF" o "Nueva planilla".
 
         } catch (e) {
             alert("Error de conexión al finalizar. Intenta de nuevo.");
-            finalizando = false;
-            btnConfirmar.disabled = false;
-            btnFinalizar.disabled = false;
-            btnConfirmar.textContent = "Sí, finalizar";
+            restaurarBoton();
         }
     });
 

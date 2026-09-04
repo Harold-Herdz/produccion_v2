@@ -13,5 +13,5 @@ $hoy = date('Y-m-d');
 // Catálogos para los selectores del formulario
 $operarios   = mysqli_fetch_all(obtenerOperariosActivosRollo($conexion), MYSQLI_ASSOC);
 $maquinas    = mysqli_fetch_all(obtenerMaquinasActivasRollo($conexion), MYSQLI_ASSOC);
-$referencias = mysqli_fetch_all(obtenerReferenciasActivasRollo($conexion), MYSQLI_ASSOC);
-$colores     = mysqli_fetch_all(obtenerColoresActivosRollo($conexion), MYSQLI_ASSOC);
+$referencias = obtenerReferenciasOrdenadas($conexion, true); // solo hasta 50K en Rollos
+$colores     = obtenerColoresOrdenados($conexion);

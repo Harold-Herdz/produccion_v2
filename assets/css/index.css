@@ -1,43 +1,25 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* PALETA DE COLORES */
-:root {
-  --fuente: "Font Awesome 6 Free", sans-serif;
-  --fondo: rgb(54, 80, 95);
-  --fondo-box: rgb(4, 50, 63);
-  --azul: #209aca86;
-  --azul-hover: #176488;
-  --texto: #d7d7d7;
-}
+/* Selector de módulos: componentes específicos (el resto viene de main.css) */
 
 /* ===========================
-   INDEX 
+   INDEX
 =========================== */
-.index-body {
-  font-family: var(--fuente);
-  height: 100vh;
+.index-centro {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--fondo);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-attachment: fixed;
+  padding: 40px 20px;
 }
 .glass-container {
   padding: 50px;
-  height: 350px;
-  border-radius: 20px;
-  background: var(--fondo-box);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radio-l);
+  background: var(--fondo-superficie);
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra-card);
   text-align: center;
+  color: var(--texto);
+}
+.glass-container h1 {
   color: var(--texto);
 }
 
@@ -56,19 +38,21 @@
   position: relative;
   font-family: var(--fuente);
   padding: 30px;
-  border-radius: 18px;
+  border-radius: var(--radio-l);
   text-decoration: none;
-  background: var(--azul);
-  color: var(--texto);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
-  transition: 0.25s;
+  background: var(--azul-claro);
+  color: var(--azul-oscuro);
+  border: 1px solid var(--azul);
+  box-shadow: var(--sombra-card);
+  transition: var(--transicion);
   font-size: 17px;
+  font-weight: 600;
   align-content: center;
 }
 .area-card:hover {
-  transform: translateY(-10px);
-  background: var(--azul-hover);
-  box-shadow: 8px 12px 15px rgba(100, 202, 250, 0.15);
+  transform: translateY(-6px);
+  background: var(--azul);
+  color: var(--texto-claro);
 }
 .area-card p {
   position: absolute;
@@ -79,17 +63,30 @@
   padding: 0 10px;
   background: none;
   border: none;
-  color: var(--texto);
-  font-size: 16px;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  color: var(--texto-secundario);
+  font-size: 14px;
+  font-weight: 400;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-6px);
-  transition: 0.25s;
+  transition: var(--transicion);
   pointer-events: none;
 }
 .area-card:hover p {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  color: var(--texto-secundario);
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 1280px) {
+  .glass-container {
+    width: 420px;
+  }
+  .glass-container .areas {
+    flex-direction: column;
+  }
 }

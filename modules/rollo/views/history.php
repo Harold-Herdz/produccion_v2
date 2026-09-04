@@ -20,8 +20,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <!-- Título -->
     <h2 class="titulo-vista">Historial Producción Rollo</h2>
 
-        <!-- Botón para registrar producción en Google Forms -->
-        <a class="btn" id="btnRegistrar" href="https://docs.google.com/forms/d/e/1FAIpQLScylHvavBGIPO_o_gF4Wio0Gnn69H1Q3wBJWaBx0age4sAvcQ/viewform?usp=dialog" target="_blank">
+        <!-- Botón para registrar producción -->
+        <a class="btn" id="btnRegistrar" href="register.php">
             Registrar Producción
         </a>
 
