@@ -21,7 +21,7 @@ function cargarDatos(tipo){
             data: {
                 labels: data.fechas,
                 datasets: [{
-                    label: 'Producción (kg)',
+                    label: 'Bruto (kg)',
                     data: data.totales,
                     tension: 0.3
                 }, {
@@ -63,7 +63,7 @@ function cargarDatos(tipo){
             data: {
                 labels: data.operarios,
                 datasets: [{
-                    label: 'Bultos',
+                    label: 'Bultos por operario',
                     data: data.bultos_operarios
                 }]
             },
@@ -137,7 +137,7 @@ function cargarGraficoReferencias(){
             data: {
                 labels: data.referencias,
                 datasets: [{
-                    label: 'Producción (kg)',
+                    label: 'Peso (kg)',
                     data: data.totales
                 }, {
                     label: 'Bultos',
@@ -193,7 +193,7 @@ function cargarGraficoMeses(){
             data: {
                 labels: data.meses.map(m => meses[m-1]),
                 datasets: [{
-                    label: 'Producción mensual',
+                    label: 'Peso mensual',
                     data: data.totales
                 }]
             },

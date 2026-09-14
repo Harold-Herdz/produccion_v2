@@ -141,7 +141,7 @@ function obtenerOperariosActivosRollo($conexion){
     return $conexion->query("SELECT id_operario, nombre_operario FROM operarios WHERE estado = 1 ORDER BY nombre_operario");
 }
 function obtenerMaquinasActivasRollo($conexion){
-    return $conexion->query("SELECT id_maquina, nombre_maquina FROM maquinas WHERE estado = 1 ORDER BY id_maquina");
+    return $conexion->query("SELECT id_maquina, nombre_maquina FROM maquinas WHERE estado = 1 AND id_maquina BETWEEN 1 AND 17 ORDER BY id_maquina");
 }
 // Referencias y colores: ver obtenerReferenciasOrdenadas()/obtenerColoresOrdenados() en shared/catalogosModel.php
 

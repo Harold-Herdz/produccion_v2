@@ -42,7 +42,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 <!-- Contenedor Principal -->
 <div class="container">
     <!-- Título -->
-    <h2 class="titulo-vista">Producción Sellado</h2>
+    <h2 class="titulo-vista">Producción de Sellado</h2>
     
     <!-- KPIs principales -->
     <div class="kpis">
@@ -58,7 +58,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
         <!-- KPI de producción del mes actual -->
         <div class="card-kpi">
-            <p>Producción del mes</p>
+            <p>Producción mensual</p>
             <h2><?php echo number_format($mes); ?></h2>
         </div>
     </div>
@@ -233,7 +233,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <hr class="seccion-divisor">
 
     <!-- Botón para abrir modal de importación -->
-    <a class="btn" id="btnImportar" onclick="abrirModal('modalImportar')">Importar Producción</a>
+    <a class="btn" id="btnImportar" onclick="abrirModal('modalImportar')">Importar Registros</a>
 
     <!-- Sección de gráficos -->
     <div class="seccion-graficos">
@@ -275,12 +275,12 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <!-- Gráficos de producción y operarios -->
         <div class="grid-graficos">
             <div class="card-grafico">
-                <h3>Producción de Paquetes</h3>
+                <h3>Paquetes por Fecha</h3>
                 <canvas id="graficoProduccion"></canvas>
             </div>
 
             <div class="card-grafico">
-                <h3>Producción por Operario</h3>
+                <h3>Paquetes por Operario</h3>
                 <canvas id="graficoOperarios"></canvas>
             </div>
         </div>
@@ -290,7 +290,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- Gráfico de producción mensual por año -->
     <div class="contenedor-grafico">
-        <h3>Producción por año (Sellado)</h3>
+        <h3>Paquetes por año (Sellado)</h3>
             <div class="header-grafico-meses">
                 <!-- Selector de año -->
                 <select id="filtroAnioMes" onchange="cargarGraficoMeses()">
@@ -323,7 +323,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <div class="grid-tablas">
         <!-- Tabla de producción por fecha -->
         <div class="tabla-dashboard">
-            <h3>Producción por Fecha</h3>
+            <h3>Paquetes por Fecha</h3>
             <table>
                 <tr>
                     <th>Fecha</th>
@@ -348,7 +348,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
         <!-- Tabla de producción por operario -->
         <div class="tabla-dashboard">
-            <h3>Producción por Operario</h3>
+            <h3>Paquetes por Operario</h3>
             <table>
                 <tr>
                     <th>Operario</th>

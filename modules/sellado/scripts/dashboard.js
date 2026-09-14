@@ -20,7 +20,7 @@ function cargarDatos(tipo){
             data: {
                 labels: data.fechas,
                 datasets: [{
-                    label: 'Producción',
+                    label: 'Producción diaria',
                     data: data.totales,
                     tension: 0.3,
                     pointRadius: 4,
@@ -70,7 +70,7 @@ function cargarDatos(tipo){
             data: {
                 labels: operariosOrdenados,
                 datasets: [{
-                    label: 'Operarios',
+                    label: 'Producción por operario',
                     data: totalesOrdenados,
                     maxBarThickness: 40
                 }]

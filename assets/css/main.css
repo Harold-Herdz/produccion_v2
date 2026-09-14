@@ -59,11 +59,8 @@ body {
   height: 75px;
   width: auto;
   /* Contorno blanco: contraste con el navbar */
-  filter:
-    drop-shadow(1px 0 0 #fff)
-    drop-shadow(-1px 0 0 #fff)
-    drop-shadow(0 1px 0 #fff)
-    drop-shadow(0 -1px 0 #fff);
+  filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
+    drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff);
 }
 .menu-toggle {
   background: none;
@@ -1057,7 +1054,7 @@ input::placeholder {
 .footer {
   width: 100%;
   margin-top: auto;
-  padding: 15px 25px;
+  padding: 15px 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;

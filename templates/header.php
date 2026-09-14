@@ -107,10 +107,6 @@ require_once dirname(__DIR__) . '/includes/config.php';
             <div class="cerrar-sesion">
                 <a id="btnCerrar" href="<?= BASE_URL ?>/auth/controllers/logout.php">Cerrar Sesión</a>
             </div>
-            <!-- Nombre de la empresa -->
-            <div class="footer-left">
-                <strong>Plastypetco</strong><span>&nbsp;&copy; 2026</span>
-            </div>
         </div>
     </nav>
 

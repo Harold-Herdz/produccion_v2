@@ -47,7 +47,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 <!-- Contenedor Principal -->
 <div class="container">
     <!-- Título -->
-    <h2 class="titulo-vista">Producción Máquina Plana</h2>
+    <h2 class="titulo-vista">Producción de Máquina Plana</h2>
 
     <!-- KPIs principales -->
     <div class="kpis">
@@ -58,12 +58,12 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
         <!-- KPI de producción de la semana actual -->
         <div class="card-kpi">
-            <p>Producción semanal</p>
+            <p>Peso semanal</p>
             <h2><?php echo number_format($semana); ?> kg</h2>
         </div>
         <!-- KPI de producción del mes actual -->
         <div class="card-kpi">
-            <p>Producción del mes</p>
+            <p>Peso mensual</p>
             <h2><?php echo number_format($mes); ?> kg</h2>
         </div>
     </div>
@@ -117,7 +117,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </select>
             </h3>
             <p>
-                🏭 Producción bruta: <?php 
+                🏭 Peso bruto: <?php 
                 echo $bruto_mes1 !== null 
                     ? number_format($bruto_mes1).' kg' 
                     : 'Sin datos'; 
@@ -131,7 +131,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 ?>
             </p>
             <p>
-                📦 Producción final: <?php 
+                📦 Peso final: <?php 
                 echo $total_mes1 !== null 
                     ? number_format($total_mes1).' kg' 
                     : 'Sin datos'; 
@@ -213,7 +213,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </select>
             </h3>
             <p>
-                🏭 Producción bruta: <?php 
+                🏭 Peso bruto: <?php 
                 echo $bruto_mes2 !== null 
                     ? number_format($bruto_mes2).' kg' 
                     : 'Sin datos'; 
@@ -227,7 +227,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 ?>
             </p>
             <p>
-                📦 Producción final: <?php 
+                📦 Peso final: <?php 
                 echo $total_mes2 !== null 
                     ? number_format($total_mes2).' kg' 
                     : 'Sin datos'; 
@@ -274,7 +274,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <hr class="seccion-divisor">
 
     <!-- Botón para abrir modal de importación -->
-    <a class="btn" id="btnImportar" onclick="abrirModal('modalImportar')">Importar Producción</a>
+    <a class="btn" id="btnImportar" onclick="abrirModal('modalImportar')">Importar Registros</a>
 
     <!-- Sección de gráficos -->
     <div class="seccion-graficos">
@@ -316,12 +316,12 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <!-- Gráficos de producción y operarios -->
         <div class="grid-graficos">
             <div class="card-grafico">
-                <h3>Producción por Peso</h3>
+                <h3>Pesos por Fecha</h3>
                 <canvas id="graficoProduccion"></canvas>
             </div>
 
             <div class="card-grafico">
-                <h3>Producción por Operario (bultos)</h3>
+                <h3>Bultos por Operario</h3>
                 <canvas id="graficoOperarios"></canvas>
             </div>
         </div>
@@ -338,7 +338,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- Gráfico de producción mensual por año -->
     <div class="contenedor-grafico">
-        <h3>Producción por año (Máquina Plana)</h3>
+        <h3>Peso por año (Máquina Plana)</h3>
             <div class="header-grafico-meses">
                 <!-- Selector de año -->
                 <select id="filtroAnioMes" onchange="cargarGraficoMeses()">
