@@ -26,8 +26,8 @@ if($tipo === "anio"){
     // Agrupado por semana del año
     $sql = "SELECT 
                 CONCAT('Sem ', WEEK(fecha_plana, 1)) fecha, 
-                SUM(total_plana) total, 
-                SUM(retal_plana) retal
+                SUM(peso_total) total, 
+                SUM(peso_retal) retal
             FROM PRODUCCION_PLANA
             WHERE YEAR(fecha_plana)=YEAR(CURDATE())
             GROUP BY WEEK(fecha_plana, 1), CONCAT('Sem ', WEEK(fecha_plana, 1))
@@ -47,8 +47,8 @@ if($tipo === "anio"){
                 AND YEAR(fecha_plana)=YEAR(CURDATE())";
     }
     $sql = "SELECT DATE(fecha_plana) fecha, 
-                SUM(total_plana) total, 
-                SUM(retal_plana) retal
+                SUM(peso_total) total, 
+                SUM(peso_retal) retal
             FROM PRODUCCION_PLANA
             $where
             GROUP BY DATE(fecha_plana)";
@@ -72,7 +72,7 @@ while($row = mysqli_fetch_assoc($res)){
 if($tipo == "anio"){
     // Top 10 operarios del año
     $sql2 = "SELECT o.nombre_operario, 
-                SUM(p.bultos_plana) total
+                SUM(p.bultos) total
             FROM PRODUCCION_PLANA p
             LEFT JOIN OPERARIOS o ON p.id_operario=o.id_operario
             WHERE YEAR(p.fecha_plana)=YEAR(CURDATE())
@@ -94,7 +94,7 @@ if($tipo == "anio"){
                 AND YEAR(p.fecha_plana)=YEAR(CURDATE())";
     }
     $sql2 = "SELECT o.nombre_operario, 
-                SUM(p.bultos_plana) total
+                SUM(p.bultos) total
             FROM PRODUCCION_PLANA p
             LEFT JOIN OPERARIOS o ON p.id_operario=o.id_operario
             $where2

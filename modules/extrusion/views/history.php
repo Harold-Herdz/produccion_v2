@@ -56,7 +56,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                         <th>Referencia</th>
                         <th>Color</th>
                         <th>Rollos</th>
-                        <th>Total (kg)</th>
+                        <th>Peso Total (kg)</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -68,12 +68,12 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <td><?php echo $fila['id_sheet']; ?></td>
                             <td><?php echo $fila['fecha_extrusion']; ?></td>
                             <td><?php echo $fila['nombre_maquina']; ?></td>
-                            <td><?php echo $fila['nombre_turno_ext']; ?></td>
-                            <td><?php echo $fila['nombre_operador_ext']; ?></td>
+                            <td><?php echo $fila['nombre_turno']; ?></td>
+                            <td><?php echo $fila['nombre_operador']; ?></td>
                             <td><?php echo $fila['nombre_referencia']; ?></td>
                             <td><?php echo $fila['nombre_color']; ?></td>
-                            <td><?php echo $fila['rollos_extrusion']; ?></td>
-                            <td><?php echo $fila['total_extrusion']; ?></td>
+                            <td><?php echo $fila['rollos']; ?></td>
+                            <td><?php echo $fila['peso_total']; ?></td>
                              <!-- Botones de editar o eliminar registros -->
                             <td>
                                 <a class="btn"

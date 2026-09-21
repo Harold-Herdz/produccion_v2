@@ -74,6 +74,7 @@ $regAbierta = $q ? $q->fetch_assoc() : null;
                         <th>Máquina</th>
                         <th>Operario</th>
                         <th>Turno</th>
+                        <th>Jornada</th>
                         <th>Referencia</th>
                         <th>Color</th>
                         <th>Total Paquetes</th>
@@ -91,6 +92,7 @@ $regAbierta = $q ? $q->fetch_assoc() : null;
                             <td><?php echo $fila['nombre_maquina']; ?></td>
                             <td><?php echo $fila['nombre_operario']; ?></td>
                             <td><?php echo $fila['nombre_turno']; ?></td>
+                            <td><?php echo $fila['nombre_jornada']; ?></td>
                             <td><?php echo $fila['nombre_referencia']; ?></td>
                             <td><?php echo $fila['nombre_color']; ?></td>
                             <td><?php echo $fila['paquetes_total']; ?></td>

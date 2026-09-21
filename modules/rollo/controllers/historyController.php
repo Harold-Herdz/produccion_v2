@@ -36,8 +36,8 @@ if(!empty($busqueda)){
         c.nombre_color LIKE '%$busqueda%' OR
         r.id LIKE '%$busqueda%' OR
         r.peso_rollo LIKE '%$busqueda%' OR
-        r.retal_rollo LIKE '%$busqueda%' OR
-        r.total_rollo LIKE '%$busqueda%'
+        r.peso_retal LIKE '%$busqueda%' OR
+        r.peso_total LIKE '%$busqueda%'
     )";
 }
 
@@ -74,6 +74,8 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
     $datos = [
         'fecha' => $_POST['fecha_rollo'],
 
+        'id_operario' => $_POST['id_operario'],
+
         'id_maquina' => $_POST['id_maquina'],
 
         'id_referencia' => $_POST['id_referencia'],
@@ -82,9 +84,7 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
 
         'peso_rollo' => $_POST['peso_rollo'],
 
-        'retal_rollo' => $_POST['retal_rollo'],
-
-        'total_rollo' => $_POST['total_rollo']
+        'peso_retal' => $_POST['peso_retal'],
     ];
 
     // Actualizar registro

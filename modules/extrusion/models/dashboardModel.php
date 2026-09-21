@@ -17,20 +17,20 @@ function obtenerTotalExtrusion($conexion, $sql){
 ================================================= */
 // Total histórico de producción
 function obtenerTotalHistoricoExtrusion($conexion){
-    $sql = "SELECT SUM(total_extrusion) total 
+    $sql = "SELECT SUM(peso_total) total 
             FROM PRODUCCION_EXTRUSION";
     return obtenerTotalExtrusion($conexion, $sql);
 }
 // Producción de la semana actual
 function obtenerProduccionSemanaExtrusion($conexion){
-    $sql = "SELECT SUM(total_extrusion) total
+    $sql = "SELECT SUM(peso_total) total
             FROM PRODUCCION_EXTRUSION
             WHERE YEARWEEK(fecha_extrusion, 1) = YEARWEEK(CURDATE(), 1)";
     return obtenerTotalExtrusion($conexion, $sql);
 }
 // Producción del mes actual
 function obtenerProduccionMesExtrusion($conexion){
-    $sql = "SELECT SUM(total_extrusion) total
+    $sql = "SELECT SUM(peso_total) total
             FROM PRODUCCION_EXTRUSION
             WHERE MONTH(fecha_extrusion) = MONTH(CURDATE())
             AND YEAR(fecha_extrusion) = YEAR(CURDATE())";
@@ -43,7 +43,7 @@ function obtenerProduccionMesExtrusion($conexion){
 // Máquina con más producción
 function obtenerTopMaquinaExtrusion($conexion){
     $sql = "SELECT m.nombre_maquina, 
-            IFNULL(SUM(e.total_extrusion),0) total
+            IFNULL(SUM(e.peso_total),0) total
             FROM PRODUCCION_EXTRUSION e
             LEFT JOIN MAQUINAS m 
             ON e.id_maquina = m.id_maquina
@@ -64,15 +64,15 @@ function obtenerTopMaquinaExtrusion($conexion){
 /* =================================================
    TOP OPERARIO
 ================================================= */
-// Operador con más producción (catálogo propio de Extrusión)
+// Operador con más producción (catálogo OPERADORES, de Extrusión)
 function obtenerTopOperarioExtrusion($conexion){
-    $sql = "SELECT o.nombre_operador_ext AS nombre_operario,
-            IFNULL(SUM(e.total_extrusion),0) total
+    $sql = "SELECT o.nombre_operador AS nombre_operario,
+            IFNULL(SUM(e.peso_total),0) total
             FROM PRODUCCION_EXTRUSION e
-            LEFT JOIN OPERADORES_EXTRUSION o
-            ON e.id_operador_ext = o.id_operador_ext
+            LEFT JOIN OPERADORES o
+            ON e.id_operador = o.id_operador
             WHERE YEAR(e.fecha_extrusion)=YEAR(CURDATE())
-            GROUP BY e.id_operador_ext
+            GROUP BY e.id_operador
             ORDER BY total DESC
             LIMIT 1";
     $res = mysqli_query($conexion, $sql);
@@ -90,7 +90,7 @@ function obtenerTopOperarioExtrusion($conexion){
 ================================================= */
 // Total de paquetes del mes
 function obtenerTotalMesExtrusion($conexion,$mes){
-    $sql = "SELECT SUM(total_extrusion) total
+    $sql = "SELECT SUM(peso_total) total
             FROM PRODUCCION_EXTRUSION
             WHERE MONTH(fecha_extrusion) = $mes
             AND YEAR(fecha_extrusion)=YEAR(CURDATE())";
@@ -102,7 +102,7 @@ function obtenerTotalMesExtrusion($conexion,$mes){
 ================================================= */
 // Rollos producidos en el mes
 function obtenerRollosMesExtrusion($conexion,$mes){
-    $sql = "SELECT SUM(rollos_extrusion) rollos
+    $sql = "SELECT SUM(rollos) rollos
             FROM PRODUCCION_EXTRUSION
             WHERE MONTH(fecha_extrusion) = $mes
             AND YEAR(fecha_extrusion)=YEAR(CURDATE())";
@@ -121,7 +121,7 @@ function obtenerRollosMesExtrusion($conexion,$mes){
 ================================================= */
 // Mejor y peor día de producción del mes
 function obtenerMejorPeorDiaMesExtrusion($conexion,$mes){
-    $sql = "SELECT DATE(fecha_extrusion) fecha, SUM(total_extrusion) total
+    $sql = "SELECT DATE(fecha_extrusion) fecha, SUM(peso_total) total
             FROM PRODUCCION_EXTRUSION
             WHERE MONTH(fecha_extrusion) = $mes
             AND YEAR(fecha_extrusion)=YEAR(CURDATE())
@@ -151,7 +151,7 @@ function obtenerMejorPeorDiaMesExtrusion($conexion,$mes){
 // Máquina con más producción en el mes
 function obtenerTopMaquinaMesExtrusion($conexion,$mes){
     $sql = "SELECT m.nombre_maquina, 
-            IFNULL(SUM(e.total_extrusion),0) total
+            IFNULL(SUM(e.peso_total),0) total
             FROM PRODUCCION_EXTRUSION e
             LEFT JOIN MAQUINAS m 
             ON e.id_maquina = m.id_maquina
@@ -176,7 +176,7 @@ function obtenerTopMaquinaMesExtrusion($conexion,$mes){
 // Producción agrupada por fecha en un rango
 function obtenerTablaFechasExtrusion($conexion,$desde,$hasta){
     $sql = "SELECT 
-            DATE(fecha_extrusion) fecha, SUM(rollos_extrusion) rollos, SUM(total_extrusion) total
+            DATE(fecha_extrusion) fecha, SUM(rollos) rollos, SUM(peso_total) total
             FROM PRODUCCION_EXTRUSION e
             WHERE DATE(e.fecha_extrusion)
             BETWEEN '$desde' AND '$hasta'
@@ -186,7 +186,7 @@ function obtenerTablaFechasExtrusion($conexion,$desde,$hasta){
 }
 // Producción agrupada por máquina en un rango
 function obtenerTablaMaquinasExtrusion($conexion,$desde,$hasta){
-    $sql = "SELECT m.nombre_maquina, SUM(rollos_extrusion) rollos, SUM(e.total_extrusion) total
+    $sql = "SELECT m.nombre_maquina, SUM(rollos) rollos, SUM(e.peso_total) total
             FROM PRODUCCION_EXTRUSION e
             LEFT JOIN MAQUINAS m
             ON e.id_maquina = m.id_maquina
@@ -203,8 +203,8 @@ function obtenerTablaMaquinasExtrusion($conexion,$desde,$hasta){
 // Fecha de la última importación de máquina plana
 function obtenerUltimaImportacionExtrusion($conexion){
     $sql = "SELECT ultimo_id_sheet
-            FROM IMPORTAR 
-            WHERE nombre = 'extrusion'";
+            FROM AREAS
+            WHERE nombre_area = 'extrusion'";
     $res = mysqli_query($conexion, $sql);
     if(!$res){
         return 'Ninguno';

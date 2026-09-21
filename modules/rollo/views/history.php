@@ -52,9 +52,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                         <th>Máquina</th>
                         <th>Referencia</th>
                         <th>Color</th>
-                        <th>Bruto (kg)</th>
-                        <th>Retal (kg)</th>
-                        <th>Total (kg)</th>
+                        <th>Peso Rollo (kg)</th>
+                        <th>Peso Retal (kg)</th>
+                        <th>Peso Total (kg)</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -70,8 +70,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <td><?php echo $fila['nombre_referencia']; ?></td>
                             <td><?php echo $fila['nombre_color']; ?></td>
                             <td><?php echo $fila['peso_rollo']; ?></td>
-                            <td><?php echo $fila['retal_rollo']; ?></td>
-                            <td><?php echo $fila['total_rollo']; ?></td>
+                            <td><?php echo $fila['peso_retal']; ?></td>
+                            <td><?php echo $fila['peso_total']; ?></td>
                             <!-- Botones de editar o eliminar registros -->
                             <td>
                                 <a class="btn"

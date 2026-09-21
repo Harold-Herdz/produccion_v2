@@ -77,7 +77,7 @@ foreach ($filas as $data) {
     $referencia  = limpiarNombre($data[4]);
     $color       = limpiarNombre($data[5]);
     $peso_rollo  = convertirNumero($data[6]);
-    $retal_rollo = convertirNumero($data[7]);
+    $peso_retal  = convertirNumero($data[7]);
 
     // Obtener IDs de catálogos o crearlos si no existen
     $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
@@ -89,10 +89,10 @@ foreach ($filas as $data) {
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_ROLLO
                     (id_sheet,fecha_rollo,id_operario,id_maquina,
-                    id_referencia,id_color,peso_rollo,retal_rollo)
+                    id_referencia,id_color,peso_rollo,peso_retal)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina',
-                    '$id_referencia','$id_color','$peso_rollo','$retal_rollo')
+                    '$id_referencia','$id_color','$peso_rollo','$peso_retal')
                 ON DUPLICATE KEY UPDATE
                     fecha_rollo   = VALUES(fecha_rollo),
                     id_operario   = VALUES(id_operario),
@@ -100,15 +100,15 @@ foreach ($filas as $data) {
                     id_referencia = VALUES(id_referencia),
                     id_color      = VALUES(id_color),
                     peso_rollo    = VALUES(peso_rollo),
-                    retal_rollo   = VALUES(retal_rollo)";
+                    peso_retal    = VALUES(peso_retal)";
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_ROLLO
                     (id_sheet,fecha_rollo,id_operario,id_maquina,
-                    id_referencia,id_color,peso_rollo,retal_rollo)
+                    id_referencia,id_color,peso_rollo,peso_retal)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina',
-                    '$id_referencia','$id_color','$peso_rollo','$retal_rollo')";
+                    '$id_referencia','$id_color','$peso_rollo','$peso_retal')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);

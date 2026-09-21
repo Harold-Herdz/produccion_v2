@@ -17,8 +17,8 @@ include dirname(__DIR__) . '/controllers/catalogsController.php';
 // Lista de catálogos disponibles para el selector superior
 $catalogos = catalogosDisponibles();
 
-// Número de columnas de la tabla (turnos muestra 2 columnas extra)
-$totalColumnas = ($clave === 'turnos') ? 5 : 4;
+// Número de columnas de la tabla
+$totalColumnas = 4;
 
 // Importar header.php
 include dirname(__DIR__, 3) . '/templates/header.php';
@@ -76,10 +76,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <?php if ($clave === 'turnos') { ?>
-                            <th>Bloque horario</th>
-                            <th>Jornada</th>
-                        <?php } ?>
                         <th>Nombre</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -93,12 +89,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                         <tr>
                             <!-- ID -->
                             <td><?= $fila[$cfg['id']] ?></td>
-
-                            <!-- Columnas propias de Turnos -->
-                            <?php if ($clave === 'turnos') { ?>
-                                <td><?= htmlspecialchars($fila['bloque_horario']) ?></td>
-                                <td><?= htmlspecialchars($fila['jornada']) ?></td>
-                            <?php } ?>
 
                             <!-- Nombre visible -->
                             <td><?= htmlspecialchars($fila[$cfg['nombre']]) ?></td>

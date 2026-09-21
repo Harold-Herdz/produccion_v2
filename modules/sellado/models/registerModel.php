@@ -217,24 +217,25 @@ function obtenerOperariosActivos($conexion){
 /* =================================================
    RESOLUCIÓN DE TURNO Y OPERARIO
 ================================================= */
-// Obtener el id_turno a partir del bloque + jornada; se crea si no existe
-function obtenerIdTurno($conexion, $bloque, $jornada){
-    $stmt = $conexion->prepare("
-        SELECT id_turno FROM turnos
-        WHERE bloque_horario = ? AND jornada = ?
-        LIMIT 1
-    ");
-    $stmt->bind_param('ss', $bloque, $jornada);
+// Nombre de turno (catálogo TURNOS) correspondiente al bloque del encabezado de la planilla
+// (el bloque ya usa el mismo nombre natural: Día/Tarde/Noche)
+function nombreTurnoDesdeBloque($bloque){
+    $validos = ['Día' => true, 'Tarde' => true, 'Noche' => true];
+    return isset($validos[$bloque]) ? $bloque : null;
+}
+
+// Id de turno a partir del bloque del encabezado. TURNOS es un catálogo cerrado de
+// 4 valores fijos (Día/Tarde/Noche/18 Horas) llenado a mano; nunca se crea uno aquí.
+function obtenerIdTurnoPorBloque($conexion, $bloque){
+    $nombreTurno = nombreTurnoDesdeBloque($bloque);
+    if($nombreTurno === null){
+        return null;
+    }
+    $stmt = $conexion->prepare("SELECT id_turno FROM turnos WHERE nombre_turno = ? LIMIT 1");
+    $stmt->bind_param('s', $nombreTurno);
     $stmt->execute();
     $fila = $stmt->get_result()->fetch_assoc();
-    if($fila){
-        return (int) $fila['id_turno'];
-    }
-    // Crear el turno si la combinación es nueva
-    $stmt = $conexion->prepare("INSERT INTO turnos (bloque_horario, jornada) VALUES (?, ?)");
-    $stmt->bind_param('ss', $bloque, $jornada);
-    $stmt->execute();
-    return $conexion->insert_id;
+    return $fila ? (int) $fila['id_turno'] : null;
 }
 
 // Id de operario por nombre; lo crea si no existe. Devuelve [id_operario, fue_creado]
@@ -282,16 +283,17 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
 
     // Sentencia de inserción/actualización por entrada
     $sql = "INSERT INTO produccion_sellado
-                (id_sheet, fecha_sellado, id_operario, id_maquina, id_referencia, id_color, id_turno,
+                (id_sheet, fecha_sellado, id_operario, id_maquina, id_referencia, id_color, id_turno, id_jornada,
                  paquetes_x70, paquetes_x90, paquetes_x98,
                  peso_hora1, peso_hora2, peso_hora3, peso_hora4, peso_hora5, obs_sellado)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             ON DUPLICATE KEY UPDATE
                 id_operario   = VALUES(id_operario),
                 id_maquina    = VALUES(id_maquina),
                 id_referencia = VALUES(id_referencia),
                 id_color      = VALUES(id_color),
                 id_turno      = VALUES(id_turno),
+                id_jornada    = VALUES(id_jornada),
                 paquetes_x70  = VALUES(paquetes_x70),
                 paquetes_x90  = VALUES(paquetes_x90),
                 paquetes_x98  = VALUES(paquetes_x98),
@@ -303,6 +305,12 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
                 obs_sellado   = VALUES(obs_sellado)";
     $stmt = $conexion->prepare($sql);
     $maquinasEnviadas = []; // solo se borran filas de máquinas que vinieron en el payload
+
+    // El turno (Día/Tarde/Noche) es el mismo para toda la planilla: se resuelve una sola vez
+    $idTurno = obtenerIdTurnoPorBloque($conexion, $bloque);
+    if($idTurno === null){
+        $avisos[] = "No se encontró el turno «" . (nombreTurnoDesdeBloque($bloque) ?? $bloque) . "» en el catálogo TURNOS.";
+    }
 
     foreach($maquinas as $m){
         $numMaq = (int) ($m['maquina'] ?? 0);
@@ -319,11 +327,13 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
         );
         if($avisoOp){ $avisos[] = $avisoOp; }
 
-        // Resolver turno con el bloque del encabezado + la jornada de la máquina
-        // (jornada es texto libre desde siempre; "otro" sin escribir nada cuenta como vacío)
-        $jornada = trim($m['jornada'] ?? '');
-        if($jornada === 'otro'){ $jornada = ''; }
-        $idTurno = ($jornada !== '') ? obtenerIdTurno($conexion, $bloque, $jornada) : null;
+        // Jornada de la máquina: catálogo cerrado de 2 valores (8 Horas/12 Horas).
+        // Cualquier otro texto (horario suelto, "Otro" sin completar, etc.) se
+        // normaliza siempre a "8 Horas"; nunca se crea una jornada nueva.
+        $idJornada = resolverIdJornada($conexion, $m['jornada'] ?? '');
+        if($idJornada === null){
+            $avisos[] = "No se encontró la jornada «" . normalizarJornada($m['jornada'] ?? '') . "» en el catálogo JORNADAS.";
+        }
 
         // Recorrer las entradas de la máquina (máximo 6); la posición cuenta solo las no vacías
         $entradas = $m['entradas'] ?? [];
@@ -363,8 +373,8 @@ function guardarPlanilla($conexion, $planilla, $maquinas){
             $obs = trim($ent['obs'] ?? '');
 
             $stmt->bind_param(
-                'ssiiiiiiiiddddds',
-                $idSheet, $fecha, $idOperario, $numMaq, $idReferencia, $idColor, $idTurno,
+                'ssiiiiiiiiiddddds',
+                $idSheet, $fecha, $idOperario, $numMaq, $idReferencia, $idColor, $idTurno, $idJornada,
                 $x70, $x90, $x98, $p1, $p2, $p3, $p4, $p5, $obs
             );
             $stmt->execute();
@@ -419,9 +429,9 @@ function obtenerPlanillaEstructurada($conexion, $planilla){
         SELECT s.id_sheet, s.id_maquina, s.id_operario, s.id_referencia, s.id_color,
                s.paquetes_x70, s.paquetes_x90, s.paquetes_x98,
                s.peso_hora1, s.peso_hora2, s.peso_hora3, s.peso_hora4, s.peso_hora5,
-               s.obs_sellado, t.jornada
+               s.obs_sellado, j.nombre_jornada AS jornada
         FROM produccion_sellado s
-        LEFT JOIN turnos t ON s.id_turno = t.id_turno
+        LEFT JOIN jornadas j ON s.id_jornada = j.id_jornada
         WHERE s.id_sheet IN ({$lista})
         ORDER BY s.id_maquina, s.id
     ");
@@ -460,7 +470,7 @@ function obtenerEntradasPlanillaPdf($conexion, $codigo){
     $filtro = ($lista === '') ? '1 = 0' : "s.id_sheet IN ({$lista})";
     return $conexion->query("
         SELECT s.id_maquina, m.nombre_maquina,
-               o.nombre_operario, t.jornada,
+               o.nombre_operario, j.nombre_jornada AS jornada,
                r.nombre_referencia, c.nombre_color,
                s.paquetes_x70, s.paquetes_x90, s.paquetes_x98, s.paquetes_total,
                s.peso_hora1, s.peso_hora2, s.peso_hora3, s.peso_hora4, s.peso_hora5,
@@ -470,7 +480,7 @@ function obtenerEntradasPlanillaPdf($conexion, $codigo){
         LEFT JOIN operarios o   ON s.id_operario   = o.id_operario
         LEFT JOIN referencias r ON s.id_referencia = r.id_referencia
         LEFT JOIN colores c     ON s.id_color      = c.id_color
-        LEFT JOIN turnos t      ON s.id_turno      = t.id_turno
+        LEFT JOIN jornadas j    ON s.id_jornada    = j.id_jornada
         WHERE {$filtro}
         ORDER BY s.id_maquina, s.id
     ");

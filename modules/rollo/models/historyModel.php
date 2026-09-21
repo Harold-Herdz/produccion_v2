@@ -36,6 +36,7 @@ function obtenerColores($conexion){
 ================================================= */
 // Actualizar registro de producción por ID
 function actualizarProduccion($conexion, $id, $datos){
+    // peso_total es una columna GENERADA (peso_rollo - peso_retal); no se incluye en el UPDATE
     $sql = "UPDATE PRODUCCION_ROLLO SET
             fecha_rollo='{$datos['fecha']}',
             id_operario='{$datos['id_operario']}',
@@ -43,8 +44,7 @@ function actualizarProduccion($conexion, $id, $datos){
             id_referencia='{$datos['id_referencia']}',
             id_color='{$datos['id_color']}',
             peso_rollo='{$datos['peso_rollo']}',
-            retal_rollo='{$datos['retal_rollo']}',
-            total_rollo='{$datos['total_rollo']}'
+            peso_retal='{$datos['peso_retal']}'
             WHERE id=$id";
     mysqli_query($conexion, $sql);
 }

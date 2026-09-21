@@ -41,13 +41,13 @@ $total_mes2 = obtenerTotalMesRollo($conexion,$mes2);
 
 // Resumenes de los meses
 $resumen_mes1 = obtenerResumenMesRollo($conexion,$mes1);
-$bruto_mes1 = $resumen_mes1['bruto'];
-$retal_mes1 = $resumen_mes1['retal'];
-$neto_mes1 = $resumen_mes1['neto'];
+$peso_rollo_mes1 = $resumen_mes1['peso_rollo'];
+$peso_retal_mes1 = $resumen_mes1['peso_retal'];
+$peso_total_mes1 = $resumen_mes1['peso_total'];
 $resumen_mes2 = obtenerResumenMesRollo($conexion,$mes2);
-$bruto_mes2 = $resumen_mes2['bruto'];
-$retal_mes2 = $resumen_mes2['retal'];
-$neto_mes2 = $resumen_mes2['neto'];
+$peso_rollo_mes2 = $resumen_mes2['peso_rollo'];
+$peso_retal_mes2 = $resumen_mes2['peso_retal'];
+$peso_total_mes2 = $resumen_mes2['peso_total'];
 
 // Mejor y peor día de los meses
 $dias_mes1 = obtenerMejorPeorDiaMesRollo($conexion,$mes1);
@@ -76,8 +76,8 @@ $diferencia = ($total_mes2 ?? 0) - ($total_mes1 ?? 0);
 $porcentaje = ($total_mes1 > 0) ? (($diferencia / $total_mes1) * 100) : 0;
 
 // Calculo de eficiencia de los meses
-$eficiencia_mes1 = ($bruto_mes1 !== null && $bruto_mes1 > 0) ? (($neto_mes1 / $bruto_mes1) * 100) : null;
-$eficiencia_mes2 = ($bruto_mes2 !== null && $bruto_mes2 > 0) ? (($neto_mes2 / $bruto_mes2) * 100) : null;
+$eficiencia_mes1 = ($peso_rollo_mes1 !== null && $peso_rollo_mes1 > 0) ? (($peso_total_mes1 / $peso_rollo_mes1) * 100) : null;
+$eficiencia_mes2 = ($peso_rollo_mes2 !== null && $peso_rollo_mes2 > 0) ? (($peso_total_mes2 / $peso_rollo_mes2) * 100) : null;
 
 // Última fecha de importación
 $ultimo_id_sheet = obtenerUltimaImportacionRollo($conexion);

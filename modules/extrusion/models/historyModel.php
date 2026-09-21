@@ -14,16 +14,19 @@ function obtenerMaquinasExtrusion($conexion){
     return mysqli_query($conexion, "SELECT * FROM MAQUINAS");
 }
 function obtenerTurnosExtrusion($conexion){
-    return mysqli_query($conexion, "SELECT * FROM TURNOS_EXTRUSION");
+    return mysqli_query($conexion, "SELECT * FROM TURNOS");
 }
 function obtenerOperadoresExtrusion($conexion){
-    return mysqli_query($conexion, "SELECT * FROM OPERADORES_EXTRUSION");
+    return mysqli_query($conexion, "SELECT * FROM OPERADORES");
 }
 function obtenerReferenciasExtrusion($conexion){
     return mysqli_query($conexion, "SELECT * FROM REFERENCIAS");
 }
 function obtenerColoresExtrusion($conexion){
     return mysqli_query($conexion, "SELECT * FROM COLORES");
+}
+function obtenerLaminaPExtrusion($conexion){
+    return mysqli_query($conexion, "SELECT * FROM LAMINA_P");
 }
 
 /* =================================================
@@ -34,13 +37,13 @@ function actualizarProduccion($conexion, $id, $datos){
     $sql = "UPDATE PRODUCCION_EXTRUSION SET
             fecha_extrusion = '{$datos['fecha']}',
             id_maquina = '{$datos['id_maquina']}',
-            id_turno_ext = '{$datos['id_turno_ext']}',
-            id_operador_ext = '{$datos['id_operador_ext']}',
+            id_turno = '{$datos['id_turno']}',
+            id_operador = '{$datos['id_operador']}',
             id_referencia = '{$datos['id_referencia']}',
             id_color = '{$datos['id_color']}',
-            lamina_p = '{$datos['lamina_p']}',
-            rollos_extrusion = '{$datos['rollos_ext']}',
-            total_extrusion = '{$datos['total_ext']}'
+            id_lamina_p = '{$datos['id_lamina_p']}',
+            rollos = '{$datos['rollos']}',
+            peso_total = '{$datos['peso_total']}'
             WHERE id = $id";
     mysqli_query($conexion, $sql);
 }

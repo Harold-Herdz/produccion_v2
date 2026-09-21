@@ -57,9 +57,9 @@ if (ob_get_level()) ob_flush(); flush();
 echo "<script>document.getElementById('msg').textContent='Cargando catálogos…';</script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
-$operarios   = cargarCatalogo($conexion, "OPERARIOS",   "nombre_operario",   "id_operario");
-$maquinas    = cargarCatalogo($conexion, "MAQUINAS",    "nombre_maquina",    "id_maquina");
-$referencias = cargarCatalogo($conexion, "REFERENCIAS", "nombre_referencia", "id_referencia");
+$operarios   = cargarCatalogo($conexion, "OPERARIOS",     "nombre_operario",       "id_operario");
+$maquinas    = cargarCatalogo($conexion, "MAQUINAS",      "nombre_maquina",        "id_maquina");
+$referencias = cargarCatalogo($conexion, "REFERENCIAS_ESP", "nombre_referencia_esp", "id_referencia_esp");
 
 // Contadores de resultado
 $contador     = 0;
@@ -70,46 +70,46 @@ $nueva_fecha  = null;
 
 foreach ($filas as $data) {
     // Limpiar y convertir datos de cada fila
-    $id_sheet     = trim($data[0]);
-    $fecha        = convertirFecha($data[1]);
-    $operario     = trim($data[2]);
-    $maquina      = trim($data[3]);
-    $referencia   = trim($data[4]);
-    $peso_plana   = convertirNumero($data[5]);
-    $retal_plana  = convertirNumero($data[6]);
-    $bultos_plana = (int)$data[7];
-    $total_plana  = convertirNumero($data[8]);
+    $id_sheet    = trim($data[0]);
+    $fecha       = convertirFecha($data[1]);
+    $operario    = trim($data[2]);
+    $maquina     = trim($data[3]);
+    $referencia  = trim($data[4]);
+    $peso_rollo  = convertirNumero($data[5]);
+    $peso_retal  = convertirNumero($data[6]);
+    $bultos      = (int)$data[7];
+    $peso_total  = convertirNumero($data[8]);
 
     // Obtener IDs de catálogos o crearlos si no existen
-    $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
-    $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
-    $id_referencia = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
+    $id_operario       = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
+    $id_maquina        = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
+    $id_referencia_esp = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia);
 
     // Modo 'todo': Insertar o actualizar si ya existe
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_PLANA
-                    (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia,
-                    peso_plana,retal_plana,bultos_plana,total_plana)
+                    (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia_esp,
+                    peso_rollo,peso_retal,bultos,peso_total)
                 VALUES
-                    ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia',
-                    '$peso_plana','$retal_plana','$bultos_plana','$total_plana')
+                    ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia_esp',
+                    '$peso_rollo','$peso_retal','$bultos','$peso_total')
                 ON DUPLICATE KEY UPDATE
-                    fecha_plana   = VALUES(fecha_plana),
-                    id_operario   = VALUES(id_operario),
-                    id_maquina    = VALUES(id_maquina),
-                    id_referencia = VALUES(id_referencia),
-                    peso_plana    = VALUES(peso_plana),
-                    retal_plana   = VALUES(retal_plana),
-                    bultos_plana  = VALUES(bultos_plana),
-                    total_plana   = VALUES(total_plana)";
+                    fecha_plana       = VALUES(fecha_plana),
+                    id_operario       = VALUES(id_operario),
+                    id_maquina        = VALUES(id_maquina),
+                    id_referencia_esp = VALUES(id_referencia_esp),
+                    peso_rollo        = VALUES(peso_rollo),
+                    peso_retal        = VALUES(peso_retal),
+                    bultos            = VALUES(bultos),
+                    peso_total        = VALUES(peso_total)";
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_PLANA
-                    (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia,
-                    peso_plana,retal_plana,bultos_plana,total_plana)
+                    (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia_esp,
+                    peso_rollo,peso_retal,bultos,peso_total)
                 VALUES
-                    ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia',
-                    '$peso_plana','$retal_plana','$bultos_plana','$total_plana')";
+                    ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia_esp',
+                    '$peso_rollo','$peso_retal','$bultos','$peso_total')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);

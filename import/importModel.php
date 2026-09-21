@@ -23,9 +23,10 @@ function limpiarNombre($texto) {
     }
     return $texto;
 }
-// Convertir horario del formulario al bloque correspondiente
+// Convertir el horario del Sheet al nombre de turno fijo del catálogo TURNOS
+// (Día/Tarde/Noche); TURNOS es un catálogo cerrado de 4 valores, nunca se crea aquí
 function convertirBloque($turno) {
-    switch (trim($turno)) {
+    switch (strtolower(trim($turno))) {
         case "6am - 2pm":
             return "Día";
         case "2pm - 10pm":
@@ -33,7 +34,7 @@ function convertirBloque($turno) {
         case "10pm - 6am":
             return "Noche";
         default:
-            return "";
+            return null;
     }
 }
 // Convertir número con formato colombiano (puntos y comas) a float
@@ -89,15 +90,15 @@ function autoCrear($conexion, &$catalogo, $tabla, $campo, $valor) {
 }
 // Obtener el último id_sheet importado
 function obtenerUltimoIdSheet($conexion, $nombre) {
-    $res = mysqli_query($conexion, "SELECT ultimo_id_sheet FROM IMPORTAR WHERE nombre = '$nombre'");
+    $res = mysqli_query($conexion, "SELECT ultimo_id_sheet FROM AREAS WHERE nombre_area = '$nombre'");
     $row = mysqli_fetch_assoc($res);
     return $row['ultimo_id_sheet'] ?? null;
 }
 // Actualizar el último id_sheet importado
 function actualizarUltimoIdSheet($conexion, $nombre, $id_sheet) {
-    $sql = "UPDATE IMPORTAR
+    $sql = "UPDATE AREAS
             SET ultimo_id_sheet = '$id_sheet'
-            WHERE nombre = '$nombre'";
+            WHERE nombre_area = '$nombre'";
     mysqli_query($conexion, $sql);
 }
 

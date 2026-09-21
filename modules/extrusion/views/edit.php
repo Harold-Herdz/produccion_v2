@@ -2,8 +2,10 @@
 /** @var array $fila */
 /** @var mysqli_result $maquinas */
 /** @var mysqli_result $turnos */
-/** @var mysqli_result $operarios */
+/** @var mysqli_result $operadores */
 /** @var mysqli_result $referencias */
+/** @var mysqli_result $colores */
+/** @var mysqli_result $laminas */
 
 // Importar authMiddleware.php
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
@@ -49,24 +51,24 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
             <!-- Turno -->
             <label>Turno</label>
-            <select name="id_turno_ext" required>
-                <?php while($t = mysqli_fetch_assoc($turnos_ext)): ?>
-                    <option 
-                        value="<?php echo $t['id_turno_ext']; ?>" 
-                        <?php if($fila['id_turno_ext'] == $t['id_turno_ext']) echo 'selected'; ?>>
-                        <?php echo $t['nombre_turno_ext']; ?>
+            <select name="id_turno" required>
+                <?php while($t = mysqli_fetch_assoc($turnos)): ?>
+                    <option
+                        value="<?php echo $t['id_turno']; ?>"
+                        <?php if($fila['id_turno'] == $t['id_turno']) echo 'selected'; ?>>
+                        <?php echo $t['nombre_turno']; ?>
                     </option>
                 <?php endwhile; ?>
             </select>
 
             <!-- Operador -->
             <label>Operador</label>
-            <select name="id_operador_ext" required>
-                <?php while($o = mysqli_fetch_assoc($operadores_ext)): ?>
-                    <option 
-                        value="<?php echo $o['id_operador_ext']; ?>" 
-                        <?php if($fila['id_operador_ext'] == $o['id_operador_ext']) echo 'selected'; ?>>
-                        <?php echo $o['nombre_operador_ext']; ?>
+            <select name="id_operador" required>
+                <?php while($o = mysqli_fetch_assoc($operadores)): ?>
+                    <option
+                        value="<?php echo $o['id_operador']; ?>"
+                        <?php if($fila['id_operador'] == $o['id_operador']) echo 'selected'; ?>>
+                        <?php echo $o['nombre_operador']; ?>
                     </option>
                 <?php endwhile; ?>
             </select>
@@ -97,24 +99,29 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
             <!-- Lamina P -->
             <label>Lamina P</label>
-            <input 
-                type="string" 
-                name="lamina_p" 
-                value="<?php echo $fila['lamina_p']; ?>">
+            <select name="id_lamina_p" required>
+                <?php while($l = mysqli_fetch_assoc($laminas)): ?>
+                    <option
+                        value="<?php echo $l['id_lamina_p']; ?>"
+                        <?php if($fila['id_lamina_p'] == $l['id_lamina_p']) echo 'selected'; ?>>
+                        <?php echo $l['nombre_lamina_p']; ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
 
             <!-- Rollos -->
             <label>Rollos</label>
             <input 
                 type="number" 
-                name="rollos_extrusion" 
-                value="<?php echo $fila['rollos_extrusion']; ?>">
+                name="rollos" 
+                value="<?php echo $fila['rollos']; ?>">
 
             <!-- Peso Total -->
-            <label>Total (kg)</label>
+            <label>Peso Total (kg)</label>
             <input 
                 type="number" 
-                name="total_extrusion" 
-                value="<?php echo $fila['total_extrusion']; ?>">
+                name="peso_total" 
+                value="<?php echo $fila['peso_total']; ?>">
 
             <!-- Botón de Actualizar -->
             <button type="submit" class="btn" id="btnActualizar">Actualizar</button>

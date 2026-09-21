@@ -8,6 +8,8 @@ mysqli_set_charset($conexion, "utf8mb4");
 require_once dirname(__DIR__, 2) . '/includes/config.php';
 // Importar importModel.php
 require_once dirname(__DIR__) . '/importModel.php';
+// Importar catalogosModel.php (normalizarJornada)
+require_once dirname(__DIR__, 2) . '/modules/shared/catalogosModel.php';
 
 // Parametros de importación
 $modo         = $_GET['modo'] ?? 'nuevos';
@@ -60,6 +62,7 @@ if (ob_get_level()) ob_flush(); flush();
 $maquinas    = cargarCatalogo($conexion, "MAQUINAS",    "nombre_maquina",    "id_maquina");
 $operarios   = cargarCatalogo($conexion, "OPERARIOS",   "nombre_operario",   "id_operario");
 $turnos      = cargarCatalogo($conexion, "TURNOS",      "nombre_turno",      "id_turno");
+$jornadas    = cargarCatalogo($conexion, "JORNADAS",    "nombre_jornada",    "id_jornada");
 $referencias = cargarCatalogo($conexion, "REFERENCIAS", "nombre_referencia", "id_referencia");
 $colores     = cargarCatalogo($conexion, "COLORES",     "nombre_color",      "id_color");
 
@@ -102,36 +105,47 @@ foreach ($filas as $data) {
     $peso4 = is_null($peso_h4) ? "NULL" : $peso_h4;
     $peso5 = is_null($peso_h5) ? "NULL" : $peso_h5;
 
-    // Convertir el turno en bloque horario
-    $bloque = convertirBloque($turno);
-    $keyTurno = $bloque . '|' . $jornada;
-
-    if (isset($turnos[$keyTurno])) {
-        $id_turno = $turnos[$keyTurno];
-    } else {
-        mysqli_query($conexion, "
-            INSERT INTO TURNOS (bloque_horario, jornada)
-            VALUES ('$bloque', '$jornada')
-        ");
-
-        $id_turno = mysqli_insert_id($conexion);
-        $turnos[$keyTurno] = $id_turno;
+    // Turno: catálogo cerrado de 4 valores (Día/Tarde/Noche/18 Horas), nunca se crea aquí.
+    // Si no se reconoce o el catálogo aún no lo tiene, la fila se guarda igual con el
+    // turno vacío (NULL) en vez de perderse; al llenar el catálogo y reimportar se completa solo.
+    $nombreTurno = convertirBloque($turno);
+    $id_turno = ($nombreTurno !== null) ? ($turnos[$nombreTurno] ?? null) : null;
+    $id_turno_sql = ($id_turno === null) ? "NULL" : "'{$id_turno}'";
+    if ($id_turno === null) {
+        $logMsg = addslashes("⚠ Turno no reconocido «{$turno}» · {$id_sheet}: guardado sin turno");
+        echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,'$logMsg','dup');</script>\n";
+        if (ob_get_level()) ob_flush();
+        flush();
     }
+
+    // Jornada: catálogo cerrado de 2 valores (8 Horas / 12 Horas), nunca se crea aquí.
+    // Cualquier otro texto (horarios sueltos como "6pm", "1pm", etc.) siempre cae en "8 Horas".
+    $nombreJornada = normalizarJornada($jornada);
+    $id_jornada = $jornadas[$nombreJornada] ?? null;
+    $id_jornada_sql = ($id_jornada === null) ? "NULL" : "'{$id_jornada}'";
+    if ($id_jornada === null) {
+        $logMsg = addslashes("⚠ Jornada «{$nombreJornada}» aún no existe en el catálogo · {$id_sheet}: guardado sin jornada");
+        echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,'$logMsg','dup');</script>\n";
+        if (ob_get_level()) ob_flush();
+        flush();
+    }
+
     // Modo 'todo': Insertar o actualizar si ya existe
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_SELLADO
-                    (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,
+                    (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,id_jornada,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina','$id_operario','$id_turno',
-                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98', 
+                    ('$id_sheet','$fecha','$id_maquina','$id_operario',$id_turno_sql,$id_jornada_sql,
+                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98',
                     $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')
                 ON DUPLICATE KEY UPDATE
                     fecha_sellado   = VALUES(fecha_sellado),
                     id_maquina      = VALUES(id_maquina),
                     id_operario     = VALUES(id_operario),
                     id_turno        = VALUES(id_turno),
+                    id_jornada      = VALUES(id_jornada),
                     id_referencia   = VALUES(id_referencia),
                     id_color        = VALUES(id_color),
                     paquetes_x70    = VALUES(paquetes_x70),
@@ -146,12 +160,12 @@ foreach ($filas as $data) {
     // Modo 'nuevos': Insertar solo si no existe
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_SELLADO
-                    (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,
+                    (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,id_jornada,
                     id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina','$id_operario','$id_turno',
-                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98', 
+                    ('$id_sheet','$fecha','$id_maquina','$id_operario',$id_turno_sql,$id_jornada_sql,
+                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98',
                     $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')";
     }
     // Ejecutar inserción y actualizar progreso

@@ -72,3 +72,25 @@ function resolverValorCatalogo($conexion, $tabla, $colId, $colNombre, $valor, $e
         : null;
     return [$id, $aviso];
 }
+
+/* =================================================
+   JORNADA: catálogo cerrado de 2 valores (8 Horas / 12 Horas)
+================================================= */
+// Normaliza cualquier texto de jornada a uno de los 2 valores cerrados del catálogo.
+// Cualquier valor que no sea exactamente "12 Horas" (sin importar mayúsculas/espacios)
+// -incluyendo horarios sueltos como "6pm", "1pm", texto vacío, etc.- cae siempre en "8 Horas".
+function normalizarJornada($valor){
+    $v = strtolower(trim((string) $valor));
+    return ($v === '12 horas') ? '12 Horas' : '8 Horas';
+}
+
+// Id de jornada a partir de cualquier texto crudo, ya normalizado a 8/12 Horas.
+// JORNADAS es un catálogo cerrado de 2 valores fijos llenado a mano; nunca se crea uno aquí.
+function resolverIdJornada($conexion, $valorCrudo){
+    $nombre = normalizarJornada($valorCrudo);
+    $stmt = $conexion->prepare("SELECT id_jornada FROM jornadas WHERE nombre_jornada = ? LIMIT 1");
+    $stmt->bind_param('s', $nombre);
+    $stmt->execute();
+    $fila = $stmt->get_result()->fetch_assoc();
+    return $fila ? (int) $fila['id_jornada'] : null;
+}

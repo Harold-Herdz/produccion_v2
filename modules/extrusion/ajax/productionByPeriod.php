@@ -26,8 +26,8 @@ if($tipo === "anio"){
     // Agrupado por semana del año
     $sql = "SELECT 
                 CONCAT('Sem ', WEEK(fecha_extrusion, 1)) fecha, 
-                SUM(total_extrusion) total, 
-                SUM(rollos_extrusion) rollos
+                SUM(peso_total) total, 
+                SUM(rollos) rollos
             FROM PRODUCCION_EXTRSION
             WHERE YEAR(fecha_extrusion)=YEAR(CURDATE())
             GROUP BY WEEK(fecha_extrusion, 1), CONCAT('Sem ', WEEK(fecha_extrusion, 1))
@@ -47,8 +47,8 @@ if($tipo === "anio"){
                 AND YEAR(fecha_extrusion)=YEAR(CURDATE())";
     }
     $sql = "SELECT DATE(fecha_extrusion) fecha, 
-                SUM(total_extrusion) total, 
-                SUM(rollos_extrusion) rollos
+                SUM(peso_total) total, 
+                SUM(rollos) rollos
             FROM PRODUCCION_EXTRUSION
             $where
             GROUP BY DATE(fecha_extrusion)";
@@ -72,7 +72,7 @@ while($row = mysqli_fetch_assoc($res)){
 if($tipo == "anio"){
     // Máquinas del año ordenadas por total
     $sql2 = "SELECT m.nombre_maquina, 
-                SUM(e.total_extrusion) total
+                SUM(e.peso_total) total
             FROM PRODUCCION_EXTRUSION e
             LEFT JOIN MAQUINAS m 
             ON e.id_maquina=m.id_maquina
@@ -82,7 +82,7 @@ if($tipo == "anio"){
 }else{
     // Máquinas del mes
     if($semana == ""){
-        $sql2 = "SELECT m.nombre_maquina, SUM(e.total_extrusion) total
+        $sql2 = "SELECT m.nombre_maquina, SUM(e.peso_total) total
                         FROM PRODUCCION_EXTRUSION e
                         LEFT JOIN MAQUINAS m 
                         ON e.id_maquina = m.id_maquina
@@ -95,7 +95,7 @@ if($tipo == "anio"){
         $inicio = (($semana - 1) * 7) + 1;
         $fin = $semana * 7;
 
-        $sql2 = "SELECT m.nombre_maquina, SUM(e.total_extrusion) total
+        $sql2 = "SELECT m.nombre_maquina, SUM(e.peso_total) total
                         FROM PRODUCCION_EXTRUSION e
                         LEFT JOIN MAQUINAS m 
                         ON e.id_maquina = m.id_maquina

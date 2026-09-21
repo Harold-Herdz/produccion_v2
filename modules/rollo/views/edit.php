@@ -1,7 +1,7 @@
 <?php
 /** @var array $fila */
+/** @var mysqli_result $operarios */
 /** @var mysqli_result $maquinas */
-/** @var mysqli_result $turnos */
 /** @var mysqli_result $referencias */
 /** @var mysqli_result $colores */
 
@@ -37,7 +37,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
             <!-- Operario -->
             <label>Operario</label>
-            <select name="id_maquina">
+            <select name="id_operario">
                 <?php while($o = mysqli_fetch_assoc($operarios)): ?>
                     <option 
                         value="<?php echo $o['id_operario']; ?>"
@@ -83,32 +83,32 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <?php endwhile; ?>
             </select>
 
-            <!-- Peso del Producido -->
-            <label>Bruto (kg)</label>
-            <input 
+            <!-- Peso del rollo -->
+            <label>Peso Rollo (kg)</label>
+            <input
                 type="number"
-                name="peso_rollo" 
-                step="any" 
-                class="form-control" 
+                name="peso_rollo"
+                step="any"
+                class="form-control"
                 value="<?php echo $fila['peso_rollo']; ?>">
 
-            <!-- Peso del Retal -->
-            <label>Retal (kg)</label>
-            <input 
-                type="number" 
-                name="retal_rollo" 
-                step="any" 
-                class="form-control" 
-                value="<?php echo $fila['retal_rollo']; ?>">
+            <!-- Peso del retal -->
+            <label>Peso Retal (kg)</label>
+            <input
+                type="number"
+                name="peso_retal"
+                step="any"
+                class="form-control"
+                value="<?php echo $fila['peso_retal']; ?>">
 
-            <!-- Peso Total -->
-            <label>Total (kg)</label>
-            <input 
-                type="number" 
-                name="total_rollo" 
-                step="any" 
-                class="form-control" 
-                value="<?php echo $fila['total_rollo']; ?>">
+            <!-- Peso total: columna generada (peso_rollo - peso_retal), no se envía -->
+            <label>Peso Total (kg)</label>
+            <input
+                type="number"
+                step="any"
+                class="form-control"
+                value="<?php echo $fila['peso_total']; ?>"
+                readonly>
         
             <!-- Botón de Actualizar -->
             <button type="submit" class="btn" id="btnActualizar">Actualizar</button>

@@ -229,9 +229,9 @@ function obtenerTablaOperariosSellado($conexion,$desde,$hasta){
 ================================================= */
 // Fecha de la última importación de paquetes
 function obtenerUltimaImportacionSellado($conexion){
-    $sql = "SELECT ultimo_id_sheet 
-            FROM IMPORTAR 
-            WHERE nombre = 'sellado'";
+    $sql = "SELECT ultimo_id_sheet
+            FROM AREAS
+            WHERE nombre_area = 'sellado'";
     $res = mysqli_query($conexion, $sql);
     if(!$res){
         return 'Ninguno';

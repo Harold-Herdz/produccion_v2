@@ -26,8 +26,8 @@ if($tipo === "anio"){
     // Agrupado por semana del año
     $sql = "SELECT 
                 CONCAT('Sem ', WEEK(fecha_rollo, 1)) fecha,
-                SUM(total_rollo) total,
-                SUM(retal_rollo) retal
+                SUM(peso_total) total,
+                SUM(peso_retal) retal
             FROM PRODUCCION_ROLLO
             WHERE YEAR(fecha_rollo) = YEAR(CURDATE())
             GROUP BY WEEK(fecha_rollo, 1), CONCAT('Sem ', WEEK(fecha_rollo, 1))
@@ -37,8 +37,8 @@ if($tipo === "anio"){
     if($semana == ""){
         $sql = "SELECT 
                     DATE(fecha_rollo) fecha,
-                    SUM(total_rollo) total,
-                    SUM(retal_rollo) retal
+                    SUM(peso_total) total,
+                    SUM(peso_retal) retal
                 FROM PRODUCCION_ROLLO
                 WHERE MONTH(fecha_rollo) = $mes
                 AND YEAR(fecha_rollo) = YEAR(CURDATE())
@@ -50,8 +50,8 @@ if($tipo === "anio"){
 
         $sql = "SELECT 
                     DATE(fecha_rollo) fecha,
-                    SUM(total_rollo) total,
-                    SUM(retal_rollo) retal
+                    SUM(peso_total) total,
+                    SUM(peso_retal) retal
                 FROM PRODUCCION_ROLLO
                 WHERE MONTH(fecha_rollo) = $mes
                 AND DAY(fecha_rollo) BETWEEN $inicio AND $fin
@@ -78,7 +78,7 @@ while($row = mysqli_fetch_assoc($res)){
 if($tipo === "anio") {
     // Máquinas del año ordenadas por total
     $sql_maquinas = "SELECT m.nombre_maquina, 
-                        SUM(r.total_rollo) total
+                        SUM(r.peso_total) total
                     FROM PRODUCCION_ROLLO r
                     LEFT JOIN MAQUINAS m 
                         ON r.id_maquina = m.id_maquina
@@ -90,7 +90,7 @@ if($tipo === "anio") {
     if($semana == ""){
         $sql_maquinas = "SELECT 
                             m.nombre_maquina, 
-                            SUM(r.total_rollo) total
+                            SUM(r.peso_total) total
                         FROM PRODUCCION_ROLLO r
                         LEFT JOIN MAQUINAS m 
                             ON r.id_maquina = m.id_maquina
@@ -104,7 +104,7 @@ if($tipo === "anio") {
         $fin = $semana * 7;
 
         $sql_maquinas = "SELECT m.nombre_maquina, 
-                            SUM(r.total_rollo) total
+                            SUM(r.peso_total) total
                         FROM PRODUCCION_ROLLO r
                         LEFT JOIN MAQUINAS m 
                             ON r.id_maquina = m.id_maquina

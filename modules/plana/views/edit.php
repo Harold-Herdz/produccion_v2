@@ -1,7 +1,6 @@
 <?php
 /** @var array $fila */
 /** @var mysqli_result $maquinas */
-/** @var mysqli_result $turnos */
 /** @var mysqli_result $operarios */
 /** @var mysqli_result $referencias */
 
@@ -59,45 +58,45 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <?php endwhile; ?>
             </select>
 
-            <!-- Referencia -->
+            <!-- Referencia especial -->
             <label>Referencia</label>
-                <select name="id_referencia" required>
+                <select name="id_referencia_esp" required>
                 <?php while($r = mysqli_fetch_assoc($referencias)): ?>
-                    <option 
-                        value="<?php echo $r['id_referencia']; ?>" 
-                        <?php if($fila['id_referencia'] == $r['id_referencia']) echo 'selected'; ?>>
-                        <?php echo $r['nombre_referencia']; ?>
+                    <option
+                        value="<?php echo $r['id_referencia_esp']; ?>"
+                        <?php if($fila['id_referencia_esp'] == $r['id_referencia_esp']) echo 'selected'; ?>>
+                        <?php echo $r['nombre_referencia_esp']; ?>
                     </option>
                 <?php endwhile; ?>
             </select>
 
-            <!-- Peso del Producido -->
-            <label>Bruto (kg)</label>
-            <input 
-                type="number" 
-                name="peso_plana" 
-                value="<?php echo $fila['peso_plana']; ?>">
+            <!-- Peso del rollo -->
+            <label>Peso Rollo (kg)</label>
+            <input
+                type="number"
+                name="peso_rollo"
+                value="<?php echo $fila['peso_rollo']; ?>">
 
-            <!-- Peso del Retal -->
-            <label>Retal (kg)</label>
-            <input 
-                type="number" 
-                name="retal_plana" 
-                value="<?php echo $fila['retal_plana']; ?>">
+            <!-- Peso del retal -->
+            <label>Peso Retal (kg)</label>
+            <input
+                type="number"
+                name="peso_retal"
+                value="<?php echo $fila['peso_retal']; ?>">
 
             <!-- Cantidad de Bultos -->
             <label>Bultos</label>
-            <input 
-                type="number" 
-                name="bultos_plana" 
-                value="<?php echo $fila['bultos_plana']; ?>">
+            <input
+                type="number"
+                name="bultos"
+                value="<?php echo $fila['bultos']; ?>">
 
             <!-- Peso Total -->
-            <label>Total (kg)</label>
-            <input 
-                type="number" 
-                name="total_plana" 
-                value="<?php echo $fila['total_plana']; ?>">
+            <label>Peso Total (kg)</label>
+            <input
+                type="number"
+                name="peso_total"
+                value="<?php echo $fila['peso_total']; ?>">
 
             <!-- Botón de Actualizar -->
             <button type="submit" class="btn" id="btnActualizar">Actualizar</button>

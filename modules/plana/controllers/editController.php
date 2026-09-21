@@ -13,8 +13,6 @@ $fila = obtenerRegistroPlanaPorId($conexion, $id);
 // Cargar catálogos para los selectores del formulario
 $maquinas = obtenerMaquinasPlana($conexion);
 
-$turnos = obtenerTurnosPlana($conexion);
-
 $operarios = obtenerOperariosPlana($conexion);
 
 $referencias = obtenerReferenciasPlana($conexion);

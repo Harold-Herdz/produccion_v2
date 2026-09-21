@@ -25,24 +25,25 @@ $inicio = ($pagina - 1) * $limite;
 // Base de consulta
 $sql_base = "FROM PRODUCCION_EXTRUSION e
 LEFT JOIN MAQUINAS m ON e.id_maquina = m.id_maquina
-LEFT JOIN TURNOS_EXTRUSION t ON e.id_turno_ext = t.id_turno_ext
-LEFT JOIN OPERADORES_EXTRUSION o ON e.id_operador_ext = o.id_operador_ext
+LEFT JOIN TURNOS t ON e.id_turno = t.id_turno
+LEFT JOIN OPERADORES o ON e.id_operador = o.id_operador
 LEFT JOIN REFERENCIAS r ON e.id_referencia = r.id_referencia
 LEFT JOIN COLORES c ON e.id_color = c.id_color
+LEFT JOIN LAMINA_P l ON e.id_lamina_p = l.id_lamina_p
 WHERE 1=1";
 
 // Buscar
 if(!empty($busqueda)){
     $sql_base .= " AND (
         m.nombre_maquina LIKE '%$busqueda%' OR
-        t.nombre_turno_ext LIKE '%$busqueda%' OR
-        o.nombre_operador_ext LIKE '%$busqueda%' OR
+        t.nombre_turno LIKE '%$busqueda%' OR
+        o.nombre_operador LIKE '%$busqueda%' OR
         r.nombre_referencia LIKE '%$busqueda%' OR
         c.nombre_color LIKE '%$busqueda%' OR
         e.id LIKE '%$busqueda%' OR
-        e.lamina_p LIKE '%$busqueda%' OR
-        e.rollos_extrusion LIKE '%$busqueda%' OR
-        e.total_extrusion LIKE '%$busqueda%'
+        l.nombre_lamina_p LIKE '%$busqueda%' OR
+        e.rollos LIKE '%$busqueda%' OR
+        e.peso_total LIKE '%$busqueda%'
     )";
 }
 
@@ -61,10 +62,11 @@ $total_paginas = ceil($total_registros/$limite);
 $sql = "SELECT
             e.*,
             m.nombre_maquina,
-            t.nombre_turno_ext,
-            o.nombre_operador_ext,
+            t.nombre_turno,
+            o.nombre_operador,
             r.nombre_referencia,
-            c.nombre_color
+            c.nombre_color,
+            l.nombre_lamina_p
         $sql_base
         ORDER BY e.id DESC
         LIMIT $inicio,$limite";
@@ -80,19 +82,19 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
 
         'id_maquina' => $_POST['id_maquina'],
 
-        'id_turno_ext' => $_POST['id_turno_ext'],
+        'id_turno' => $_POST['id_turno'],
 
-        'id_operador_ext' => $_POST['id_operador_ext'],
+        'id_operador' => $_POST['id_operador'],
 
         'id_referencia' => $_POST['id_referencia'],
 
         'id_color' => $_POST['id_color'],
 
-        'lamina_p' => $_POST['lamina_p'],
+        'id_lamina_p' => $_POST['id_lamina_p'],
 
-        'rollos_ext' => $_POST['rollos_extrusion'],
+        'rollos' => $_POST['rollos'],
 
-        'total_ext' => $_POST['total_extrusion']
+        'peso_total' => $_POST['peso_total']
     ];
     actualizarProduccion($conexion,$id,$datos);
     header("Location: ".BASE_URL."/modules/extrusion/views/history.php");

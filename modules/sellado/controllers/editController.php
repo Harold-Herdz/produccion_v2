@@ -19,3 +19,5 @@ $referencias = obtenerReferencias($conexion);
 $colores = obtenerColores($conexion);
 
 $turnos = obtenerTurnos($conexion);
+
+$jornadas = obtenerJornadas($conexion);

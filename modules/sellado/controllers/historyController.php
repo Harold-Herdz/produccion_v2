@@ -26,6 +26,7 @@ LEFT JOIN MAQUINAS m ON s.id_maquina = m.id_maquina
 LEFT JOIN REFERENCIAS r ON s.id_referencia = r.id_referencia
 LEFT JOIN COLORES c ON s.id_color = c.id_color
 LEFT JOIN TURNOS t ON s.id_turno = t.id_turno
+LEFT JOIN JORNADAS j ON s.id_jornada = j.id_jornada
 WHERE 1=1";
 
 // Aplicar filtro de búsqueda por texto
@@ -36,6 +37,7 @@ if(!empty($busqueda)){
         r.nombre_referencia LIKE '%$busqueda%' OR
         c.nombre_color LIKE '%$busqueda%' OR
         t.nombre_turno LIKE '%$busqueda%' OR
+        j.nombre_jornada LIKE '%$busqueda%' OR
         s.id LIKE '%$busqueda%' OR
         s.paquetes_x70 LIKE '%$busqueda%' OR
         s.paquetes_x90 LIKE '%$busqueda%' OR
@@ -63,12 +65,13 @@ $total_registros = $total_fila['total'];
 $total_paginas = ceil($total_registros / $limite);
 
 // Consulta final con campos y límite de página
-$sql = "SELECT s.*, 
+$sql = "SELECT s.*,
             o.nombre_operario,
             m.nombre_maquina,
             r.nombre_referencia,
             c.nombre_color,
-            t.nombre_turno
+            t.nombre_turno,
+            j.nombre_jornada
         $sql_base
         ORDER BY s.id DESC
         LIMIT $inicio, $limite";
@@ -92,6 +95,8 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
         'id_color' => $_POST['id_color'],
 
         'id_turno' => $_POST['id_turno'],
+
+        'id_jornada' => $_POST['id_jornada'],
 
         'paq_x70' => $_POST['paquetes_x70'],
 

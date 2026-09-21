@@ -9,13 +9,13 @@
 /** @var float $semana */
 /** @var float $mes */
 /** @var array $top_maquina */
-/** @var float $bruto_mes1 */
-/** @var float $retal_mes1 */
-/** @var float $neto_mes1 */
+/** @var float $peso_rollo_mes1 */
+/** @var float $peso_retal_mes1 */
+/** @var float $peso_total_mes1 */
 /** @var float $eficiencia_mes1 */
-/** @var float $bruto_mes2 */
-/** @var float $retal_mes2 */
-/** @var float $neto_mes2 */
+/** @var float $peso_rollo_mes2 */
+/** @var float $peso_retal_mes2 */
+/** @var float $peso_total_mes2 */
 /** @var float $eficiencia_mes2 */
 /** @var array $mejor_dia_mes1 */
 /** @var array $peor_dia_mes1 */
@@ -115,24 +115,24 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </select>
             </h3>
             <p>
-                🏭 Peso bruto: <?php 
-                echo $bruto_mes1 !== null 
-                    ? number_format($bruto_mes1,2).' kg' 
-                    : 'Sin datos'; 
+                🏭 Peso rollo: <?php
+                echo $peso_rollo_mes1 !== null
+                    ? number_format($peso_rollo_mes1,2).' kg'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
-                ♻️ Retal: <?php 
-                echo $retal_mes1 !== null 
-                    ? number_format($retal_mes1,2).' kg' 
-                    : 'Sin datos'; 
+                ♻️ Peso retal: <?php
+                echo $peso_retal_mes1 !== null
+                    ? number_format($peso_retal_mes1,2).' kg'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
-                📦 Peso final: <?php 
-                echo $neto_mes1 !== null 
-                    ? number_format($neto_mes1,2).' kg' 
-                    : 'Sin datos'; 
+                📦 Peso total: <?php
+                echo $peso_total_mes1 !== null
+                    ? number_format($peso_total_mes1,2).' kg'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
@@ -213,24 +213,24 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </select>
             </h3>
             <p>
-                🏭 Peso bruto: <?php 
-                echo $bruto_mes2 !== null 
-                    ? number_format($bruto_mes2,2).' kg' 
-                    : 'Sin datos'; 
+                🏭 Peso rollo: <?php
+                echo $peso_rollo_mes2 !== null
+                    ? number_format($peso_rollo_mes2,2).' kg'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
-                ♻️ Retal: <?php 
-                echo $retal_mes2 !== null 
-                    ? number_format($retal_mes2,2).' kg' 
-                    : 'Sin datos'; 
+                ♻️ Peso retal: <?php
+                echo $peso_retal_mes2 !== null
+                    ? number_format($peso_retal_mes2,2).' kg'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
-                📦 Peso final: <?php 
-                echo $neto_mes2 !== null 
-                    ? number_format($neto_mes2,2).' kg' 
-                    : 'Sin datos'; 
+                📦 Peso total: <?php
+                echo $peso_total_mes2 !== null
+                    ? number_format($peso_total_mes2,2).' kg'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
@@ -368,32 +368,32 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <table>
             <tr>
                 <th>Fecha</th>
-                <th>Bruto (kg)</th>
-                <th>Retal (kg)</th>
-                <th>Neto (kg)</th>
+                <th>Peso Rollo (kg)</th>
+                <th>Peso Retal (kg)</th>
+                <th>Peso Total (kg)</th>
             </tr>
             <?php
-            $total_bruto = 0;
-            $total_retal = 0;
-            $total_neto = 0;
+            $total_peso_rollo = 0;
+            $total_peso_retal = 0;
+            $total_peso_total = 0;
             while($row = mysqli_fetch_assoc($res_tabla_fecha)){
-            $total_bruto += $row['bruto'];
-            $total_retal += $row['retal'];
-            $total_neto += $row['neto'];
+            $total_peso_rollo += $row['peso_rollo'];
+            $total_peso_retal += $row['peso_retal'];
+            $total_peso_total += $row['peso_total'];
             ?>
             <tr>
                 <td><?php echo date("d M Y", strtotime($row['fecha'])); ?></td>
-                <td><?php echo number_format($row['bruto'],2); ?></td>
-                <td><?php echo number_format($row['retal'],2); ?></td>
-                <td><?php echo number_format($row['neto'],2); ?></td>
+                <td><?php echo number_format($row['peso_rollo'],2); ?></td>
+                <td><?php echo number_format($row['peso_retal'],2); ?></td>
+                <td><?php echo number_format($row['peso_total'],2); ?></td>
             </tr>
             <?php } ?>
             <!-- Fila de total -->
             <tr class="fila-total">
                 <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_bruto,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_retal,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_neto,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_peso_rollo,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_peso_retal,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_peso_total,2); ?></strong></td>
             </tr>
         </table>
     </div>
@@ -404,31 +404,31 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <table>
             <tr>
                 <th>Máquina</th>
-                <th>Bruto (kg)</th>
-                <th>Retal (kg)</th>
-                <th>Neto (kg)</th>
+                <th>Peso Rollo (kg)</th>
+                <th>Peso Retal (kg)</th>
+                <th>Peso Total (kg)</th>
             </tr>
             <?php
-            $total_bruto = 0;
-            $total_retal = 0;
-            $total_neto = 0;
+            $total_peso_rollo = 0;
+            $total_peso_retal = 0;
+            $total_peso_total = 0;
             while($row = mysqli_fetch_assoc($res_tabla_maquina)){
-            $total_bruto += $row['bruto'];
-            $total_retal += $row['retal'];
-            $total_neto += $row['neto'];
+            $total_peso_rollo += $row['peso_rollo'];
+            $total_peso_retal += $row['peso_retal'];
+            $total_peso_total += $row['peso_total'];
             ?>
             <tr>
                 <td><?php echo $row['nombre_maquina']; ?></td>
-                <td><?php echo number_format($row['bruto'],2); ?></td>
-                <td><?php echo number_format($row['retal'],2); ?></td>
-                <td><?php echo number_format($row['neto'],2); ?></td>
+                <td><?php echo number_format($row['peso_rollo'],2); ?></td>
+                <td><?php echo number_format($row['peso_retal'],2); ?></td>
+                <td><?php echo number_format($row['peso_total'],2); ?></td>
             </tr>
             <?php } ?>
             <tr class="fila-total">
                 <td><strong>TOTAL</strong></td>
-                <td><strong><?php echo number_format($total_bruto,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_retal,2); ?></strong></td>
-                <td><strong><?php echo number_format($total_neto,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_peso_rollo,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_peso_retal,2); ?></strong></td>
+                <td><strong><?php echo number_format($total_peso_total,2); ?></strong></td>
             </tr>
         </table>
     </div>

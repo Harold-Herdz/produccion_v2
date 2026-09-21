@@ -41,14 +41,14 @@ $total_mes2 = obtenerTotalMesPlana($conexion,$mes2);
 
 // Resumenes de los meses
 $resumen_mes1 = obtenerResumenMesPlana($conexion,$mes1);
-$bruto_mes1 = $resumen_mes1['bruto'];
-$retal_mes1 = $resumen_mes1['retal'];
-$total_mes1  = $resumen_mes1['neto'];
+$peso_rollo_mes1 = $resumen_mes1['peso_rollo'];
+$peso_retal_mes1 = $resumen_mes1['peso_retal'];
+$total_mes1  = $resumen_mes1['peso_total'];
 $bultos_mes1  = $resumen_mes1['bultos'];
 $resumen_mes2 = obtenerResumenMesPlana($conexion,$mes2);
-$bruto_mes2 = $resumen_mes2['bruto'];
-$retal_mes2 = $resumen_mes2['retal'];
-$total_mes2  = $resumen_mes2['neto'];
+$peso_rollo_mes2 = $resumen_mes2['peso_rollo'];
+$peso_retal_mes2 = $resumen_mes2['peso_retal'];
+$total_mes2  = $resumen_mes2['peso_total'];
 $bultos_mes2  = $resumen_mes2['bultos'];
 
 // Mejor y peor día de los meses

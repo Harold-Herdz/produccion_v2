@@ -16,10 +16,12 @@ $fila = obtenerRegistroExtrusionPorId($conexion, $id);
 // Cargar catálogos
 $maquinas = obtenerMaquinasExtrusion($conexion);
 
-$turnos_ext = obtenerTurnosExtrusion($conexion);
+$turnos = obtenerTurnosExtrusion($conexion);
 
-$operadores_ext = obtenerOperadoresExtrusion($conexion);
+$operadores = obtenerOperadoresExtrusion($conexion);
 
 $referencias = obtenerReferenciasExtrusion($conexion);
 
 $colores = obtenerColoresExtrusion($conexion);
+
+$laminas = obtenerLaminaPExtrusion($conexion);

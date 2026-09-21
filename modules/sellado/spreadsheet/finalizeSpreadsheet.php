@@ -9,9 +9,7 @@ require_once dirname(__DIR__) . '/models/registerModel.php';
 require_once __DIR__ . '/spreadsheetPdf.php';
 require_once __DIR__ . '/appscript.php';
 
-header('Content-Type: application/json');
-
-$entrada  = json_decode(file_get_contents('php://input'), true) ?: [];
+header('Content-Type: application/json');$entrada  = json_decode(file_get_contents('php://input'), true) ?: [];
 $codigo   = $entrada['codigo'] ?? '';
 $maquinas = $entrada['maquinas'] ?? [];
 // La nota va al PDF, no a la base de datos

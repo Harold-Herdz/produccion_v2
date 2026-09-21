@@ -13,14 +13,11 @@ function obtenerRegistroPlanaPorId($conexion, $id){
 function obtenerMaquinasPlana($conexion){
     return mysqli_query($conexion, "SELECT * FROM MAQUINAS");
 }
-function obtenerTurnosPlana($conexion){
-    return mysqli_query($conexion, "SELECT * FROM TURNOS");
-}
 function obtenerOperariosPlana($conexion){
     return mysqli_query($conexion, "SELECT * FROM OPERARIOS");
 }
 function obtenerReferenciasPlana($conexion){
-    return mysqli_query($conexion, "SELECT * FROM REFERENCIAS");
+    return mysqli_query($conexion, "SELECT * FROM REFERENCIAS_ESP");
 }
 
 /* =================================================
@@ -31,13 +28,12 @@ function actualizarProduccion($conexion, $id, $datos){
     $sql = "UPDATE PRODUCCION_PLANA SET
             fecha_plana = '{$datos['fecha']}',
             id_maquina = '{$datos['id_maquina']}',
-            id_turno = '{$datos['id_turno']}',
             id_operario = '{$datos['id_operario']}',
-            id_referencia = '{$datos['id_referencia']}',
-            peso_plana = '{$datos['peso_plana']}',
-            retal_plana = '{$datos['retal_plana']}',
-            bultos_plana = '{$datos['bultos_plana']}',
-            total_plana = '{$datos['total_plana']}'
+            id_referencia_esp = '{$datos['id_referencia_esp']}',
+            peso_rollo = '{$datos['peso_rollo']}',
+            peso_retal = '{$datos['peso_retal']}',
+            bultos = '{$datos['bultos']}',
+            peso_total = '{$datos['peso_total']}'
             WHERE id = $id";
     mysqli_query($conexion, $sql);
 }

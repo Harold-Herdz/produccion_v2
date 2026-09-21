@@ -17,7 +17,7 @@ $anio = $filtros['anio'];
 // Producción total agrupada por mes
 $sql = "SELECT 
             MONTH(fecha_plana) mes, 
-            SUM(total_plana) totales
+            SUM(peso_total) totales
         FROM PRODUCCION_PLANA
         WHERE YEAR(fecha_plana) = $anio
         GROUP BY MONTH(fecha_plana)

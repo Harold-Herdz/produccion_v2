@@ -84,50 +84,72 @@ function catalogosDisponibles()
             ],
         ],
 
-        // Turnos (la columna `nombre_turno` es generada a partir
-        // de `bloque_horario` + `jornada`, por eso NO se inserta directamente)
+        // Referencias especiales (usadas por Plana y como segunda referencia de Sellado/Extrusión)
+        'referencias_esp' => [
+            'etiqueta' => 'Referencias especiales',
+            'tabla'    => 'REFERENCIAS_ESP',
+            'id'       => 'id_referencia_esp',
+            'nombre'   => 'nombre_referencia_esp',
+            'campos'   => [
+                'nombre_referencia_esp' => [
+                    'etiqueta' => 'Nombre de la referencia especial',
+                    'tipo'     => 'text',
+                ],
+            ],
+        ],
+
+        // Turnos: catálogo cerrado de 4 valores fijos (Día, Tarde, Noche, 18 Horas).
+        // Se llena manualmente; el código nunca crea turnos nuevos.
         'turnos' => [
             'etiqueta' => 'Turnos',
             'tabla'    => 'TURNOS',
             'id'       => 'id_turno',
             'nombre'   => 'nombre_turno',
             'campos'   => [
-                'bloque_horario' => [
-                    'etiqueta' => 'Bloque horario',
-                    'tipo'     => 'select',
-                    'opciones' => ['Día', 'Tarde', 'Noche'],
-                ],
-                'jornada' => [
-                    'etiqueta' => 'Jornada',
-                    'tipo'     => 'select',
-                    'opciones' => ['8 Horas', '12 Horas'],
-                ],
-            ],
-        ],
-
-        // Turnos del área de extrusión
-        'turnos_extrusion' => [
-            'etiqueta' => 'Turnos de extrusión',
-            'tabla'    => 'TURNOS_EXTRUSION',
-            'id'       => 'id_turno_ext',
-            'nombre'   => 'nombre_turno_ext',
-            'campos'   => [
-                'nombre_turno_ext' => [
+                'nombre_turno' => [
                     'etiqueta' => 'Nombre del turno',
                     'tipo'     => 'text',
                 ],
             ],
         ],
 
-        // Operadores del área de extrusión
-        'operadores_extrusion' => [
-            'etiqueta' => 'Operadores de extrusión',
-            'tabla'    => 'OPERADORES_EXTRUSION',
-            'id'       => 'id_operador_ext',
-            'nombre'   => 'nombre_operador_ext',
+        // Jornadas (8 Horas, 12 Horas, ...)
+        'jornadas' => [
+            'etiqueta' => 'Jornadas',
+            'tabla'    => 'JORNADAS',
+            'id'       => 'id_jornada',
+            'nombre'   => 'nombre_jornada',
             'campos'   => [
-                'nombre_operador_ext' => [
+                'nombre_jornada' => [
+                    'etiqueta' => 'Nombre de la jornada',
+                    'tipo'     => 'text',
+                ],
+            ],
+        ],
+
+        // Operadores (área de extrusión)
+        'operadores' => [
+            'etiqueta' => 'Operadores',
+            'tabla'    => 'OPERADORES',
+            'id'       => 'id_operador',
+            'nombre'   => 'nombre_operador',
+            'campos'   => [
+                'nombre_operador' => [
                     'etiqueta' => 'Nombre del operador',
+                    'tipo'     => 'text',
+                ],
+            ],
+        ],
+
+        // Lámina P (área de extrusión)
+        'lamina_p' => [
+            'etiqueta' => 'Lámina P',
+            'tabla'    => 'LAMINA_P',
+            'id'       => 'id_lamina_p',
+            'nombre'   => 'nombre_lamina_p',
+            'campos'   => [
+                'nombre_lamina_p' => [
+                    'etiqueta' => 'Nombre de la lámina',
                     'tipo'     => 'text',
                 ],
             ],

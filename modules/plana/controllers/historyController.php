@@ -23,20 +23,20 @@ $inicio = ($pagina - 1) * $limite;
 $sql_base = "FROM PRODUCCION_PLANA p
 LEFT JOIN MAQUINAS m ON p.id_maquina = m.id_maquina
 LEFT JOIN OPERARIOS o ON p.id_operario = o.id_operario
-LEFT JOIN REFERENCIAS r ON p.id_referencia = r.id_referencia
+LEFT JOIN REFERENCIAS_ESP r ON p.id_referencia_esp = r.id_referencia_esp
 WHERE 1=1";
 
 // Aplicar filtro de búsqueda por texto
 if(!empty($busqueda)){
     $sql_base .= " AND (
-        r.nombre_referencia LIKE '%$busqueda%' OR
+        r.nombre_referencia_esp LIKE '%$busqueda%' OR
         o.nombre_operario LIKE '%$busqueda%' OR
         m.nombre_maquina LIKE '%$busqueda%' OR
         p.id LIKE '%$busqueda%' OR
-        p.peso_plana LIKE '%$busqueda%' OR
-        p.bultos_plana LIKE '%$busqueda%' OR
-        p.retal_plana LIKE '%$busqueda%' OR
-        p.total_plana LIKE '%$busqueda%'
+        p.peso_rollo LIKE '%$busqueda%' OR
+        p.bultos LIKE '%$busqueda%' OR
+        p.peso_retal LIKE '%$busqueda%' OR
+        p.peso_total LIKE '%$busqueda%'
     )";
 }
 
@@ -53,12 +53,12 @@ $total_registros = $total_fila['total'];
 $total_paginas = ceil($total_registros / $limite);
 
 // Consulta final con campos y límite de página
-$sql = "SELECT p.*, 
-            m.nombre_maquina, 
-            o.nombre_operario, 
-            r.nombre_referencia 
-        $sql_base 
-        ORDER BY p.id DESC 
+$sql = "SELECT p.*,
+            m.nombre_maquina,
+            o.nombre_operario,
+            r.nombre_referencia_esp
+        $sql_base
+        ORDER BY p.id DESC
         LIMIT $inicio, $limite";
 
 $resultado = mysqli_query($conexion, $sql);
@@ -73,26 +73,24 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
 
         'id_maquina' => $_POST['id_maquina'],
 
-        'id_turno' => $_POST['id_turno'],
-
         'id_operario' => $_POST['id_operario'],
 
-        'id_referencia' => $_POST['id_referencia'],
+        'id_referencia_esp' => $_POST['id_referencia_esp'],
 
-        'peso_plana' => $_POST['peso_plana'],
+        'peso_rollo' => $_POST['peso_rollo'],
 
-        'bultos_plana' => $_POST['bultos_plana'],
+        'bultos' => $_POST['bultos'],
 
-        'retal_plana' => $_POST['retal_plana'],
+        'peso_retal' => $_POST['peso_retal'],
 
-        'total_plana' => $_POST['total_plana']
+        'peso_total' => $_POST['peso_total']
     ];
 
     // Actualizar registro
     actualizarProduccion($conexion, $id, $datos);
 
     // Redirigir al Historial
-    header("Location: " . BASE_URL . "/modules/rollo/views/history.php");
+    header("Location: " . BASE_URL . "/modules/plana/views/history.php");
     exit;
 }
 
@@ -104,6 +102,6 @@ if(isset($_GET['id'])){
     eliminarProduccion($conexion, $id);
 
     // Redirigir al Historial
-    header("Location: " . BASE_URL . "/modules/rollo/views/history.php");
+    header("Location: " . BASE_URL . "/modules/plana/views/history.php");
     exit;
 }

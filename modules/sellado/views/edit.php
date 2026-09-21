@@ -5,6 +5,7 @@
 /** @var mysqli_result $referencias */
 /** @var mysqli_result $colores */
 /** @var mysqli_result $turnos */
+/** @var mysqli_result $jornadas */
 
 // Importar authMiddleware.php
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
@@ -68,6 +69,18 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                         value="<?php echo $t['id_turno']; ?>"
                         <?php echo ($t['id_turno'] == $fila['id_turno']) ? 'selected' : ''; ?>>
                         <?php echo $t['nombre_turno']; ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+
+            <!-- Jornada -->
+            <label>Jornada</label>
+            <select name="id_jornada">
+                <?php while($j = mysqli_fetch_assoc($jornadas)): ?>
+                    <option
+                        value="<?php echo $j['id_jornada']; ?>"
+                        <?php echo ($j['id_jornada'] == $fila['id_jornada']) ? 'selected' : ''; ?>>
+                        <?php echo $j['nombre_jornada']; ?>
                     </option>
                 <?php endwhile; ?>
             </select>
