@@ -17,7 +17,7 @@ function obtenerOperarios($conexion){
 }
 function obtenerMaquinas($conexion){
     return mysqli_query($conexion,
-        "SELECT * FROM MAQUINAS"
+        "SELECT * FROM MAQUINAS ORDER BY CAST(REGEXP_SUBSTR(nombre_maquina, '[0-9]+') AS UNSIGNED)"
     );
 }
 function obtenerReferencias($conexion){
@@ -36,7 +36,6 @@ function obtenerColores($conexion){
 ================================================= */
 // Actualizar registro de producción por ID
 function actualizarProduccion($conexion, $id, $datos){
-    // peso_total es una columna GENERADA (peso_rollo - peso_retal); no se incluye en el UPDATE
     $sql = "UPDATE PRODUCCION_ROLLO SET
             fecha_rollo='{$datos['fecha']}',
             id_operario='{$datos['id_operario']}',

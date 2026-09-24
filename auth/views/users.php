@@ -171,9 +171,6 @@ include dirname(__DIR__, 2) . '/templates/header.php';
     </div>
 </div>
 
-<!-- Botón para volver -->
-<a id="btn-volver" href="<?= BASE_URL ?>/index.php">← Volver</a>
-
 <script src="<?= BASE_URL ?>/auth/shared/auth.js"></script>
 
 <?php include dirname(__DIR__, 2) . '/templates/footer.php'; ?>

@@ -27,17 +27,27 @@ if(!function_exists('opcionesCatalogo')){
     }
 }
 
-// Ayudante: select de catálogo + "Otro" (al elegirlo, el mismo campo se
-// convierte en texto libre; ver .tiene-otro/.campo-libre en register.js)
+// Ayudante: select de catálogo + "Otro". En Operario aparece una casilla
+// nueva al lado; en los demás la casilla reemplaza al select (ver register.js).
+// El botón "volver" solo se usa/aparece en el modo de reemplazo (no Operario).
 if(!function_exists('campoCatalogoConOtro')){
     function campoCatalogoConOtro($lista, $idKey, $nombreKey, $seleccionado, $clase, $titulo = ''){
+        $esOperario = ($clase === 'f-operario');
         ob_start(); ?>
-        <select class="<?= $clase ?> tiene-otro" <?= $titulo ? 'title="' . htmlspecialchars($titulo) . '"' : '' ?>>
-            <option value=""></option>
-            <option value="otro">Otro</option>
-            <?= opcionesCatalogo($lista, $idKey, $nombreKey, $seleccionado, false) ?>
-        </select>
-        <input type="text" class="<?= $clase ?> campo-libre" hidden autocomplete="off" placeholder="Escribe...">
+        <span class="campo-otro-wrap <?= $esOperario ? 'campo-otro-apilado' : '' ?>">
+            <select class="<?= $clase ?> tiene-otro" <?= $titulo ? 'title="' . htmlspecialchars($titulo) . '"' : '' ?>>
+                <option value=""></option>
+                <option value="otro">Otro</option>
+                <?= opcionesCatalogo($lista, $idKey, $nombreKey, $seleccionado, false) ?>
+            </select>
+            <?php if($esOperario): ?>
+                <!-- El espacio de esta casilla queda reservado siempre (visibility, no display) -->
+                <input type="text" class="<?= $clase ?> campo-libre campo-libre-reservado" autocomplete="off" placeholder="Escribe...">
+            <?php else: ?>
+                <input type="text" class="<?= $clase ?> campo-libre" hidden autocomplete="off" placeholder="Escribe...">
+                <button type="button" class="btn-volver-lista" hidden title="Volver a la lista">&#8634;</button>
+            <?php endif; ?>
+        </span>
         <?php return ob_get_clean();
     }
 }
@@ -49,20 +59,24 @@ if(!function_exists('valPlanilla')){
     }
 }
 
-// Ayudante: las celdas de una entrada (referencia..observaciones + eliminar)
+// Ayudante: las celdas de una entrada (referencia..observaciones + eliminar).
+// $referenciasMaquina ya viene filtrada a lo que produce esa máquina (o el catálogo
+// completo de Referencias Especiales si $esEsp); el valor preseleccionado sale de
+// id_referencia_esp en vez de id_referencia cuando corresponde.
 if(!function_exists('celdasEntradaPlanilla')){
-    function celdasEntradaPlanilla($ent, $referencias, $colores){
+    function celdasEntradaPlanilla($ent, $referenciasMaquina, $colores, $esEsp = false){
+        $seleccionadoRef = $esEsp ? ($ent['id_referencia_esp'] ?? '') : ($ent['id_referencia'] ?? '');
         ob_start(); ?>
-        <td><?= campoCatalogoConOtro($referencias, 'id_referencia', 'nombre_referencia', $ent['id_referencia'] ?? '', 'f-ref') ?></td>
-        <td><?= campoCatalogoConOtro($colores, 'id_color', 'nombre_color', $ent['id_color'] ?? '', 'f-color') ?></td>
+        <td><?= campoCatalogoConOtro($referenciasMaquina, 'id', 'nombre', $seleccionadoRef, 'f-ref') ?></td>
+        <td class="td-grueso"><?= campoCatalogoConOtro($colores, 'id_color', 'nombre_color', $ent['id_color'] ?? '', 'f-color') ?></td>
         <td><input type="number" class="f-x70" min="0" step="1" value="<?= valPlanilla($ent['x70'] ?? '') ?>"></td>
         <td><input type="number" class="f-x90" min="0" step="1" value="<?= valPlanilla($ent['x90'] ?? '') ?>"></td>
-        <td><input type="number" class="f-x98" min="0" step="1" value="<?= valPlanilla($ent['x98'] ?? '') ?>"></td>
+        <td class="td-grueso"><input type="number" class="f-x98" min="0" step="1" value="<?= valPlanilla($ent['x98'] ?? '') ?>"></td>
         <td><input type="number" class="f-p1" min="0" step="0.01" value="<?= valPlanilla($ent['p1'] ?? '') ?>"></td>
         <td><input type="number" class="f-p2" min="0" step="0.01" value="<?= valPlanilla($ent['p2'] ?? '') ?>"></td>
         <td><input type="number" class="f-p3" min="0" step="0.01" value="<?= valPlanilla($ent['p3'] ?? '') ?>"></td>
         <td><input type="number" class="f-p4" min="0" step="0.01" value="<?= valPlanilla($ent['p4'] ?? '') ?>"></td>
-        <td><input type="number" class="f-p5" min="0" step="0.01" value="<?= valPlanilla($ent['p5'] ?? '') ?>"></td>
+        <td class="td-grueso"><input type="number" class="f-p5" min="0" step="0.01" value="<?= valPlanilla($ent['p5'] ?? '') ?>"></td>
         <td><input type="text" class="f-obs" autocomplete="off" value="<?= valPlanilla($ent['obs'] ?? '') ?>"></td>
         <td class="celda-acciones"><button type="button" class="btn-quitar" title="Quitar entrada">&times;</button></td>
         <?php return ob_get_clean();
@@ -71,6 +85,64 @@ if(!function_exists('celdasEntradaPlanilla')){
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
+
+<?php if(!$planilla): ?>
+
+<!-- Sin turno abierto: formulario para iniciar uno nuevo -->
+<div class="container" id="containerRegister">
+    <h2 class="titulo-vista">Planilla de Producción · Sellado</h2>
+
+    <div class="card">
+        <div class="aviso-toast" id="avisoInicio" hidden>
+            <span class="aviso-toast-texto" id="avisoInicioTexto"></span>
+            <div class="aviso-toast-barra" id="avisoInicioBarra"></div>
+        </div>
+
+        <form class="form-inicio" method="POST" action="<?= BASE_URL ?>/modules/sellado/views/register.php">
+            <input type="hidden" name="accion" value="iniciar">
+
+            <div class="campo">
+                <label>Fecha</label>
+                <input type="date" name="fecha" value="<?= htmlspecialchars(date('Y-m-d')) ?>" required>
+            </div>
+
+            <div class="campo">
+                <label>Turno</label>
+                <select name="bloque" required>
+                    <option value=""></option>
+                    <?php foreach(bloquesTurno() as $nombre => $datosBloque): ?>
+                        <option value="<?= $nombre ?>"><?= $nombre ?> (<?= $datosBloque['horario'] ?? '' ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>Supervisor</label>
+                <select name="id_supervisor" required <?= empty($supervisores) ? 'disabled' : '' ?>>
+                    <option value=""></option>
+                    <?php foreach($supervisores as $s): ?>
+                        <option value="<?= $s['id_operario'] ?>"><?= htmlspecialchars($s['nombre_operario']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <?php if(empty($supervisores)): ?>
+                    <p class="aviso aviso-error">No hay operarios marcados como supervisor. Ve a Catálogos › Operarios para marcar uno.</p>
+                <?php endif; ?>
+            </div>
+
+            <button type="submit" class="btn" id="btnIniciar" <?= empty($supervisores) ? 'disabled' : '' ?>>Iniciar planilla</button>
+        </form>
+    </div>
+</div>
+
+<script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
+<script src="<?= BASE_URL ?>/modules/shared/avisoToast.js"></script>
+<?php $regError = $_GET['reg_error'] ?? ''; if($regError !== ''): ?>
+<script>
+    crearAvisoToast("avisoInicio", "avisoInicioTexto", "avisoInicioBarra")
+        .mostrar(<?= json_encode($regError) ?>, "error", true);
+</script>
+<?php endif; ?>
+<?php include dirname(__DIR__, 3) . '/templates/footer.php'; return; endif; ?>
 
 <!-- Contenedor de Register -->
 <div class="container" id="containerRegister">
@@ -135,7 +207,12 @@ if(!function_exists('celdasEntradaPlanilla')){
             </thead>
 
             <?php foreach($maquinas as $m):
-                $num      = (int) $m['id_maquina'];
+                // numero_maquina (1-17) es solo para agrupar/etiquetar; id_maquina es el id
+                // real del catálogo (no coincide con el número) y es el que se guarda como FK.
+                $num       = (int) $m['numero_maquina'];
+                $idMaquina = (int) $m['id_maquina'];
+                $esEsp     = (bool) $m['usa_referencias_esp'];
+                $referenciasMaquina = $m['referencias'];
                 $etq      = str_pad($num, 2, '0', STR_PAD_LEFT);
                 $datos    = $datosMaquinas[$num] ?? null;
                 $entradas = $datos['entradas'] ?? [];
@@ -145,40 +222,49 @@ if(!function_exists('celdasEntradaPlanilla')){
                 }
                 $span = count($entradas) + 1; // + fila del botón "+ Entrada"
             ?>
-            <tbody class="grupo-maquina" data-maquina="<?= $num ?>">
+            <tbody class="grupo-maquina" data-maquina="<?= $num ?>" data-id-maquina="<?= $idMaquina ?>">
                 <?php foreach($entradas as $i => $ent): ?>
                 <tr class="fila-entrada">
                     <?php if($i === 0): ?>
-                        <!-- Número de máquina agrupando visualmente todas sus entradas -->
-                        <td class="col-maquina" rowspan="<?= $span ?>"><?= $etq ?></td>
+                        <!-- Número de máquina agrupando visualmente todas sus entradas (visual: sin cero a la izquierda; lo guardado no depende de este texto) -->
+                        <td class="col-maquina" rowspan="<?= $span ?>"><?= $num ?></td>
                         <!-- Bloque de operario / jornada de la máquina -->
                         <td class="col-operario" rowspan="<?= $span ?>">
                             <div class="op-bloque">
-                                <!-- Operario: sin subtítulo; "Otro" se vuelve texto libre en el mismo campo -->
-                                <?= campoCatalogoConOtro($operarios, 'id_operario', 'nombre_operario', $datos['id_operario'] ?? '', 'f-operario', 'Operario') ?>
-                                <!-- Jornada: conserva subtítulo; también admite "Otro" -->
+                                <!-- Operario: "Otro" agrega una casilla nueva debajo (no reemplaza) -->
+                                <label class="op-sub">Nombre
+                                    <?= campoCatalogoConOtro($operarios, 'id_operario', 'nombre_operario', $datos['id_operario'] ?? '', 'f-operario', 'Operario') ?>
+                                </label>
+                                <!-- Jornada: "Otro" reemplaza el select en el mismo lugar -->
                                 <label class="op-sub">Jornada
-                                    <select class="f-jornada tiene-otro">
-                                        <option value=""></option>
-                                        <option value="otro">Otro</option>
-                                        <option value="8 Horas"  <?= (($datos['jornada'] ?? '') === '8 Horas')  ? 'selected' : '' ?>>8 Horas</option>
-                                        <option value="12 Horas" <?= (($datos['jornada'] ?? '') === '12 Horas') ? 'selected' : '' ?>>12 Horas</option>
-                                    </select>
-                                    <input type="text" class="f-jornada campo-libre" hidden autocomplete="off" placeholder="Escribe...">
+                                    <span class="campo-otro-wrap">
+                                        <select class="f-jornada tiene-otro">
+                                            <option value=""></option>
+                                            <option value="otro">Otro</option>
+                                            <option value="8 Horas"  <?= (($datos['jornada'] ?? '') === '8 Horas')  ? 'selected' : '' ?>>8 Horas</option>
+                                            <option value="12 Horas" <?= (($datos['jornada'] ?? '') === '12 Horas') ? 'selected' : '' ?>>12 Horas</option>
+                                        </select>
+                                        <input type="text" class="f-jornada campo-libre" hidden autocomplete="off" placeholder="Escribe...">
+                                        <button type="button" class="btn-volver-lista" hidden title="Volver a la lista">&#8634;</button>
+                                    </span>
                                 </label>
                             </div>
                         </td>
                     <?php endif; ?>
-                    <?= celdasEntradaPlanilla($ent, $referencias, $colores) ?>
+                    <?= celdasEntradaPlanilla($ent, $referenciasMaquina, $colores, $esEsp) ?>
                 </tr>
                 <?php endforeach; ?>
 
                 <!-- Agregar otra entrada a esta máquina -->
                 <tr class="fila-add">
-                    <td colspan="12">
+                    <td colspan="2" class="td-grueso">
                         <button type="button" class="btn-entrada">+ Entrada</button>
                         <span class="tope-entradas">Máximo 6 entradas por máquina</span>
                     </td>
+                    <td colspan="3" class="td-grueso"></td>
+                    <td colspan="5" class="td-grueso"></td>
+                    <td></td>
+                    <td class="celda-acciones"></td>
                 </tr>
             </tbody>
             <?php endforeach; ?>
@@ -202,9 +288,10 @@ if(!function_exists('celdasEntradaPlanilla')){
         <button type="button" class="btn btn-finalizar" id="btnFinalizar">Finalizar turno</button>
     </div>
 
-    <!-- Plantilla de una entrada nueva (para el botón "+ Entrada") -->
+    <!-- Plantilla de una entrada nueva (para el botón "+ Entrada"); la referencia
+         se llena vacía y register.js la puebla según la máquina al clonar la fila -->
     <template id="tplEntrada">
-        <tr class="fila-entrada"><?= celdasEntradaPlanilla([], $referencias, $colores) ?></tr>
+        <tr class="fila-entrada"><?= celdasEntradaPlanilla([], [], $colores) ?></tr>
     </template>
 
 </div>
@@ -238,6 +325,7 @@ if(!function_exists('celdasEntradaPlanilla')){
 
 <!-- Scripts -->
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
+<script>const mapaReferenciasMaquina = <?= json_encode($mapaReferenciasMaquina, JSON_HEX_TAG) ?>;</script>
 <script src="<?= BASE_URL ?>/modules/sellado/scripts/register.js"></script>
 
 <?php include dirname(__DIR__, 3) . '/templates/footer.php'; ?>

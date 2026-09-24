@@ -6,43 +6,38 @@ require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 require_once dirname(__DIR__) . '/models/registerModel.php';
 
-// Asegurar la tabla del sobre del turno
-asegurarTablaPlanillas($conexion);
-
-// Supervisor: id siempre del usuario en sesión; el nombre se puede editar a mano al iniciar el turno
-$id_supervisor      = $_SESSION['id_usuario'] ?? null;
-$supervisor_nombre  = $_SESSION['usuario'] ?? 'Sin usuario';
-
 $hoy      = date('Y-m-d');
 $bloques  = bloquesTurno();
 
 $rutaRegister = BASE_URL . '/modules/sellado/views/register.php';
-$rutaHistory  = BASE_URL . '/modules/sellado/views/history.php';
 
 /* =================================================
-   INICIAR TURNO (patrón PRG; formulario en el modal de history.php)
+   INICIAR TURNO (patrón PRG; formulario de inicio en register.php)
 ================================================= */
 if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'iniciar'){
 
     $bloque = $_POST['bloque'] ?? '';
     $fecha  = validarFechaPlanilla($_POST['fecha'] ?? '') ?: $hoy;
 
-    $supervisorManual = trim($_POST['supervisor'] ?? '');
-    if($supervisorManual !== ''){
-        $supervisor_nombre = $supervisorManual;
-    }
-
     if(!isset($bloques[$bloque])){
-        header('Location: ' . $rutaHistory . '?reg_error=' . urlencode('Selecciona un turno válido.'));
+        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode('Selecciona un turno válido.'));
         exit;
     }
+
+    $supervisor = obtenerOperarioSupervisorPorId($conexion, $_POST['id_supervisor'] ?? 0);
+    if(!$supervisor){
+        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode('Selecciona un supervisor válido.'));
+        exit;
+    }
+    $id_supervisor     = $supervisor['id_operario'];
+    $supervisor_nombre = $supervisor['nombre_operario'];
 
     $codigo    = construirCodigoPlanilla($fecha, $bloque);
     $existente = obtenerPlanillaPorCodigo($conexion, $codigo);
     $abierta   = obtenerPlanillaAbierta($conexion);
 
     if($existente && $existente['estado'] === 'finalizada'){
-        header('Location: ' . $rutaHistory . '?reg_error=' . urlencode("El turno {$codigo} ya fue finalizado."));
+        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} ya fue finalizado."));
         exit;
     }
     if($abierta){
@@ -74,14 +69,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'cancel
 $planilla = obtenerPlanillaAbierta($conexion);
 
 if(!$planilla){
-    header('Location: ' . $rutaHistory);
-    exit;
+    // Sin turno abierto: register.php muestra el formulario de inicio
+    $supervisores = mysqli_fetch_all(obtenerOperariosSupervisores($conexion), MYSQLI_ASSOC);
+    return;
 }
 
 // Catálogos y datos ya guardados del turno
-$maquinas    = mysqli_fetch_all(obtenerMaquinasSellado($conexion), MYSQLI_ASSOC);
+$datosMaquina  = obtenerMaquinasConReferencias($conexion, 'sellado');
+$maquinas      = $datosMaquina['maquinas'];
+$mapaReferenciasMaquina = $datosMaquina['mapaJs'];
 $operarios   = mysqli_fetch_all(obtenerOperariosActivos($conexion), MYSQLI_ASSOC);
-$referencias = obtenerReferenciasOrdenadas($conexion);
 $colores     = obtenerColoresOrdenados($conexion);
 $datosMaquinas = obtenerPlanillaEstructurada($conexion, $planilla);
 $horarioTurno  = $bloques[$planilla['bloque']]['horario'] ?? '';

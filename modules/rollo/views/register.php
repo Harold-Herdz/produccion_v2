@@ -21,7 +21,8 @@ if(!function_exists('opcionesCatalogoRollo')){
     }
 }
 
-// Select de catálogo + "Otro" (al elegirlo, el mismo campo se vuelve texto libre)
+// Select de catálogo + "Otro". En Operario aparece una casilla nueva al lado;
+// en Referencia/Color la casilla reemplaza al select (ver register.js)
 if(!function_exists('campoConOtroRollo')){
     function campoConOtroRollo($lista, $idKey, $nombreKey, $id, $nombre){
         ob_start(); ?>
@@ -43,7 +44,10 @@ if(!function_exists('campoConOtroRollo')){
     <h2 class="titulo-vista">Registro de Producción · Rollos</h2>
 
     <div class="card">
-        <p class="aviso" id="avisoRollo" hidden></p>
+        <div class="aviso-toast" id="avisoRollo" hidden>
+            <span class="aviso-toast-texto" id="avisoRolloTexto"></span>
+            <div class="aviso-toast-barra" id="avisoRolloBarra"></div>
+        </div>
 
         <form class="form-inicio" id="formRegistroRollo">
             <div class="campo">
@@ -59,22 +63,19 @@ if(!function_exists('campoConOtroRollo')){
             <div class="campo">
                 <label>Máquina</label>
                 <select name="id_maquina" id="maquinaRollo" required>
-                    <?= opcionesCatalogoRollo($maquinas, 'id_maquina', 'nombre_maquina') ?>
+                    <option value=""></option>
+                    <?= opcionesCatalogoRollo($maquinas, 'id_maquina', 'nombre_maquina', false) ?>
                 </select>
             </div>
 
             <div class="campo">
                 <label>Referencia</label>
-                <select name="id_referencia" id="referenciaRollo" required>
-                    <?= opcionesCatalogoRollo($referencias, 'id_referencia', 'nombre_referencia') ?>
-                </select>
+                <?= campoConOtroRollo([], 'id', 'nombre', 'referenciaRollo', 'id_referencia') ?>
             </div>
 
             <div class="campo">
                 <label>Color</label>
-                <select name="id_color" id="colorRollo" required>
-                    <?= opcionesCatalogoRollo($colores, 'id_color', 'nombre_color') ?>
-                </select>
+                <?= campoConOtroRollo($colores, 'id_color', 'nombre_color', 'colorRollo', 'id_color') ?>
             </div>
 
             <div class="campo-doble">
@@ -89,7 +90,7 @@ if(!function_exists('campoConOtroRollo')){
             </div>
 
             <div class="acciones-rollo">
-                <a class="btn btn-cancelar" href="<?= BASE_URL ?>/modules/rollo/views/history.php">Volver</a>
+                <a class="btn btn-cancelar" id="btnVolverRollo" href="<?= BASE_URL ?>/modules/rollo/views/history.php">Volver</a>
                 <button type="submit" class="btn" id="btnRegistrarRollo">Registrar</button>
             </div>
         </form>
@@ -97,6 +98,8 @@ if(!function_exists('campoConOtroRollo')){
 </div>
 
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
+<script src="<?= BASE_URL ?>/modules/shared/avisoToast.js"></script>
+<script>const mapaReferenciasMaquina = <?= json_encode($mapaReferenciasMaquina, JSON_HEX_TAG) ?>;</script>
 <script src="<?= BASE_URL ?>/modules/rollo/scripts/register.js"></script>
 
 <?php include dirname(__DIR__, 3) . '/templates/footer.php'; ?>

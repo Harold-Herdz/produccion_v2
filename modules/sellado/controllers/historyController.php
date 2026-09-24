@@ -24,6 +24,7 @@ $sql_base = "FROM PRODUCCION_SELLADO s
 LEFT JOIN OPERARIOS o ON s.id_operario = o.id_operario
 LEFT JOIN MAQUINAS m ON s.id_maquina = m.id_maquina
 LEFT JOIN REFERENCIAS r ON s.id_referencia = r.id_referencia
+LEFT JOIN REFERENCIAS_ESP re ON s.id_referencia_esp = re.id_referencia_esp
 LEFT JOIN COLORES c ON s.id_color = c.id_color
 LEFT JOIN TURNOS t ON s.id_turno = t.id_turno
 LEFT JOIN JORNADAS j ON s.id_jornada = j.id_jornada
@@ -35,6 +36,7 @@ if(!empty($busqueda)){
         o.nombre_operario LIKE '%$busqueda%' OR
         m.nombre_maquina LIKE '%$busqueda%' OR
         r.nombre_referencia LIKE '%$busqueda%' OR
+        re.nombre_referencia_esp LIKE '%$busqueda%' OR
         c.nombre_color LIKE '%$busqueda%' OR
         t.nombre_turno LIKE '%$busqueda%' OR
         j.nombre_jornada LIKE '%$busqueda%' OR
@@ -68,7 +70,7 @@ $total_paginas = ceil($total_registros / $limite);
 $sql = "SELECT s.*,
             o.nombre_operario,
             m.nombre_maquina,
-            r.nombre_referencia,
+            COALESCE(r.nombre_referencia, re.nombre_referencia_esp) AS nombre_referencia,
             c.nombre_color,
             t.nombre_turno,
             j.nombre_jornada

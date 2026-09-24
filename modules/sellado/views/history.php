@@ -12,21 +12,8 @@ require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 // Importar historyController.php
 include dirname(__DIR__) . '/controllers/historyController.php';
-// Importar registerModel.php (asegurarTablaPlanillas)
-require_once dirname(__DIR__) . '/models/registerModel.php';
 // Importar header.php
 include dirname(__DIR__, 3) . '/templates/header.php';
-
-// Modal "Registrar Producción" (inicio de turno)
-$regError   = $_GET['reg_error'] ?? '';
-$regHoy     = date('Y-m-d');
-$regUsuario = $_SESSION['usuario'] ?? 'Sin usuario';
-$regTurnos  = ['Día' => '6am - 2pm', 'Tarde' => '2pm - 10pm', 'Noche' => '10pm - 6am'];
-
-// ¿Ya hay un turno abierto?
-asegurarTablaPlanillas($conexion);
-$q = $conexion->query("SELECT codigo FROM sellado_planilla WHERE estado = 'abierta' ORDER BY id_planilla DESC LIMIT 1");
-$regAbierta = $q ? $q->fetch_assoc() : null;
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
@@ -35,19 +22,6 @@ $regAbierta = $q ? $q->fetch_assoc() : null;
 <div class="container" id="containerHistorial">
     <!-- Título -->
     <h2 class="titulo-vista">Historial Producción Sellado</h2>
-
-        <!-- Botón para registrar producción: abre el modal, o continúa el turno abierto -->
-        <?php if($regAbierta): ?>
-            <a class="btn" id="btnRegistrar" href="<?= BASE_URL ?>/modules/sellado/views/register.php">
-                Continuar planilla
-            </a>
-        <?php else: ?>
-            <a class="btn" id="btnRegistrar" onclick="abrirModal('modalRegistrar')">
-                Registrar Producción
-            </a>
-        <?php endif; ?>
-
-        <br> <br>
 
         <!-- Tarjeta -->
         <div class="card">
@@ -161,52 +135,7 @@ $regAbierta = $q ? $q->fetch_assoc() : null;
 
 </div>
 
-<!-- Modal: nueva planilla (inicio de turno) -->
-<div class="overlay" id="modalRegistrar">
-    <div class="modal">
-        <div class="modal-header">
-            <h2>Nueva planilla · Sellado</h2>
-            <button type="button" onclick="cerrarModal('modalRegistrar')">X</button>
-        </div>
-
-        <?php if($regError): ?>
-            <p class="aviso aviso-error"><?= htmlspecialchars($regError) ?></p>
-        <?php endif; ?>
-
-        <!-- El formulario envía a register.php, que crea el turno y abre la planilla -->
-        <form class="form-inicio" method="POST"
-              action="<?= BASE_URL ?>/modules/sellado/views/register.php">
-            <input type="hidden" name="accion" value="iniciar">
-
-            <div class="campo">
-                <label>Fecha</label>
-                <input type="date" name="fecha" value="<?= htmlspecialchars($regHoy) ?>" required>
-            </div>
-
-            <div class="campo">
-                <label>Turno</label>
-                <select name="bloque" required>
-                    <option value="">Seleccione el turno...</option>
-                    <?php foreach($regTurnos as $nombre => $horario): ?>
-                        <option value="<?= $nombre ?>"><?= $nombre ?> (<?= $horario ?>)</option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="campo">
-                <label>Supervisor</label>
-                <input type="text" name="supervisor" value="<?= htmlspecialchars($regUsuario) ?>" autocomplete="off">
-            </div>
-
-            <button type="submit" class="btn" id="btnIniciar">Iniciar planilla</button>
-        </form>
-    </div>
-</div>
-
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
-<?php if($regError): ?>
-<script>abrirModal('modalRegistrar');</script>
-<?php endif; ?>
 
 <?php
 // Importar footer.php

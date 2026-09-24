@@ -38,7 +38,7 @@
   width: 100%;
   padding: 12px 14px;
   border-radius: var(--radio-m);
-  border: 2px solid var(--azul);
+  border: 2px solid var(--azul-oscuro);
   background-color: var(--fondo-superficie);
   color: var(--texto);
   font-size: 14px;
@@ -58,6 +58,10 @@
 .form-inicio input[readonly] {
   border-color: var(--borde-fuerte);
   opacity: 0.85;
+}
+/* Casilla "Otro": aparece debajo del select, no lo reemplaza */
+.form-inicio input.campo-libre {
+  margin-top: 8px;
 }
 .form-inicio #btnIniciar {
   width: 100%;
@@ -150,28 +154,85 @@
   color: var(--danger);
 }
 
+/* Aviso tipo "toast": mensaje con barra de tiempo que se autooculta a los pocos
+   segundos. Compartido entre todos los módulos (ver modules/shared/avisoToast.js) */
+.aviso-toast {
+  position: relative;
+  margin-bottom: 16px;
+  padding: 12px 16px 14px;
+  border-radius: var(--radio-m);
+  font-size: 14px;
+  overflow: hidden;
+}
+.aviso-toast.aviso-info {
+  background: var(--info-bg);
+  border: 1px solid var(--azul);
+  color: var(--azul-oscuro);
+}
+.aviso-toast.aviso-error {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+.aviso-toast-texto {
+  display: block;
+}
+.aviso-toast-barra {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 0;
+  background: currentColor;
+  opacity: 0.55;
+}
+
 /* ===========================
    PLANILLA
 =========================== */
 .planilla-scroll {
   margin-top: 20px;
   width: 100%;
+  max-height: 65vh;
   overflow-x: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  border-radius: var(--radio-m);
-  border: 1px solid var(--borde);
+  /* Sin border-radius a propósito: con el encabezado sticky, la esquina
+     redondeada dejaba una línea blanca por el recorte del contenedor */
+  border: 2px solid var(--azul-oscuro);
+  scrollbar-width: thin;
+  scrollbar-color: var(--azul-oscuro) var(--fondo-secundario);
+}
+/* Barra de desplazamiento: mismo estilo que .tabla-dashboard en main.css */
+.planilla-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.planilla-scroll::-webkit-scrollbar-track {
+  background: var(--fondo-secundario);
+}
+.planilla-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--azul-oscuro);
+  border-radius: 10px;
+}
+.planilla-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--azul);
 }
 .planilla {
   width: 100%;
   min-width: 900px;        /* debajo de esto la tabla se desplaza (responsive) */
   table-layout: fixed;
-  border-collapse: collapse;
+  /* "separate" a propósito: con "collapse" + encabezado sticky, Chrome deja
+     una línea blanca (bug de compositing) justo en el borde izquierdo del
+     encabezado al hacer scroll. Con spacing en 0 se ve igual que collapse. */
+  border-collapse: separate;
+  border-spacing: 0;
   background: var(--fondo-superficie);
   font-size: 12px;
 }
 
-/* Anchos de columna */
-.c-maq   { width: 58px; }
+/* Anchos de columna (Máquina más ancha: número grande, celda cuadrada) */
+.c-maq   { width: 80px; }
 .c-op    { width: 134px; }
 .c-ref   { width: 108px; }
 .c-color { width: 86px; }
@@ -180,51 +241,125 @@
 .c-obs   { width: auto; }
 .c-del   { width: 36px; }
 
+/* Encabezado fijo: se queda visible mientras se baja por las máquinas.
+   Sin "border" a propósito: mezclado con position:sticky, border-collapse
+   deja líneas blancas entre celdas; el fondo sólido ya las separa bien. */
 .planilla thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   background: var(--azul-oscuro);
   color: var(--texto-claro);
   font-size: 11px;
   font-weight: 600;
-  padding: 8px 4px;
-  border: 1px solid var(--azul-oscuro);
+  padding: 11px 4px;
+  border: none;
   text-align: center;
   white-space: nowrap;
 }
 .planilla td {
-  padding: 1px 3px;
+  padding: 1px 2px;
   border: 1px solid var(--borde);
   vertical-align: middle;
 }
 
-/* Inputs y selects compactos */
+/* Inputs y selects estilo "celda de tabla": sin borde ni fondo propios,
+   se apoyan en el borde de la celda; solo el foco se resalta */
 .planilla input,
 .planilla select {
+  display: block;
+  box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  padding: 3px 6px;
-  border-radius: 6px;
-  border: 1px solid var(--borde-fuerte);
-  background-color: var(--fondo-superficie);
+  height: 20px;
+  padding: 1px 6px;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
   color: var(--texto);
   font-size: 11px;
 }
-.planilla input:focus,
+/* Borde fino en los dropdown (select): los distingue de las celdas de texto
+   y evita el reborde blanco raro que dejaba el outline al abrirse */
+.planilla select {
+  border: 1px solid var(--borde-fuerte);
+}
+/* El atributo hidden debe ganarle siempre a "display:block" de arriba */
+.planilla [hidden] {
+  display: none;
+}
+.planilla input:focus {
+  outline: 2px solid var(--azul-oscuro);
+  outline-offset: -2px;
+  background-color: var(--azul-claro);
+}
 .planilla select:focus {
   outline: none;
   border-color: var(--azul-oscuro);
-  box-shadow: 0 0 0 2px var(--azul-claro);
+  background-color: var(--azul-claro);
 }
 
-/* Flecha del select */
+/* Envoltorio select + "Otro". Referencia/Color/Jornada: fila (la casilla
+   reemplaza al select, con botón para volver a la lista). Operario: columna
+   (casilla nueva debajo, el select se queda visible mostrando "Otro"). */
+.campo-otro-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+}
+.campo-otro-wrap select,
+.campo-otro-wrap input {
+  flex: 1;
+  min-width: 0;
+}
+.campo-otro-wrap.campo-otro-apilado {
+  flex-direction: column;
+  align-items: stretch;
+}
+/* En modo apilado la altura la da el height fijo, no el crecimiento flex */
+.campo-otro-apilado select,
+.campo-otro-apilado input {
+  flex: 0 0 auto;
+}
+/* Casilla de Operario: el espacio queda reservado siempre (visibility, no display) */
+.campo-libre-reservado {
+  visibility: hidden;
+  margin-top: 1px;
+  border-top: 1px dashed var(--borde-fuerte);
+}
+.campo-libre-reservado.activo {
+  visibility: visible;
+}
+.btn-volver-lista {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: var(--azul-claro);
+  color: var(--azul-oscuro);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+.btn-volver-lista:hover {
+  background: var(--azul);
+  color: var(--texto-claro);
+}
+
+/* Flecha del select (indica que es una celda con lista desplegable) */
 .planilla select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  padding-right: 20px;
+  padding-right: 18px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a4a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 5px center;
-  background-size: 11px;
+  background-position: right 4px center;
+  background-size: 10px;
 }
 
 /* Sin flechas de número */
@@ -238,50 +373,69 @@
   margin: 0;
 }
 
-/* Columna máquina */
+/* Columna máquina: número grande, celda ancha y compacta (cuadrada) */
 .col-maquina {
-  background: var(--verde-claro);
+  background: var(--azul-muy-claro);
   color: var(--texto);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 24px;
   text-align: center;
   vertical-align: middle;
+  border-left: 3px solid var(--azul-oscuro) !important;
+  border-right: 3px solid var(--azul-oscuro) !important;
 }
 
-/* Bloque operario/jornada */
+/* Bloque operario/jornada: sin color propio, se apoya en el fondo normal de la fila */
 .col-operario {
-  background: var(--fondo-secundario);
   vertical-align: middle;
-  padding: 4px !important;
+  padding: 3px 4px !important;
 }
+/* Fijo arriba: no se corre al centro cuando el bloque crece con "+ Entrada" */
 .op-bloque {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  height: 100%;
+  justify-content: flex-start;
 }
-/* Subtítulo de jornada */
+/* Subtítulo (Nombre / Jornada) */
 .op-sub {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   font-size: 9px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--texto-tenue);
 }
+.op-sub select,
+.op-sub input {
+  height: 20px;
+}
 
-/* Separación entre máquinas */
+/* Líneas gruesas que agrupan columnas: Máquina | Operario·Referencia·Color |
+   X70·X90·X98 | Pesos 1-5 | Observaciones (solo en el cuerpo; el encabezado
+   ya es un bloque de color sólido, sin bordes por el bug de sticky+collapse) */
+.td-grueso {
+  border-right: 3px solid var(--azul-oscuro) !important;
+}
+
+/* Separación entre máquinas: más gruesa para distinguir cada bloque de registros */
 .grupo-maquina {
-  border-bottom: 3px solid var(--borde);
+  border-bottom: 4px solid var(--azul-oscuro);
 }
 
-/* Zebra suave por entrada */
-.fila-entrada:nth-of-type(even) td:not(.col-maquina):not(.col-operario) {
-  background: var(--fondo-secundario);
+/* Zebra por entrada: mismo azul muy claro de la columna Máquina, alternado */
+.fila-entrada:nth-of-type(even) td:not(.col-maquina) {
+  background: var(--azul-muy-claro);
 }
 
-.celda-acciones { text-align: center; }
+.celda-acciones {
+  text-align: center;
+  border-left: 3px solid var(--azul-oscuro) !important;
+  border-right: 3px solid var(--azul-oscuro) !important;
+}
 .btn-quitar {
   border: none;
   background: transparent;
@@ -304,7 +458,7 @@
 .btn-entrada {
   padding: 3px 12px;
   border-radius: var(--radio-s);
-  border: 1px dashed var(--azul);
+  border: 1px dashed var(--azul-oscuro);
   background: transparent;
   color: var(--azul-oscuro);
   font-weight: 600;
@@ -463,6 +617,10 @@
   background: var(--fondo-secundario);
   color: var(--texto);
   border: 1px solid var(--borde-fuerte);
+}
+.acciones-rollo .btn-cancelar.bloqueado {
+  opacity: 0.5;
+  pointer-events: none;
 }
 #btnRegistrarRollo {
   flex: 1;

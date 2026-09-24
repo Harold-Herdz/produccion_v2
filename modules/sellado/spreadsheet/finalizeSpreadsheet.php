@@ -16,7 +16,7 @@ $maquinas = $entrada['maquinas'] ?? [];
 $nota     = trim((string) ($entrada['nota'] ?? ''));
 
 // Candado anti doble finalización
-$lockName = 'sellado_planilla_' . preg_replace('/[^A-Za-z0-9_]/', '', $codigo);
+$lockName = 'sellado_sheet_' . preg_replace('/[^A-Za-z0-9_]/', '', $codigo);
 $conexion->query("SELECT GET_LOCK('{$lockName}', 15)");
 
 try {

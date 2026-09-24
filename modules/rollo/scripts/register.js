@@ -1,67 +1,162 @@
-// Register Rollos: registrar producción y limpiar el formulario para el siguiente
+// Register Rollos: registrar y limpiar sin salir
 
 const formRollo = document.getElementById("formRegistroRollo");
 
 if (formRollo) {
-    const aviso        = document.getElementById("avisoRollo");
-    const btnRegistrar = document.getElementById("btnRegistrarRollo");
-    const campoFecha    = document.getElementById("fechaRollo");
-    let enviando = false; // evita doble clic
+    const aviso          = document.getElementById("avisoRollo");
+    const btnRegistrar  = document.getElementById("btnRegistrarRollo");
+    const btnVolver      = document.getElementById("btnVolverRollo");
+    const campoFecha     = document.getElementById("fechaRollo");
+    let enviando = false;        // evita doble clic / doble registro
 
-    function mostrarAviso(texto, tipo) {
-        aviso.textContent = texto;
-        aviso.className = "aviso aviso-" + tipo;
-        aviso.hidden = false;
+    /* =========================================
+       AVISO (toast compartido: ver modules/shared/avisoToast.js)
+    ========================================= */
+    const avisoToast = crearAvisoToast("avisoRollo", "avisoRolloTexto", "avisoRolloBarra");
+    function mostrarAviso(texto, tipo, autoOcultar) { avisoToast.mostrar(texto, tipo, autoOcultar); }
+    function ocultarAviso() { avisoToast.ocultar(); }
+
+    // Ocultar aviso al retomar el formulario
+    formRollo.addEventListener("input", () => {
+        if (!enviando && !aviso.hidden) ocultarAviso();
+    });
+
+    // Solo letras y espacios
+    function soloLetras(texto) {
+        return texto.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]/g, "");
+    }
+    // Cada palabra con mayúscula inicial
+    function capitalizar(texto) {
+        const limpio = texto.trim().replace(/\s+/g, " ");
+        if (!limpio) return "";
+        return limpio
+            .toLowerCase()
+            .split(" ")
+            .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+            .join(" ");
     }
 
-    // "Otro": el select se convierte en texto libre en el mismo lugar
+    // Operario: el select se queda visible con "Otro", casilla nueva al lado.
+    // Referencia/Color: la casilla reemplaza al select en el mismo lugar.
     formRollo.addEventListener("change", e => {
-        if (e.target.classList.contains("tiene-otro") && e.target.value === "otro") {
-            const libre = e.target.nextElementSibling;
-            e.target.hidden = true;
+        if (!e.target.classList.contains("tiene-otro")) return;
+        const libre = e.target.nextElementSibling;
+        const esOperario = e.target.id === "operarioRollo";
+        if (e.target.value === "otro") {
+            if (!esOperario) e.target.hidden = true;
             libre.hidden = false;
+            libre.value = "";
             libre.focus();
+        } else {
+            libre.hidden = true;
+            libre.value = "";
+            e.target.hidden = false;
         }
     });
 
-    // Valor activo de un campo con "Otro": el select o, si ya se convirtió, el input
+    // Filtra letras mientras se escribe
+    formRollo.addEventListener("input", e => {
+        if (e.target.classList.contains("campo-libre")) {
+            const limpio = soloLetras(e.target.value);
+            if (limpio !== e.target.value) e.target.value = limpio;
+        }
+    });
+
+    // Capitaliza al salir del campo; en Referencia/Color, si queda vacío vuelve al select
+    formRollo.addEventListener("blur", e => {
+        if (!e.target.classList.contains("campo-libre")) return;
+        e.target.value = capitalizar(e.target.value);
+        if (e.target.id !== "operarioRolloTexto" && e.target.value === "") {
+            const select = e.target.previousElementSibling;
+            e.target.hidden = true;
+            select.hidden = false;
+            select.selectedIndex = 0;
+        }
+    }, true); // blur no burbujea
+
+    // Valor del select, o el texto libre capitalizado si eligió "Otro"
     function valorConOtro(idSelect) {
         const select = document.getElementById(idSelect);
-        return select.hidden ? select.nextElementSibling.value.trim() : select.value;
+        return select.value === "otro" ? capitalizar(select.nextElementSibling.value) : select.value;
     }
+
+    // Vuelve un campo "Otro" a su estado de select (usado al limpiar el formulario)
+    function restaurarCampoConOtro(idSelect) {
+        const select = document.getElementById(idSelect);
+        const libre = select.nextElementSibling;
+        libre.hidden = true;
+        libre.value = "";
+        select.selectedIndex = 0;
+    }
+
+    /* =========================================
+       REFERENCIA SEGÚN LA MÁQUINA (mapaReferenciasMaquina, embebido en register.php)
+    ========================================= */
+    const selectMaquina    = document.getElementById("maquinaRollo");
+    const selectReferencia = document.getElementById("referenciaRollo");
+
+    function poblarReferenciasRollo(idMaquina) {
+        const datos = typeof mapaReferenciasMaquina !== "undefined" ? mapaReferenciasMaquina[idMaquina] : null;
+        restaurarCampoConOtro("referenciaRollo");
+        selectReferencia.innerHTML = '<option value=""></option><option value="otro">Otro</option>';
+        if (!datos) return;
+        datos.opciones.forEach(op => {
+            const option = document.createElement("option");
+            option.value = op.id;
+            option.textContent = op.nombre;
+            selectReferencia.appendChild(option);
+        });
+    }
+
+    selectMaquina.addEventListener("change", () => poblarReferenciasRollo(Number(selectMaquina.value)));
 
     // Limpiar los campos de un registro, manteniendo la fecha
     function limpiarFormulario() {
-        const operario = document.getElementById("operarioRollo");
-        if (operario.hidden) {
-            const libre = operario.nextElementSibling;
-            libre.hidden = true;
-            libre.value = "";
-            operario.hidden = false;
-        }
-        operario.selectedIndex = 0;
-        document.getElementById("maquinaRollo").selectedIndex = 0;
-        document.getElementById("referenciaRollo").selectedIndex = 0;
-        document.getElementById("colorRollo").selectedIndex = 0;
+        restaurarCampoConOtro("operarioRollo");
+        selectMaquina.selectedIndex = 0;
+        poblarReferenciasRollo(null);
+        restaurarCampoConOtro("colorRollo");
         document.getElementById("pesoRolloInput").value = "";
         document.getElementById("pesoRetalInput").value = "";
-        operario.focus();
+        document.getElementById("operarioRollo").focus();
     }
 
+    /* =========================================
+       BLOQUEOS MIENTRAS SE ESTÁ REGISTRANDO
+    ========================================= */
+    // Bloquea "Volver" mientras procesa
+    if (btnVolver) {
+        btnVolver.addEventListener("click", e => {
+            if (enviando) e.preventDefault();
+        });
+    }
+
+    // Avisa antes de cerrar/recargar
+    window.addEventListener("beforeunload", e => {
+        if (enviando) {
+            e.preventDefault();
+            e.returnValue = "";
+        }
+    });
+
+    /* =========================================
+       ENVÍO DEL REGISTRO
+    ========================================= */
     formRollo.addEventListener("submit", async e => {
         e.preventDefault();
-        if (enviando) return;
+        if (enviando) return; // doble clic / envío repetido mientras procesa
         enviando = true;
         btnRegistrar.disabled = true;
         btnRegistrar.textContent = "Registrando…";
-        aviso.hidden = true;
+        if (btnVolver) btnVolver.classList.add("bloqueado");
+        ocultarAviso();
 
         const payload = {
             fecha:         campoFecha.value,
             id_operario:   valorConOtro("operarioRollo"),
-            id_maquina:    document.getElementById("maquinaRollo").value,
-            id_referencia: document.getElementById("referenciaRollo").value,
-            id_color:      document.getElementById("colorRollo").value,
+            id_maquina:    selectMaquina.value,
+            id_referencia: valorConOtro("referenciaRollo"),
+            id_color:      valorConOtro("colorRollo"),
             peso_rollo:    document.getElementById("pesoRolloInput").value,
             peso_retal:    document.getElementById("pesoRetalInput").value
         };
@@ -75,18 +170,19 @@ if (formRollo) {
             const data = await res.json();
 
             if (!data.ok) {
-                mostrarAviso(data.error || "No se pudo registrar.", "error");
+                mostrarAviso(data.error || "No se pudo registrar.", "error", true);
                 return;
             }
-            mostrarAviso("Registrado correctamente" + (data.aviso ? " · " + data.aviso : ""), "info");
+            mostrarAviso("Registrado correctamente" + (data.aviso ? " · " + data.aviso : ""), "info", true);
             limpiarFormulario();
 
         } catch (err) {
-            mostrarAviso("Sin conexión. Intenta de nuevo.", "error");
+            mostrarAviso("Sin conexión. Intenta de nuevo.", "error", true);
         } finally {
             enviando = false;
             btnRegistrar.disabled = false;
             btnRegistrar.textContent = "Registrar";
+            if (btnVolver) btnVolver.classList.remove("bloqueado");
         }
     });
 }

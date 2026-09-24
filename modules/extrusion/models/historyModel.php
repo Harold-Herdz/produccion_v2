@@ -11,7 +11,7 @@ function obtenerRegistroExtrusionPorId($conexion, $id){
 
 // Catálogos para selectores del formulario
 function obtenerMaquinasExtrusion($conexion){
-    return mysqli_query($conexion, "SELECT * FROM MAQUINAS");
+    return mysqli_query($conexion, "SELECT * FROM MAQUINAS ORDER BY CAST(REGEXP_SUBSTR(nombre_maquina, '[0-9]+') AS UNSIGNED)");
 }
 function obtenerTurnosExtrusion($conexion){
     return mysqli_query($conexion, "SELECT * FROM TURNOS");

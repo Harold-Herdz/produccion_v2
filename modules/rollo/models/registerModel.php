@@ -3,33 +3,14 @@
 
 date_default_timezone_set('America/Bogota');
 
-require_once __DIR__ . '/../spreadsheet/spreadsheetPdf.php';
+require_once __DIR__ . '/../spreadsheet/pdfSpreadsheet.php';
 require_once dirname(__DIR__, 3) . '/import/importModel.php';
 require_once dirname(__DIR__, 2) . '/shared/catalogosModel.php';
 
 /* =================================================
    TABLA DE LOGS POR DÍA (local; espejo del LOGS del Sheet)
+   Tabla ya definida en bd_produccion_v2.sql
 ================================================= */
-// Crear la tabla de logs por día si aún no existe
-function asegurarTablaLogsRollo($conexion){
-    $conexion->query("
-        CREATE TABLE IF NOT EXISTS rollo_logs (
-            id_log          INT(11) NOT NULL AUTO_INCREMENT,
-            id_dia          VARCHAR(20) NOT NULL,
-            fecha           DATE NOT NULL,
-            estado          ENUM('en_proceso','completado') NOT NULL DEFAULT 'en_proceso',
-            inicio          DATETIME NOT NULL,
-            fin             DATETIME DEFAULT NULL,
-            total_registros INT(11) NOT NULL DEFAULT 0,
-            ruta_pdf        VARCHAR(255) DEFAULT NULL,
-            creado_en       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id_log),
-            UNIQUE KEY id_dia (id_dia),
-            KEY idx_estado (estado)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
-    ");
-}
-
 // Id del día: R{yyyyMMdd}
 function construirIdDia($fecha){
     return 'R' . date('Ymd', strtotime($fecha));
@@ -47,7 +28,7 @@ function validarFechaRollo($fecha){
 
 // Log de un día por su id
 function obtenerLogPorIdDia($conexion, $id_dia){
-    $stmt = $conexion->prepare("SELECT * FROM rollo_logs WHERE id_dia = ? LIMIT 1");
+    $stmt = $conexion->prepare("SELECT * FROM rollo_sheet WHERE id_dia = ? LIMIT 1");
     $stmt->bind_param('s', $id_dia);
     $stmt->execute();
     return $stmt->get_result()->fetch_assoc();
@@ -55,7 +36,7 @@ function obtenerLogPorIdDia($conexion, $id_dia){
 
 // El día actualmente en proceso (debería haber a lo sumo uno)
 function obtenerDiaEnProceso($conexion){
-    $res = $conexion->query("SELECT * FROM rollo_logs WHERE estado = 'en_proceso' ORDER BY id_log DESC LIMIT 1");
+    $res = $conexion->query("SELECT * FROM rollo_sheet WHERE estado = 'en_proceso' ORDER BY id_log DESC LIMIT 1");
     return $res ? $res->fetch_assoc() : null;
 }
 
@@ -64,13 +45,13 @@ function abrirDia($conexion, $id_dia, $fecha){
     $log = obtenerLogPorIdDia($conexion, $id_dia);
     if($log){
         if($log['estado'] === 'completado'){
-            $stmt = $conexion->prepare("UPDATE rollo_logs SET estado='en_proceso', fin=NULL WHERE id_dia = ?");
+            $stmt = $conexion->prepare("UPDATE rollo_sheet SET estado='en_proceso', fin=NULL WHERE id_dia = ?");
             $stmt->bind_param('s', $id_dia);
             $stmt->execute();
         }
         return obtenerLogPorIdDia($conexion, $id_dia);
     }
-    $stmt = $conexion->prepare("INSERT INTO rollo_logs (id_dia, fecha, estado, inicio) VALUES (?, ?, 'en_proceso', NOW())");
+    $stmt = $conexion->prepare("INSERT INTO rollo_sheet (id_dia, fecha, estado, inicio) VALUES (?, ?, 'en_proceso', NOW())");
     $stmt->bind_param('ss', $id_dia, $fecha);
     $stmt->execute();
     return obtenerLogPorIdDia($conexion, $id_dia);
@@ -78,7 +59,7 @@ function abrirDia($conexion, $id_dia, $fecha){
 
 // Sumar 1 al contador local de registros del día
 function incrementarContadorDia($conexion, $id_dia){
-    $stmt = $conexion->prepare("UPDATE rollo_logs SET total_registros = total_registros + 1 WHERE id_dia = ?");
+    $stmt = $conexion->prepare("UPDATE rollo_sheet SET total_registros = total_registros + 1 WHERE id_dia = ?");
     $stmt->bind_param('s', $id_dia);
     $stmt->execute();
 }
@@ -86,7 +67,7 @@ function incrementarContadorDia($conexion, $id_dia){
 // Cerrar el día: total real (contado del Sheet) y ruta del PDF
 function cerrarDia($conexion, $id_dia, $total, $rutaPdf){
     $stmt = $conexion->prepare("
-        UPDATE rollo_logs
+        UPDATE rollo_sheet
         SET estado = 'completado', fin = NOW(), total_registros = ?, ruta_pdf = ?
         WHERE id_dia = ?
     ");
@@ -117,6 +98,24 @@ function filasDelDiaRollo($fechaObjetivo){
     return $delDia;
 }
 
+// Verifica si la fila ya se guardó (evita falso error)
+function yaExisteRegistroRollo($fecha, $operario, $maquina, $referencia, $color, $pesoRollo, $pesoRetal){
+    $filas = filasDelDiaRollo($fecha);
+    $recientes = array_slice($filas, -5); // solo las últimas 5 filas del día
+    foreach($recientes as $fila){
+        if($fila['operario'] === $operario
+            && $fila['maquina'] === $maquina
+            && $fila['referencia'] === $referencia
+            && $fila['color'] === $color
+            && abs(convertirNumero($fila['peso_rollo']) - $pesoRollo) < 0.01
+            && abs(convertirNumero($fila['peso_retal']) - $pesoRetal) < 0.01
+        ){
+            return true;
+        }
+    }
+    return false;
+}
+
 // Arma el paquete de cierre (PDF + fila de LOGS) para un día ya presente en el Sheet
 function prepararCierreRollo($logDia){
     $filas = filasDelDiaRollo($logDia['fecha']);
@@ -140,10 +139,29 @@ function prepararCierreRollo($logDia){
 function obtenerOperariosActivosRollo($conexion){
     return $conexion->query("SELECT id_operario, nombre_operario FROM operarios WHERE estado = 1 ORDER BY nombre_operario");
 }
-function obtenerMaquinasActivasRollo($conexion){
-    return $conexion->query("SELECT id_maquina, nombre_maquina FROM maquinas WHERE estado = 1 AND id_maquina BETWEEN 1 AND 17 ORDER BY id_maquina");
+// Máquinas (con sus referencias) y colores: ver obtenerMaquinasConReferencias()/
+// obtenerColoresOrdenados() en shared/catalogosModel.php
+
+/* =================================================
+   NOMBRE ESCRITO A MANO ("Otro" de operario)
+================================================= */
+// Solo letras y espacios (incluye acentos/ñ); rechaza números y símbolos
+function nombrePropioValido($texto){
+    return (bool) preg_match('/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/u', $texto);
 }
-// Referencias y colores: ver obtenerReferenciasOrdenadas()/obtenerColoresOrdenados() en shared/catalogosModel.php
+// Cada palabra con mayúscula inicial
+function capitalizarNombre($texto){
+    $limpio = trim(preg_replace('/\s+/', ' ', (string) $texto));
+    if($limpio === ''){
+        return '';
+    }
+    $palabras = explode(' ', mb_strtolower($limpio, 'UTF-8'));
+    foreach($palabras as &$palabra){
+        $palabra = mb_strtoupper(mb_substr($palabra, 0, 1, 'UTF-8'), 'UTF-8')
+            . mb_substr($palabra, 1, null, 'UTF-8');
+    }
+    return implode(' ', $palabras);
+}
 
 // Nombre de un catálogo por id; null si no existe
 function nombreCatalogo($conexion, $tabla, $columnaId, $columnaNombre, $id){

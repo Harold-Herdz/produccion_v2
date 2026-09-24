@@ -20,13 +20,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <!-- Título -->
     <h2 class="titulo-vista">Historial Producción Máquina Plana</h2>
 
-        <!-- Botón para registrar producción en Google Forms -->
-        <a class="btn" id="btnRegistrar" href="https://docs.google.com/forms/d/e/1FAIpQLSfaRx43KiOMm9vi_y_TB46Mw2c-obkC9RCe7aMIZfdR2ACYcA/viewform?usp=dialog" target="_blank">
-            Registrar Producción
-        </a>
-
-        <br> <br>
-
         <!-- Tarjeta -->
         <div class="card">
 

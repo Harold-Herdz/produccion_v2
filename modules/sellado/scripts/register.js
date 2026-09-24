@@ -41,12 +41,18 @@ if (planilla) {
     }
 
     /* =========================================
-       CAMPOS "OTRO" (el select se vuelve texto libre en el mismo lugar)
+       CAMPOS "OTRO" (el select sigue visible mostrando "Otro"; aparece
+       una casilla nueva al lado para escribir el nombre)
     ========================================= */
-    // Valor activo de un campo con "Otro": el select o, si ya se convirtió, el input
+    // Valor activo: el select, o la casilla de texto libre si eligió "Otro"
     function valorConOtro(contenedor, clase) {
-        const el = contenedor.querySelector("." + clase + ":not([hidden])");
-        return el ? el.value.trim() : "";
+        const select = contenedor.querySelector("select." + clase);
+        if (!select) return "";
+        if (select.value === "otro") {
+            const libre = contenedor.querySelector("input." + clase + ".campo-libre");
+            return libre ? libre.value.trim() : "";
+        }
+        return select.value;
     }
 
     /* =========================================
@@ -57,6 +63,7 @@ if (planilla) {
             const op = tb.querySelector(".col-operario");
             return {
                 maquina:     Number(tb.dataset.maquina),
+                id_maquina:  Number(tb.dataset.idMaquina),
                 id_operario: valorConOtro(op, "f-operario"),
                 jornada:     valorConOtro(op, "f-jornada"),
                 entradas: [...tb.querySelectorAll(".fila-entrada")].map(tr => ({
@@ -83,16 +90,22 @@ if (planilla) {
     }
 
     /* =========================================
-       AVISOS (operarios nuevos, errores)
+       AVISOS (operarios nuevos, errores): se leen y desaparecen solos
     ========================================= */
+    let avisosTimeout = null;
     function mostrarAvisos(avisos) {
+        clearTimeout(avisosTimeout);
         zonaAvisos.innerHTML = "";
-        (avisos || []).forEach(msg => {
+        avisos = avisos || [];
+        avisos.forEach(msg => {
             const p = document.createElement("p");
             p.className = "aviso aviso-info";
             p.textContent = msg;
             zonaAvisos.appendChild(p);
         });
+        if (avisos.length > 0) {
+            avisosTimeout = setTimeout(() => { zonaAvisos.innerHTML = ""; }, 5000);
+        }
     }
 
     // Actualizar el código si cambió la fecha (recodificación)
@@ -149,6 +162,22 @@ if (planilla) {
     }
 
     /* =========================================
+       REFERENCIAS SEGÚN LA MÁQUINA (mapaReferenciasMaquina, embebido en register.php)
+    ========================================= */
+    function poblarReferenciasFila(tr, idMaquina) {
+        const datos = typeof mapaReferenciasMaquina !== "undefined" ? mapaReferenciasMaquina[idMaquina] : null;
+        const select = tr.querySelector(".f-ref");
+        if (!select || !datos) return;
+        select.innerHTML = '<option value=""></option><option value="otro">Otro</option>';
+        datos.opciones.forEach(op => {
+            const option = document.createElement("option");
+            option.value = op.id;
+            option.textContent = op.nombre;
+            select.appendChild(option);
+        });
+    }
+
+    /* =========================================
        ROWSPAN DE LA COLUMNA MÁQUINA / OPERARIO
     ========================================= */
     function recalcularRowspan(tb) {
@@ -158,22 +187,83 @@ if (planilla) {
     }
 
     /* =========================================
+       NOMBRE LIBRE DE OPERARIO ("Otro"): solo letras, capitaliza cada palabra
+    ========================================= */
+    function soloLetras(texto) {
+        return texto.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]/g, "");
+    }
+    function capitalizarNombre(texto) {
+        const limpio = texto.trim().replace(/\s+/g, " ");
+        if (!limpio) return "";
+        return limpio
+            .toLowerCase()
+            .split(" ")
+            .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+            .join(" ");
+    }
+
+    /* =========================================
        EVENTOS DE LA PLANILLA
     ========================================= */
-    planilla.addEventListener("input", marcarCambio);
-    planilla.addEventListener("change", e => {
-        // "Otro": el select se convierte en texto libre en el mismo lugar
-        if (e.target.classList.contains("tiene-otro") && e.target.value === "otro") {
-            const libre = e.target.nextElementSibling;
-            e.target.hidden = true;
-            libre.hidden = false;
-            libre.focus();
+    planilla.addEventListener("input", e => {
+        if (e.target.classList.contains("f-operario") && e.target.classList.contains("campo-libre")) {
+            const limpio = soloLetras(e.target.value);
+            if (limpio !== e.target.value) e.target.value = limpio;
         }
         marcarCambio();
     });
+    planilla.addEventListener("change", e => {
+        if (e.target.classList.contains("tiene-otro")) {
+            const wrap    = e.target.closest(".campo-otro-wrap");
+            const libre   = wrap.querySelector(".campo-libre");
+            const volver  = wrap.querySelector(".btn-volver-lista");
+            const esOperario = e.target.classList.contains("f-operario");
+            if (e.target.value === "otro") {
+                if (esOperario) {
+                    // Operario: el espacio ya está reservado; solo se activa (visibility)
+                    libre.classList.add("activo");
+                } else {
+                    // Referencia/Color/Jornada: la casilla reemplaza al select en el mismo lugar
+                    e.target.hidden = true;
+                    libre.hidden = false;
+                    volver.hidden = false;
+                }
+                libre.focus();
+            } else {
+                if (esOperario) {
+                    libre.classList.remove("activo");
+                } else {
+                    libre.hidden = true;
+                }
+                libre.value = "";
+                e.target.hidden = false;
+                if (volver) volver.hidden = true;
+            }
+        }
+        marcarCambio();
+    });
+    // Capitaliza el nombre libre de Operario al salir del campo
+    planilla.addEventListener("blur", e => {
+        if (e.target.classList.contains("f-operario") && e.target.classList.contains("campo-libre")) {
+            e.target.value = capitalizarNombre(e.target.value);
+        }
+    }, true); // blur no burbujea
 
-    // Agregar / quitar entradas
+    // Agregar / quitar entradas, y volver de "Otro" a la lista
     planilla.addEventListener("click", e => {
+
+        // Referencia/Color/Jornada: volver a mostrar el select (por si "Otro" fue un error)
+        if (e.target.classList.contains("btn-volver-lista")) {
+            const wrap   = e.target.closest(".campo-otro-wrap");
+            const select = wrap.querySelector("select");
+            const libre  = wrap.querySelector(".campo-libre");
+            libre.hidden = true;
+            libre.value = "";
+            select.hidden = false;
+            select.selectedIndex = 0;
+            e.target.hidden = true;
+            marcarCambio();
+        }
 
         // + Entrada
         if (e.target.classList.contains("btn-entrada")) {
@@ -183,6 +273,7 @@ if (planilla) {
                 return;
             }
             const tr = tplEntrada.content.firstElementChild.cloneNode(true);
+            poblarReferenciasFila(tr, Number(tb.dataset.idMaquina));
             tb.querySelector(".fila-add").before(tr);
             recalcularRowspan(tb);
             if (tb.querySelectorAll(".fila-entrada").length >= MAX_ENTRADAS) tb.classList.add("tope");

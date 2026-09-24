@@ -20,13 +20,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <!-- Título -->
     <h2 class="titulo-vista">Historial Producción Rollo</h2>
 
-        <!-- Botón para registrar producción -->
-        <a class="btn" id="btnRegistrar" href="register.php">
-            Registrar Producción
-        </a>
-
-        <br> <br>
-
         <!-- Tarjeta -->
         <div class="card">
             <!-- Filtros de búsqueda -->

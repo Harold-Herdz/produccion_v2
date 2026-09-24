@@ -9,10 +9,9 @@ require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 require_once dirname(__DIR__) . '/models/registerModel.php';
-require_once __DIR__ . '/appscript.php';
+require_once __DIR__ . '/appsScript.php';
 
 header('Content-Type: application/json');
-asegurarTablaLogsRollo($conexion);
 
 $entrada = json_decode(file_get_contents('php://input'), true) ?: [];
 
@@ -28,24 +27,47 @@ $valorOperario = trim((string) ($entrada['id_operario'] ?? ''));
 if($valorOperario !== '' && $valorOperario !== 'otro' && is_numeric($valorOperario)){
     $nombreOperario = nombreCatalogo($conexion, 'operarios', 'id_operario', 'nombre_operario', (int) $valorOperario);
 } elseif($valorOperario !== '' && $valorOperario !== 'otro'){
+    if(!nombrePropioValido($valorOperario)){
+        echo json_encode(['ok' => false, 'error' => 'El nombre del operario solo puede tener letras.']);
+        exit;
+    }
+    // Capitaliza cada palabra
+    $valorOperario = capitalizarNombre($valorOperario);
     [$idOp, $fueCreado] = resolverCatalogoIdONuevo($conexion, 'operarios', 'id_operario', 'nombre_operario', $valorOperario);
     $nombreOperario = $valorOperario;
-    if($fueCreado){ $avisoOperario = "Se agregó «{$valorOperario}» como nuevo operario. Falta verificarlo en Catálogos."; }
+    if($fueCreado){
+        $avisoOperario = "Se agregó «{$valorOperario}» como nuevo operario. Falta verificarlo en Catálogos.";
+        registrarCatalogoPendiente($conexion, 'operarios', $idOp, $valorOperario, 'nuevo operario', '', 'rollo');
+    }
 } else {
     $nombreOperario = null;
 }
 
-$idMaquina    = (int) ($entrada['id_maquina'] ?? 0);
-$idReferencia = (int) ($entrada['id_referencia'] ?? 0);
-$idColor      = (int) ($entrada['id_color'] ?? 0);
+$idMaquina     = (int) ($entrada['id_maquina'] ?? 0);
+$nombreMaquina = $idMaquina ? nombreCatalogo($conexion, 'maquinas', 'id_maquina', 'nombre_maquina', $idMaquina) : null;
 
-$nombreMaquina    = $idMaquina    ? nombreCatalogo($conexion, 'maquinas', 'id_maquina', 'nombre_maquina', $idMaquina) : null;
+// Referencia: numérica = id de la lista de esa máquina; texto = "Otro" escrito a mano
+[$idReferencia, $avisoReferencia] = resolverValorCatalogo(
+    $conexion, 'referencias', 'id_referencia', 'nombre_referencia',
+    $entrada['id_referencia'] ?? '', 'nueva referencia', '', 'rollo'
+);
 $nombreReferencia = $idReferencia ? nombreCatalogo($conexion, 'referencias', 'id_referencia', 'nombre_referencia', $idReferencia) : null;
-$nombreColor      = $idColor      ? nombreCatalogo($conexion, 'colores', 'id_color', 'nombre_color', $idColor) : null;
+
+// Color: numérico = id existente; texto = "Otro" escrito a mano
+[$idColor, $avisoColor] = resolverValorCatalogo(
+    $conexion, 'colores', 'id_color', 'nombre_color',
+    $entrada['id_color'] ?? '', 'nuevo color', '', 'rollo'
+);
+$nombreColor = $idColor ? nombreCatalogo($conexion, 'colores', 'id_color', 'nombre_color', $idColor) : null;
 
 if(!$nombreOperario || !$nombreMaquina || !$nombreReferencia || !$nombreColor){
     echo json_encode(['ok' => false, 'error' => 'Operario, máquina, referencia y color son obligatorios.']);
     exit;
+}
+
+$avisoExtra = $avisoReferencia ?: $avisoColor;
+if($avisoExtra){
+    $avisoOperario = $avisoOperario ? $avisoOperario . ' ' . $avisoExtra : $avisoExtra;
 }
 
 $pesoRollo = pesoRollo($entrada['peso_rollo'] ?? '');
@@ -79,10 +101,19 @@ try {
     // Fila a agregar en REGISTROS (columnas B..H)
     $fila = [$fecha, $nombreOperario, $nombreMaquina, $nombreReferencia, $nombreColor, $pesoRollo, $pesoRetal];
 
-    $respuesta = enviarAppScriptRollo(['fila' => $fila, 'cierre' => $cierreAvance]);
+    // Id único (reservado para futuro chequeo en Apps Script)
+    $idRegistro = bin2hex(random_bytes(8));
+
+    $respuesta = enviarAppScriptRollo(['fila' => $fila, 'cierre' => $cierreAvance, 'id_registro' => $idRegistro]);
+
     if(!$respuesta['ok']){
-        echo json_encode(['ok' => false, 'error' => $respuesta['error'] ?? 'No se pudo registrar en Google.']);
-        return;
+        // Respuesta no interpretable: confirma si ya se guardó
+        if(yaExisteRegistroRollo($fecha, $nombreOperario, $nombreMaquina, $nombreReferencia, $nombreColor, $pesoRollo, $pesoRetal)){
+            $respuesta = ['ok' => true, 'cierre_pdf_url' => null];
+        } else {
+            echo json_encode(['ok' => false, 'error' => $respuesta['error'] ?? 'No se pudo registrar en Google.']);
+            return;
+        }
     }
 
     // Solo ahora, con la fila ya confirmada en el Sheet, se abre/actualiza el día local

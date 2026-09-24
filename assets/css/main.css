@@ -1015,40 +1015,6 @@ input::placeholder {
 }
 
 /* ===========================
-   BOTÓN VOLVER (páginas independientes)
-=========================== */
-#btn-volver {
-  background: var(--azul-oscuro);
-  cursor: pointer;
-  font-family: var(--fuente);
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--texto-claro);
-  box-shadow: var(--sombra-card);
-  padding: 15px 21px;
-  border-radius: var(--radio-l);
-  position: fixed;
-  bottom: 25px;
-  right: 35px;
-  text-decoration: none;
-  transition: var(--transicion);
-  border: none;
-}
-#btn-volver:hover {
-  background: var(--azul-oscuro-hover);
-  transform: translateY(-4px);
-}
-@media (max-width: 768px) {
-  #btn-volver {
-    top: 20px;
-    right: 20px;
-    bottom: auto;
-    padding: 12px 18px;
-    font-size: 16px;
-  }
-}
-
-/* ===========================
    FOOTER
 =========================== */
 .footer {

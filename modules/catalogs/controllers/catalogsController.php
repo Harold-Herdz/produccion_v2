@@ -36,9 +36,13 @@ $rutaVista = BASE_URL . '/modules/catalogs/views/catalogs.php';
    GET (al navegar). Si no es válida, se usa "operarios".
 ===================================================== */
 $clave = $_POST['cat'] ?? $_GET['cat'] ?? 'operarios';
-$cfg   = obtenerConfigCatalogo($clave);
 
-if ($cfg === null) {
+// Las relaciones máquina↔área / máquina↔referencia no son catálogos genéricos
+$esMatriz = in_array($clave, ['maquina_areas', 'maquina_referencias'], true);
+
+$cfg = $esMatriz ? null : obtenerConfigCatalogo($clave);
+
+if (!$esMatriz && $cfg === null) {
     $clave = 'operarios';
     $cfg   = obtenerConfigCatalogo($clave);
 }
@@ -61,6 +65,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         cambiarEstadoRegistro($conexion, $cfg, $idRegistro);
     }
 
+    // Marcar / desmarcar un operario como supervisor
+    if ($accion === 'toggle_supervisor' && $clave === 'operarios') {
+        alternarSupervisorOperario($conexion, $_POST['id'] ?? 0);
+    }
+
+    // Matriz máquina↔área / máquina↔referencia (AJAX; responde JSON, sin recargar la página)
+    if (in_array($accion, ['toggle_maquina_area', 'toggle_maquina_referencia', 'toggle_maquina_esp'], true)) {
+        $idMaquina = $_POST['id_maquina'] ?? 0;
+        if ($accion === 'toggle_maquina_area') {
+            alternarMaquinaArea($conexion, $idMaquina, $_POST['id_area'] ?? 0);
+        } elseif ($accion === 'toggle_maquina_referencia') {
+            alternarMaquinaReferencia($conexion, $idMaquina, $_POST['id_referencia'] ?? 0);
+        } else {
+            alternarUsaReferenciasEsp($conexion, $idMaquina);
+        }
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => true]);
+        exit;
+    }
+
+    // Exportar / importar varios catálogos (AJAX; responde JSON, sin recargar la página)
+    if ($accion === 'exportar' || $accion === 'importar') {
+        $seleccionados = $_POST['catalogos'] ?? [];
+        $resultados = [];
+        foreach (catalogosDisponibles() as $key => $cfgCat) {
+            if (!in_array($key, $seleccionados, true)) {
+                continue;
+            }
+            if ($accion === 'exportar') {
+                $total = exportarCatalogo($conexion, $cfgCat);
+                $resultados[] = ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => "{$total} exportados", 'error' => false];
+            } else {
+                $r = importarCatalogo($conexion, $cfgCat);
+                $resultados[] = $r['error']
+                    ? ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => $r['error'], 'error' => true]
+                    : ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => "{$r['agregados']} agregados, {$r['existentes']} ya existían", 'error' => false];
+            }
+        }
+
+        // Usuarios: exporta/importa con contraseña y rol (no es un catálogo genérico)
+        if (in_array('usuarios', $seleccionados, true)) {
+            if ($accion === 'exportar') {
+                $total = exportarUsuarios($conexion);
+                $resultados[] = ['etiqueta' => 'Usuarios', 'detalle' => "{$total} exportados", 'error' => false];
+            } else {
+                $r = importarUsuarios($conexion);
+                $resultados[] = $r['error']
+                    ? ['etiqueta' => 'Usuarios', 'detalle' => $r['error'], 'error' => true]
+                    : ['etiqueta' => 'Usuarios', 'detalle' => "{$r['agregados']} agregados, {$r['existentes']} ya existían", 'error' => false];
+            }
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(['tipo' => $accion, 'resultados' => $resultados]);
+        exit;
+    }
+
     // Redirigir de vuelta a la vista con el catálogo seleccionado
     header('Location: ' . $rutaVista . '?cat=' . urlencode($clave));
     exit;
@@ -70,4 +131,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    LISTAR REGISTROS (GET)
 ===================================================== */
 $busqueda  = trim($_GET['buscar'] ?? '');
-$registros = listarRegistros($conexion, $cfg, $busqueda);
+$registros = $esMatriz ? null : listarRegistros($conexion, $cfg, $busqueda);

@@ -1,5 +1,5 @@
 <?php
-// Genera el PDF del día de Rollos (bytes en memoria; se envía a Drive vía Apps Script)
+// Genera el PDF del día de Rollos
 
 require_once dirname(__DIR__, 2) . '/shared/fpdf/fpdf.php';
 
@@ -10,17 +10,34 @@ function pdfTxtRollo($texto){
     return $conv !== false ? $conv : $texto;
 }
 
+// Colores corporativos (ver assets/css/root.css) — mismos que usa el PDF de Sellado
+function pdfColoresRollo(){
+    return [
+        'azul_oscuro'    => [22, 74, 125],
+        'azul_claro'     => [227, 238, 249],
+        'azul_muy_claro' => [240, 246, 252],
+        'borde'          => [200, 208, 201],
+        'texto'          => [40, 40, 40],
+    ];
+}
+
 // $filas: array de ['operario','maquina','referencia','color','peso_rollo','peso_retal','peso_total']
 function generarPdfDiaRollo($fecha, $filas){
+    $col = pdfColoresRollo();
     $pdf = new FPDF('L', 'mm', 'Letter');
     $pdf->SetMargins(10, 10, 10);
     $pdf->SetAutoPageBreak(false);
+    $pdf->SetDrawColor(...$col['borde']);
+    $pdf->SetLineWidth(0.2);
     $pdf->AddPage();
 
-    $pdf->SetFont('Helvetica', 'B', 15);
-    $pdf->Cell(0, 8, pdfTxtRollo('PRODUCCIÓN DE ROLLOS'), 0, 1, 'C');
+    $pdf->SetFont('Helvetica', 'B', 17);
+    $pdf->SetTextColor(...$col['azul_oscuro']);
+    $pdf->Cell(0, 9, pdfTxtRollo('PRODUCCION ROLLOS'), 0, 1, 'C');
     $pdf->SetFont('Helvetica', '', 10);
-    $pdf->Cell(0, 6, pdfTxtRollo('Fecha: ' . date('d/m/Y', strtotime($fecha))), 0, 1, 'C');
+    $pdf->SetTextColor(...$col['texto']);
+    $pdf->SetFillColor(...$col['azul_claro']);
+    $pdf->Cell(0, 8, pdfTxtRollo('Fecha: ' . date('d/m/Y', strtotime($fecha))), 1, 1, 'C', true);
     $pdf->Ln(2);
 
     $cols = [
@@ -34,17 +51,17 @@ function generarPdfDiaRollo($fecha, $filas){
     ];
     $anchoTotal = array_sum($cols);
 
-    // Fila de encabezado (se repite al saltar de página)
-    $encabezado = function() use ($pdf, $cols){
-        $pdf->SetFont('Helvetica', 'B', 9);
-        $pdf->SetFillColor(4, 42, 53);
+    // Encabezado, repetido en cada página
+    $encabezado = function() use ($pdf, $cols, $col){
+        $pdf->SetFont('Helvetica', 'B', 10);
+        $pdf->SetFillColor(...$col['azul_oscuro']);
         $pdf->SetTextColor(255);
         foreach($cols as $etiqueta => $ancho){
-            $pdf->Cell($ancho, 8, pdfTxtRollo($etiqueta), 1, 0, 'C', true);
+            $pdf->Cell($ancho, 9, pdfTxtRollo($etiqueta), 1, 0, 'C', true);
         }
         $pdf->Ln();
-        $pdf->SetTextColor(0);
-        $pdf->SetFont('Helvetica', '', 9);
+        $pdf->SetTextColor(...$col['texto']);
+        $pdf->SetFont('Helvetica', '', 9.5);
     };
     $encabezado();
 
@@ -58,7 +75,7 @@ function generarPdfDiaRollo($fecha, $filas){
                 $encabezado();
             }
             $par = !$par;
-            $pdf->SetFillColor($par ? 234 : 255, $par ? 240 : 255, $par ? 243 : 255);
+            if($par){ $pdf->SetFillColor(...$col['azul_muy_claro']); } else { $pdf->SetFillColor(255, 255, 255); }
 
             $valores = [
                 ['OPERARIO', $fila['operario'], 'L'],
@@ -75,21 +92,22 @@ function generarPdfDiaRollo($fecha, $filas){
                 while($texto !== '' && $pdf->GetStringWidth($texto) > $ancho - 2){
                     $texto = substr($texto, 0, -1);
                 }
-                $pdf->Cell($ancho, 6, $texto, 1, 0, $align, true);
+                $pdf->Cell($ancho, 7, $texto, 1, 0, $align, true);
             }
             $pdf->Ln();
         }
     } else {
-        $pdf->Cell($anchoTotal, 7, pdfTxtRollo('Sin registros'), 1, 1, 'C');
+        $pdf->Cell($anchoTotal, 8, pdfTxtRollo('Sin registros'), 1, 1, 'C');
     }
 
-    $pdf->SetFont('Helvetica', 'B', 9);
-    $pdf->Cell($anchoTotal, 7, pdfTxtRollo('Total de registros: ' . count($filas)), 1, 1, 'R');
+    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetFillColor(...$col['azul_claro']);
+    $pdf->Cell($anchoTotal, 8, pdfTxtRollo('Total de registros: ' . count($filas)), 1, 1, 'R', true);
 
     return $pdf->Output('S');
 }
 
-// Nombre del archivo PDF del día
+// Nombre del archivo PDF del día: el id del día ya viene como "R20260924"
 function nombrePdfDiaRollo($id_dia){
-    return 'Rollos_' . $id_dia . '.pdf';
+    return $id_dia . '.pdf';
 }

@@ -14,7 +14,7 @@ function obtenerProduccionPorId($conexion, $id){
 // Catálogos para selectores del formulario
 function obtenerMaquinas($conexion){
     return mysqli_query($conexion,
-        "SELECT * FROM MAQUINAS"
+        "SELECT * FROM MAQUINAS ORDER BY CAST(REGEXP_SUBSTR(nombre_maquina, '[0-9]+') AS UNSIGNED)"
     );
 }
 function obtenerOperarios($conexion){

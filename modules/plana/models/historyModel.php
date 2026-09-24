@@ -11,7 +11,7 @@ function obtenerRegistroPlanaPorId($conexion, $id){
 
 // Catálogos para selectores del formulario
 function obtenerMaquinasPlana($conexion){
-    return mysqli_query($conexion, "SELECT * FROM MAQUINAS");
+    return mysqli_query($conexion, "SELECT * FROM MAQUINAS ORDER BY CAST(REGEXP_SUBSTR(nombre_maquina, '[0-9]+') AS UNSIGNED)");
 }
 function obtenerOperariosPlana($conexion){
     return mysqli_query($conexion, "SELECT * FROM OPERARIOS");
