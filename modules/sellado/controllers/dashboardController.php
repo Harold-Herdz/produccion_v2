@@ -28,10 +28,10 @@ $mes2 = $_GET['mes2'] ?? $mes_actual;
 
 // Total histórico de producción
 $total = obtenerTotalHistoricoSellado($conexion);
-// Producción de la semana y del mes actual
+// Producción semana y mes
 $semana = obtenerProduccionSemanaSellado($conexion);
 $mes = obtenerProduccionMesSellado($conexion);
-// Top máquina y top operario (año actual)
+// Top máquina y operario
 $top_maquina = obtenerTopMaquinaSellado($conexion);
 $top_operario = obtenerTopOperarioSellado($conexion);
 
@@ -39,7 +39,7 @@ $top_operario = obtenerTopOperarioSellado($conexion);
 $total_mes1 = obtenerTotalMesSellado($conexion,$mes1);
 $total_mes2 = obtenerTotalMesSellado($conexion,$mes2);
 
-// Mejor y peor día de los meses
+// Mejor y peor día
 $dias_mes1 = obtenerMejorPeorDiaMesSellado($conexion,$mes1);
 $mejor_dia_mes1 = $dias_mes1['mejor'];
 $peor_dia_mes1 = $dias_mes1['peor'];
@@ -57,11 +57,11 @@ $top_operario_mes2 = obtenerTopOperarioMesSellado($conexion,$mes2);
 // Filtros de fecha para tablas
 $desde = $_GET['desde'] ?? date('Y-m-01');
 $hasta = $_GET['hasta'] ?? date('Y-m-d');
-// Tablas de producción por fecha y operario
+// Tablas por fecha y operario
 $res_tabla_fecha = obtenerTablaFechasSellado($conexion,$desde,$hasta);
 $res_tabla_operario = obtenerTablaOperariosSellado($conexion,$desde,$hasta);
 
-// Diferencia y porcentaje de variación entre meses
+// Variación entre meses
 $diferencia = ($total_mes2 ?? 0) - ($total_mes1 ?? 0);
 $porcentaje = ($total_mes1 > 0) ? (($diferencia / $total_mes1) * 100) : 0;
 

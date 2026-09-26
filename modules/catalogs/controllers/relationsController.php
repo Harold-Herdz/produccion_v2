@@ -8,7 +8,7 @@
  *  Administra las relaciones entre catálogos:
  *    - Máquina × Área
  *    - Máquina × Referencia (y "Especiales")
- *  Los cambios llegan por AJAX (POST, responde JSON).
+ * Cambios por AJAX (JSON)
  */
 
 // Restringir acceso solo a administradores

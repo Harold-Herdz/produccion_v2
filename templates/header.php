@@ -1,5 +1,5 @@
 <?php
-// Obtener rol del usuario en sesión
+// Rol del usuario
 $rol = $_SESSION['rol'] ?? 'Sin rol';
 // Importar config.php
 require_once dirname(__DIR__) . '/includes/config.php';
@@ -15,10 +15,10 @@ require_once dirname(__DIR__) . '/includes/config.php';
     <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/images/logo.png">    
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/main.css">
     <?php if($_SESSION['rol'] == 'admin'){ ?>
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/notificaciones.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/notifications.css">
     <?php } ?>
 
-    <script src="<?= BASE_URL ?>/assets/js/mantenerScroll.js"></script>
+    <script src="<?= BASE_URL ?>/assets/js/keepScroll.js"></script>
 
 </head>
 
@@ -45,7 +45,7 @@ require_once dirname(__DIR__) . '/includes/config.php';
         <!-- Rol -->
         <div class="rol">
             <?php if($_SESSION['rol'] == 'admin'){ ?>
-            <!-- Campanita: valores de catálogo escritos a mano pendientes de revisión -->
+            <!-- Campanita de notificaciones -->
             <div class="campana-wrap">
                 <button type="button" id="campanaBtn" class="campana-btn" data-url="<?= BASE_URL ?>/modules/catalogs/controllers/pendientesController.php" aria-label="Notificaciones">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
@@ -71,7 +71,7 @@ require_once dirname(__DIR__) . '/includes/config.php';
     </div>
 
     <?php if($_SESSION['rol'] == 'admin'){ ?>
-    <script src="<?= BASE_URL ?>/assets/js/notificaciones.js"></script>
+    <script src="<?= BASE_URL ?>/assets/js/notifications.js"></script>
     <?php } ?>
 
     <!-- Menú lateral de acceso rápido -->

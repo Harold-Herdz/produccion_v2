@@ -2,7 +2,7 @@
 /* =================================================
    FUNCIÓN BASE
 ================================================= */
-// Ejecutar consulta y retornar valor 'total'
+// Consulta que retorna 'total'
 function obtenerTotalRollo($conexion, $sql){
     $res = mysqli_query($conexion, $sql);
     if(!$res){
@@ -121,7 +121,7 @@ function obtenerResumenMesRollo($conexion,$mes){
 /* =================================================
    MEJOR Y PEOR DÍA
 ================================================= */
-// Mejor y peor día de producción del mes
+// Mejor y peor día
 function obtenerMejorPeorDiaMesRollo($conexion,$mes){
     $sql = "SELECT 
                 DATE(fecha_rollo) fecha, SUM(peso_total) total
@@ -159,7 +159,7 @@ function obtenerMejorPeorDiaMesRollo($conexion,$mes){
 /* =================================================
    TOP OPERARIO
 ================================================= */
-// Operario con más producción en el mes
+// Operario líder del mes
 function obtenerTopOperarioMesRollo($conexion,$mes){
     $sql = "SELECT o.nombre_operario,
             IFNULL(SUM(r.peso_total),0) total
@@ -184,7 +184,7 @@ function obtenerTopOperarioMesRollo($conexion,$mes){
 /* =================================================
    TOP MÁQUINA
 ================================================= */
-// Máquina con más producción en el mes
+// Máquina líder del mes
 function obtenerTopMaquinaMesRollo($conexion,$mes){
     $sql = "SELECT m.nombre_maquina,
             IFNULL(SUM(r.peso_total),0) total
@@ -209,7 +209,7 @@ function obtenerTopMaquinaMesRollo($conexion,$mes){
 /* =================================================
    TABLAS
 ================================================= */
-// Producción agrupada por fecha en un rango
+// Producción por fecha
 function obtenerTablaFechasRollo($conexion, $desde, $hasta){
     $sql = "SELECT
             DATE(p.fecha_rollo) fecha, SUM(p.peso_rollo) peso_rollo, SUM(p.peso_retal) peso_retal, SUM(p.peso_total) peso_total
@@ -220,7 +220,7 @@ function obtenerTablaFechasRollo($conexion, $desde, $hasta){
             ORDER BY fecha DESC";
     return mysqli_query($conexion, $sql);
 }
-// Producción agrupada por máquina en un rango
+// Producción por máquina
 function obtenerTablaMaquinasRollo($conexion, $desde, $hasta){
     $sql = "SELECT m.nombre_maquina,
                 SUM(p.peso_rollo) peso_rollo,
@@ -239,7 +239,7 @@ function obtenerTablaMaquinasRollo($conexion, $desde, $hasta){
 /* =================================================
    IMPORTACIÓN
 ================================================= */
-// Fecha de la última importación de rollos
+// Última importación de Rollos
 function obtenerUltimaImportacionRollo($conexion){
     $sql = "SELECT ultimo_id_sheet
             FROM AREAS

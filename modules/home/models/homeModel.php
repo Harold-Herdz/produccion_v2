@@ -11,13 +11,13 @@ require_once dirname(__DIR__, 2) . '/catalogs/models/catalogsModel.php';
    sale de esta lista blanca.
 ===================================================== */
 
-// Ordena "Máquina 02" por su número y "1,5K" por su valor numérico
+// Orden numérico de nombres
 function homeOrdenNumerico($expr)
 {
     return "CAST(REPLACE(REGEXP_SUBSTR({$expr}, '[0-9]+(,[0-9]+)?'), ',', '.') AS DECIMAL(12,2))";
 }
 
-// Definición completa de módulos, dimensiones y medidas
+// Módulos, dimensiones y medidas
 function homeModulos()
 {
     // Uniones reutilizables (alias => SQL)
@@ -33,7 +33,7 @@ function homeModulos()
         'lp' => 'LEFT JOIN LAMINA_P lp ON lp.id_lamina_p = p.id_lamina_p',
     ];
 
-    // Dimensiones de fecha (según la columna de fecha de cada tabla)
+    // Dimensiones de fecha
     $fechas = function ($col) {
         return [
             'fecha'  => ['etiqueta' => 'Fecha',  'expr' => "DATE_FORMAT(p.{$col}, '%Y-%m-%d')", 'orden' => "DATE_FORMAT(p.{$col}, '%Y-%m-%d')", 'joins' => [], 'tipo' => 'fecha'],
@@ -47,7 +47,7 @@ function homeModulos()
     $color      = ['etiqueta' => 'Color',      'expr' => "COALESCE(c.nombre_color, {$sd})", 'orden' => "COALESCE(c.nombre_color, {$sd})", 'joins' => ['c']];
     $turno      = ['etiqueta' => 'Turno',      'expr' => "COALESCE(t.nombre_turno, {$sd})", 'orden' => 'COALESCE(t.id_turno, 99)', 'joins' => ['t']];
     $referencia = ['etiqueta' => 'Referencia', 'expr' => "COALESCE(r.nombre_referencia, {$sd})", 'orden' => homeOrdenNumerico('r.nombre_referencia'), 'joins' => ['r']];
-    // Sellado/Extrusión: la referencia puede ser normal o especial
+    // Referencia normal o especial
     $referenciaMixta = ['etiqueta' => 'Referencia', 'expr' => "COALESCE(r.nombre_referencia, re.nombre_referencia_esp, {$sd})",
         'orden' => "COALESCE(r.nombre_referencia, re.nombre_referencia_esp, {$sd})", 'joins' => ['r', 're']];
     $referenciaEsp = ['etiqueta' => 'Referencia especial', 'expr' => "COALESCE(re.nombre_referencia_esp, {$sd})", 'orden' => "COALESCE(re.nombre_referencia_esp, {$sd})", 'joins' => ['re']];
@@ -71,7 +71,7 @@ function homeModulos()
                 'paquetes_x98'   => ['etiqueta' => 'Paquetes x98',   'expr' => 'SUM(COALESCE(p.paquetes_x98, 0))',   'eje' => 'y',  'color' => '#a04ab8', 'defecto' => false],
             ],
             'principal' => 'paquetes_total',
-            // Columnas de datos de la tabla (las últimas)
+            // Columnas de la tabla
             'columnas'  => ['paquetes_x70', 'paquetes_x90', 'paquetes_x98', 'paquetes_total'],
             'tabla_dims_defecto' => ['fecha', 'maquina'],
         ],
@@ -155,14 +155,14 @@ function homeModulos()
         ],
     ];
 
-    // Las medidas siempre se muestran en el orden de 'columnas' (tarjetas, series y tabla)
+    // Medidas en orden de columnas
     foreach ($modulos as $k => $m) {
         $modulos[$k]['medidas'] = array_replace(array_flip($m['columnas']), $m['medidas']);
     }
     return $modulos;
 }
 
-// Descripción para el navegador (sin SQL)
+// Descripción para el navegador
 function homeMeta()
 {
     $meta = [];
@@ -191,7 +191,7 @@ function homeFecha($valor)
     return ($d && $d->format('Y-m-d') === $valor) ? $valor : null;
 }
 
-// FROM + uniones necesarias (solo las de las dimensiones usadas) + WHERE de fechas y filtros
+// FROM, uniones y WHERE
 // $filtros: [claveDim => [valor, ...]]
 function homeFromWhere($conexion, $mod, array $clavesDim, $desde, $hasta, array $filtros)
 {
@@ -218,7 +218,7 @@ function homeFromWhere($conexion, $mod, array $clavesDim, $desde, $hasta, array 
     return $sql . ' WHERE ' . implode(' AND ', $donde);
 }
 
-// Consulta agrupada: filas con las dimensiones pedidas y todas las medidas del módulo
+// Consulta agrupada
 function homeDatos($conexion, $clave, array $clavesDim, $desde, $hasta, array $filtros, $limite = 5000)
 {
     $modulos = homeModulos();
@@ -258,7 +258,7 @@ function homeDatos($conexion, $clave, array $clavesDim, $desde, $hasta, array $f
     return $filas;
 }
 
-// Valores distintos de una dimensión (para los filtros)
+// Valores de una dimensión
 function homeOpciones($conexion, $clave, $dim)
 {
     $modulos = homeModulos();
@@ -275,7 +275,7 @@ function homeOpciones($conexion, $clave, $dim)
     return $valores;
 }
 
-// Totales de un módulo en el rango (tarjetas del resumen)
+// Totales del módulo
 function homeResumen($conexion, $clave, $desde, $hasta)
 {
     $filas = homeDatos($conexion, $clave, [], $desde, $hasta, [], 1);
@@ -292,12 +292,11 @@ function homeHojas()
         'sellado'   => ['id' => '1B1A-pSUBLG9w56ibWcERxhAKEsaPJN74SjRjeNv2UCg', 'gid_registros' => '1191265238'],
         'rollo'     => ['id' => '1LtibtaYF6GEsXE5Mxgq6uq8BR_ZEQ1idlqFUof5mgRo', 'gid_registros' => '46026898'],
         'plana'     => ['id' => '1DO_G6MHfoMagMMEOUOipTiE6W1UC-65f7BamJZQwGSc', 'gid_registros' => '1759801026'],
-        'extrusion' => ['id' => '1TLsQx_s9tWBjJwuPm9xseJfsDQbKDQNQKOK9lf9Xezk', 'gid_registros' => '1583688034'],
+        'extrusion' => ['id' => '1TLsQx_s9tWBjJwuPm9xseJfsDQbKDQNQKOK9lf9Xezk', 'gid_registros' => '1284283091', 'gid_import' => '1583688034'],
     ];
 }
 
-// Enlace para ver el Sheet en Google (pestaña REGISTROS). Quien lo abre entra con su cuenta de Google:
-// si solo tiene permiso de "Lector" no puede editar.
+// Enlace al Sheet (Lector no edita)
 function homeUrlSheet($modulo)
 {
     $hojas = homeHojas();
@@ -307,7 +306,7 @@ function homeUrlSheet($modulo)
     return "https://docs.google.com/spreadsheets/d/{$hojas[$modulo]['id']}/edit?gid={$hojas[$modulo]['gid_registros']}#gid={$hojas[$modulo]['gid_registros']}";
 }
 
-// Carpeta de Drive con los PDFs de cada módulo (pega aquí el enlace de la carpeta; vacío = sin botón)
+// Carpeta de PDFs (vacío = sin botón)
 function homeCarpetaPdfs($modulo)
 {
     $carpetas = [
@@ -319,7 +318,7 @@ function homeCarpetaPdfs($modulo)
     return ($carpetas[$modulo] ?? '') ?: null;
 }
 
-// URL CSV de una hoja: REGISTROS o LOGS (las únicas que se pueden ver)
+// URL CSV de REGISTROS o LOGS
 function homeUrlHoja($modulo, $hoja)
 {
     $hojas = homeHojas();
@@ -327,6 +326,10 @@ function homeUrlHoja($modulo, $hoja)
         return null;
     }
     $h = $hojas[$modulo];
+    // Hoja que lee el importador (en Extrusión es RESUMEN)
+    if ($hoja === 'IMPORT') {
+        return "https://docs.google.com/spreadsheets/d/{$h['id']}/export?format=csv&gid=" . ($h['gid_import'] ?? $h['gid_registros']);
+    }
     if ($hoja === 'REGISTROS') {
         return "https://docs.google.com/spreadsheets/d/{$h['id']}/export?format=csv&gid={$h['gid_registros']}";
     }
@@ -336,7 +339,7 @@ function homeUrlHoja($modulo, $hoja)
     return null;
 }
 
-// Filas de una hoja (primera fila = encabezados); null si no se pudo leer
+// Filas de una hoja
 function homeLeerHoja($modulo, $hoja, $maxFilas = 30000)
 {
     $url = homeUrlHoja($modulo, $hoja);
@@ -359,7 +362,7 @@ function homeLeerHoja($modulo, $hoja, $maxFilas = 30000)
 /* =====================================================
    RESUMEN Y ESTADO POR MÓDULO
 ===================================================== */
-// Tablas de seguimiento (planillas / días) de cada módulo
+// Tablas de seguimiento
 function homeSeguimiento()
 {
     return [
@@ -370,7 +373,7 @@ function homeSeguimiento()
     ];
 }
 
-// Totales del módulo en el rango + actividad del rango
+// Resumen y actividad del rango
 function homeResumenModulo($conexion, $clave, $desde, $hasta)
 {
     $modulos = homeModulos();
@@ -385,7 +388,7 @@ function homeResumenModulo($conexion, $clave, $desde, $hasta)
     return $r;
 }
 
-// Estado del módulo (independiente del rango): importación, último registro, planillas/días
+// Estado del módulo
 function homeEstadoModulo($conexion, $clave)
 {
     $modulos = homeModulos();
@@ -420,7 +423,7 @@ function homeEstadoModulo($conexion, $clave)
     return $out;
 }
 
-// Registros del Sheet que aún no se importan (id posterior al último importado). Caché de 5 min.
+// Registros pendientes de importar
 function homePendientes($conexion, $clave, $forzar = false)
 {
     if (!isset(homeHojas()[$clave])) {
@@ -432,7 +435,7 @@ function homePendientes($conexion, $clave, $forzar = false)
         return ['disponible' => true, 'pendientes' => (int) $cache['n']];
     }
 
-    $filas = homeLeerHoja($clave, 'REGISTROS', 60000);
+    $filas = homeLeerHoja($clave, 'IMPORT', 60000);
     if ($filas === null) {
         return ['disponible' => true, 'pendientes' => null, 'error' => 'No se pudo leer el Sheet'];
     }
@@ -455,7 +458,7 @@ function homePendientes($conexion, $clave, $forzar = false)
 /* =====================================================
    RESUMEN GENERAL Y CATÁLOGOS
 ===================================================== */
-// Tarjetas de arriba: mes actual de cada módulo + estado
+// Tarjetas superiores
 function homeGeneral($conexion)
 {
     $desde = date('Y-m-01');
@@ -473,7 +476,7 @@ function homeGeneral($conexion)
     return ['modulos' => $mods, 'total_registros' => $totalRegistros, 'notificaciones' => (int) ($pend[0] ?? 0)];
 }
 
-// Estado de cada catálogo de tablas maestras
+// Estado de catálogos
 function homeCatalogos($conexion)
 {
     $estado = estadoSistemaLeer();

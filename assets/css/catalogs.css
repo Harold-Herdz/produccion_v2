@@ -1,4 +1,4 @@
-/* Catálogos: componentes específicos (el resto viene de main.css) */
+/* Catálogos: componentes específicos */
 
 /* ===========================
    BARRA SUPERIOR
@@ -313,7 +313,7 @@
 .tabla-matriz thead .col-matriz-esp {
   background: var(--verde-oscuro);
 }
-/* Columnas de igual ancho (Máquina × Área): la primera fija, el resto se reparte parejo */
+/* Columnas de igual ancho */
 .tabla-matriz-igual {
   table-layout: fixed;
   width: 100%;

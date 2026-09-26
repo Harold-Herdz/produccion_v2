@@ -1,16 +1,16 @@
 <?php
-// Genera el PDF del día de Rollos
+// PDF del día de Rollos
 
 require_once dirname(__DIR__, 2) . '/shared/fpdf/fpdf.php';
 
-// Pasar texto UTF-8 a la codificación de las fuentes base de FPDF
+// UTF-8 a codificación FPDF
 function pdfTxtRollo($texto){
     $texto = (string) $texto;
     $conv = @iconv('UTF-8', 'windows-1252//TRANSLIT', $texto);
     return $conv !== false ? $conv : $texto;
 }
 
-// Colores corporativos (ver assets/css/root.css) — mismos que usa el PDF de Sellado
+// Colores corporativos
 function pdfColoresRollo(){
     return [
         'azul_oscuro'    => [22, 74, 125],
@@ -33,7 +33,7 @@ function generarPdfDiaRollo($fecha, $filas){
 
     $pdf->SetFont('Helvetica', 'B', 17);
     $pdf->SetTextColor(...$col['azul_oscuro']);
-    $pdf->Cell(0, 9, pdfTxtRollo('PRODUCCION ROLLOS'), 0, 1, 'C');
+    $pdf->Cell(0, 9, pdfTxtRollo('PRODUCCIÓN ROLLOS'), 0, 1, 'C');
     $pdf->SetFont('Helvetica', '', 10);
     $pdf->SetTextColor(...$col['texto']);
     $pdf->SetFillColor(...$col['azul_claro']);
@@ -107,7 +107,7 @@ function generarPdfDiaRollo($fecha, $filas){
     return $pdf->Output('S');
 }
 
-// Nombre del archivo PDF del día: el id del día ya viene como "R20260924"
+// Nombre del PDF del día
 function nombrePdfDiaRollo($id_dia){
     return $id_dia . '.pdf';
 }

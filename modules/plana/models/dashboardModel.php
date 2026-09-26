@@ -2,7 +2,7 @@
 /* =================================================
    FUNCIÓN BASE
 ================================================= */
-// Ejecutar consulta y retornar valor 'total'
+// Consulta que retorna 'total'
 function obtenerTotalPlana($conexion, $sql){
     $res = mysqli_query($conexion, $sql);
     if(!$res){
@@ -120,7 +120,7 @@ function obtenerResumenMesPlana($conexion,$mes){
 /* =================================================
    MEJOR Y PEOR DÍA
 ================================================= */
-// Mejor y peor día de producción del mes
+// Mejor y peor día
 function obtenerMejorPeorDiaMesPlana($conexion,$mes){
     $sql = "SELECT DATE(fecha_plana) fecha, SUM(peso_total) total
             FROM PRODUCCION_PLANA
@@ -149,7 +149,7 @@ function obtenerMejorPeorDiaMesPlana($conexion,$mes){
 /* =================================================
    TOP MÁQUINA
 ================================================= */
-// Máquina con más producción en el mes
+// Máquina líder del mes
 function obtenerTopMaquinaMesPlana($conexion,$mes){
     $sql = "SELECT m.nombre_maquina, 
             IFNULL(SUM(p.peso_total),0) total
@@ -173,7 +173,7 @@ function obtenerTopMaquinaMesPlana($conexion,$mes){
 /* =================================================
    TOP OPERARIO
 ================================================= */
-// Operario con más producción en el mes
+// Operario líder del mes
 function obtenerTopOperarioMesPlana($conexion,$mes){
     $sql = "SELECT o.nombre_operario, 
             IFNULL(SUM(p.peso_total),0) total
@@ -197,7 +197,7 @@ function obtenerTopOperarioMesPlana($conexion,$mes){
 /* =================================================
    TABLAS
 ================================================= */
-// Producción agrupada por fecha en un rango
+// Producción por fecha
 function obtenerTablaFechasPlana($conexion, $desde, $hasta){
     $sql = "SELECT
             DATE(fecha_plana) fecha, SUM(peso_rollo) peso_rollo, SUM(peso_retal) peso_retal, SUM(bultos) bultos, SUM(peso_total) peso_total
@@ -207,7 +207,7 @@ function obtenerTablaFechasPlana($conexion, $desde, $hasta){
             ORDER BY fecha DESC";
     return mysqli_query($conexion, $sql);
 }
-// Producción por referencias especiales en un rango
+// Producción por referencia
 function obtenerTablaReferenciasPlana($conexion, $desde, $hasta){
     $sql = "SELECT r.nombre_referencia_esp,
                 SUM(p.peso_rollo) peso_rollo,
@@ -221,7 +221,7 @@ function obtenerTablaReferenciasPlana($conexion, $desde, $hasta){
             ORDER BY peso_total DESC";
     return mysqli_query($conexion, $sql);
 }
-// Producción agrupada por máquina en un rango
+// Producción por máquina
 function obtenerTablaMaquinasPlana($conexion, $desde, $hasta){
     $sql = "SELECT m.nombre_maquina,
                 SUM(p.peso_rollo) peso_rollo,
@@ -239,7 +239,7 @@ function obtenerTablaMaquinasPlana($conexion, $desde, $hasta){
 /* =================================================
    IMPORTACIÓN
 ================================================= */
-// Fecha de la última importación de máquina plana
+// Última importación de Plana
 function obtenerUltimaImportacionPlana($conexion){
     $sql = "SELECT ultimo_id_sheet
             FROM AREAS

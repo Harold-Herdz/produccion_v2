@@ -34,20 +34,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
 
     $codigo    = construirCodigoPlanilla($fecha, $bloque);
     $existente = obtenerPlanillaPorCodigo($conexion, $codigo);
-    $abierta   = obtenerPlanillaAbierta($conexion);
 
     if($existente && $existente['estado'] === 'finalizada'){
         header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} ya fue finalizado."));
         exit;
     }
-    if($abierta){
-        // Ya hay un turno abierto: ir directo a esa planilla
-        header('Location: ' . $rutaRegister);
-        exit;
+    // Ya abierto: continuar; si no, crear uno nuevo
+    if(!$existente){
+        crearPlanilla($conexion, $fecha, $bloque, $id_supervisor, $supervisor_nombre);
     }
-
-    crearPlanilla($conexion, $fecha, $bloque, $id_supervisor, $supervisor_nombre);
-    header('Location: ' . $rutaRegister);
+    header('Location: ' . $rutaRegister . '?codigo=' . urlencode($codigo));
     exit;
 }
 
@@ -55,8 +51,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
    CANCELAR TURNO (patrón PRG)
 ================================================= */
 if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'cancelar'){
-    $abierta = obtenerPlanillaAbierta($conexion);
-    if($abierta){
+    $abierta = obtenerPlanillaPorCodigo($conexion, $_POST['codigo'] ?? '');
+    if($abierta && $abierta['estado'] === 'abierta'){
         cancelarPlanilla($conexion, $abierta);
     }
     header('Location: ' . $rutaRegister);
@@ -66,15 +62,22 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'cancel
 /* =================================================
    ESTADO ACTUAL
 ================================================= */
-$planilla = obtenerPlanillaAbierta($conexion);
+$planilla = null;
+if(!empty($_GET['codigo'])){
+    $candidata = obtenerPlanillaPorCodigo($conexion, $_GET['codigo']);
+    if($candidata && $candidata['estado'] === 'abierta'){
+        $planilla = $candidata;
+    }
+}
 
 if(!$planilla){
-    // Sin turno abierto: register.php muestra el formulario de inicio
+    // Sin planilla: formulario de inicio y turnos abiertos
     $supervisores = mysqli_fetch_all(obtenerOperariosSupervisores($conexion), MYSQLI_ASSOC);
+    $abiertas     = listarPlanillasAbiertas($conexion);
     return;
 }
 
-// Catálogos y datos ya guardados del turno
+// Catálogos y datos del turno
 $datosMaquina  = obtenerMaquinasConReferencias($conexion, 'sellado');
 $maquinas      = $datosMaquina['maquinas'];
 $mapaReferenciasMaquina = $datosMaquina['mapaJs'];

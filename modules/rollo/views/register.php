@@ -21,8 +21,7 @@ if(!function_exists('opcionesCatalogoRollo')){
     }
 }
 
-// Select de catálogo + "Otro". En Operario aparece una casilla nueva al lado;
-// en Referencia/Color la casilla reemplaza al select (ver register.js)
+// Select de catálogo + Otro
 if(!function_exists('campoConOtroRollo')){
     function campoConOtroRollo($lista, $idKey, $nombreKey, $id, $nombre){
         ob_start(); ?>

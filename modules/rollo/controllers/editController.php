@@ -6,11 +6,11 @@ require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 // Importar produccionModel.php
 require_once dirname(__DIR__) . '/models/historyModel.php';
 
-// Obtener ID del registro a editar
+// ID a editar
 $id = $_GET['id'];
 $fila = obtenerProduccionPorId($conexion, $id);
 
-// Cargar catálogos para los selectores del formulario
+// Catálogos del formulario
 $operarios = obtenerOperarios($conexion);
 
 $maquinas = obtenerMaquinas($conexion);

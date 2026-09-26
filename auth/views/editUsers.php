@@ -12,7 +12,7 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 // Importar header.php
 require_once dirname(__DIR__, 2) . '/templates/header.php';
 
-// Obtener ID del usuario a editar
+// ID del usuario a editar
 $id = (int)($_GET['id'] ?? 0);
 
 // Buscar usuario en la BD

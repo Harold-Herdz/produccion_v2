@@ -47,7 +47,7 @@ include dirname(__DIR__, 2) . '/templates/header.php';
                     </tr>
                 </thead>
 
-                <!-- Filas de usuarios traídos de la base de datos -->
+                <!-- Filas de usuarios -->
                 <tbody>
                     <?php while($usuario = mysqli_fetch_assoc($res)){ ?>
                     <tr>

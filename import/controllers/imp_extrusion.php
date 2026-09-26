@@ -53,7 +53,7 @@ echo "<script>
 </script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
-// Cargar catálogos desde la base de datos
+// Cargar catálogos
 echo "<script>document.getElementById('msg').textContent='Cargando catálogos…';</script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
@@ -61,6 +61,7 @@ $maquinas    = cargarCatalogo($conexion, "MAQUINAS",    "nombre_maquina",    "id
 $turnos      = cargarCatalogo($conexion, "TURNOS",      "nombre_turno",      "id_turno");
 $operadores  = cargarCatalogo($conexion, "OPERADORES",  "nombre_operador",   "id_operador");
 $referencias = cargarCatalogo($conexion, "REFERENCIAS", "nombre_referencia", "id_referencia");
+$referenciasEsp = cargarCatalogo($conexion, "REFERENCIAS_ESP", "nombre_referencia_esp", "id_referencia_esp");
 $colores     = cargarCatalogo($conexion, "COLORES",     "nombre_color",      "id_color");
 $laminas     = cargarCatalogo($conexion, "LAMINA_P",    "nombre_lamina_p",   "id_lamina_p");
 
@@ -71,7 +72,7 @@ $actualizados = 0;
 $duplicados   = 0;
 
 foreach ($filas as $data) {
-    // Limpiar y convertir datos de cada fila
+    // Limpiar datos de la fila
     $id_sheet   = trim($data[0]);
     $fecha      = convertirFecha($data[1]);
     $maquina    = limpiarNombre($data[2]);
@@ -79,13 +80,12 @@ foreach ($filas as $data) {
     $operador   = limpiarNombre($data[4]);
     $referencia = limpiarNombre($data[5]);
     $color      = limpiarNombre($data[6]);
-    $lamina     = limpiarNombre($data[7]);
-    $rollos     = convertirNumero($data[8]);
-    $peso_total = convertirNumero($data[9]);
+    // Hoja RESUMEN: H lámina P, I rollos, J peso total del turno
+    $lamina     = limpiarNombre($data[7] ?? '');
+    $rollos     = convertirNumero($data[8] ?? '');
+    $peso_total = convertirNumero($data[9] ?? '');
 
-    // Turno: catálogo cerrado de 4 valores (Día/Tarde/Noche/18 Horas), nunca se crea aquí.
-    // Si no se reconoce o el catálogo aún no lo tiene, la fila se guarda igual con el
-    // turno vacío (NULL) en vez de perderse; al llenar el catálogo y reimportar se completa solo.
+    // Turno: catálogo cerrado
     // El Sheet trae "Día"/"Tarde"/"Noche"/"18 Horas"
     $mapaTurnoExt = ['dia' => 'Día', 'día' => 'Día', 'tarde' => 'Tarde', 'noche' => 'Noche', '18 horas' => '18 Horas'];
     $nombreTurno = $mapaTurnoExt[strtolower(trim($turno))] ?? null;
@@ -98,44 +98,57 @@ foreach ($filas as $data) {
         flush();
     }
 
-    // Obtener IDs de catálogos o crearlos si no existen
+    // IDs de catálogos (o crear)
     $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
     $id_operador   = $operadores[$operador]    ?? autoCrear($conexion, $operadores,  "OPERADORES",  "nombre_operador",   $operador);
-    $id_referencia = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
+    // Referencia normal o especial (el Sheet trae solo el nombre)
+    $id_referencia = $referencias[$referencia] ?? null;
+    $id_referencia_esp = null;
+    if ($id_referencia === null) {
+        $id_referencia_esp = $referenciasEsp[$referencia] ?? null;
+        if ($id_referencia_esp === null) {
+            $id_referencia = autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
+        }
+    }
+    $id_referencia_sql     = ($id_referencia === null) ? "NULL" : "'{$id_referencia}'";
+    $id_referencia_esp_sql = ($id_referencia_esp === null) ? "NULL" : "'{$id_referencia_esp}'";
     $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
-    $id_lamina_p   = $laminas[$lamina]         ?? autoCrear($conexion, $laminas,     "LAMINA_P",    "nombre_lamina_p",   $lamina);
+    // Lámina P opcional (vacía = sin lámina)
+    $id_lamina_p   = ($lamina === '') ? null : ($laminas[$lamina] ?? autoCrear($conexion, $laminas, "LAMINA_P", "nombre_lamina_p", $lamina));
+    $id_lamina_sql = ($id_lamina_p === null) ? "NULL" : "'{$id_lamina_p}'";
 
-    // Modo 'todo': Insertar o actualizar si ya existe
+    // Modo todo: insertar/actualizar
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_EXTRUSION
                     (id_sheet,fecha_extrusion,id_maquina,id_turno,id_operador,
-                    id_referencia,id_color,id_lamina_p,rollos,peso_total)
+                    id_referencia,id_referencia_esp,id_color,id_lamina_p,rollos,peso_total)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina',$id_turno_sql,'$id_operador',
-                    '$id_referencia','$id_color','$id_lamina_p','$rollos','$peso_total')
+                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color',$id_lamina_sql,'$rollos','$peso_total')
                 ON DUPLICATE KEY UPDATE
                     fecha_extrusion = VALUES(fecha_extrusion),
                     id_maquina      = VALUES(id_maquina),
                     id_turno        = VALUES(id_turno),
                     id_operador     = VALUES(id_operador),
                     id_referencia   = VALUES(id_referencia),
+                    id_referencia_esp = VALUES(id_referencia_esp),
                     id_color        = VALUES(id_color),
                     id_lamina_p     = VALUES(id_lamina_p),
                     rollos          = VALUES(rollos),
                     peso_total      = VALUES(peso_total)";
-    // Modo 'nuevos': Insertar solo si no existe
+    // Modo nuevos: solo insertar
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_EXTRUSION
                     (id_sheet,fecha_extrusion,id_maquina,id_turno,id_operador,
-                    id_referencia,id_color,id_lamina_p,rollos,peso_total)
+                    id_referencia,id_referencia_esp,id_color,id_lamina_p,rollos,peso_total)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina',$id_turno_sql,'$id_operador',
-                    '$id_referencia','$id_color','$id_lamina_p','$rollos','$peso_total')";
+                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color',$id_lamina_sql,'$rollos','$peso_total')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
 }
 
-// Al finalizar: Mostrar contadores y guardar última fecha
+// Mostrar contadores al final
 finalizarImportacion($conexion,'extrusion',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
 ?>

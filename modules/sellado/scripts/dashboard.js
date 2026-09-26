@@ -1,9 +1,9 @@
-// Variables globales para instancias de gráficos
+// Instancias de gráficos
 window.chartProduccion = window.chartProduccion || null;
 window.chartOperarios  = window.chartOperarios  || null;
 window.chartMeses      = window.chartMeses      || null;
 
-// Cargar gráficos de producción y operarios según el tipo de filtro
+// Cargar gráficos según filtros
 function cargarDatos(tipo){
     let mes    = document.getElementById("filtroMes").value;
     let semana = document.getElementById("filtroSemana").value;
@@ -12,7 +12,7 @@ function cargarDatos(tipo){
     .then(res => res.json())
     .then(data => {
 
-        // Gráfico de producción (línea por mes/semana, barras por año)
+        // Gráfico de producción
         if(chartProduccion) chartProduccion.destroy();
         const tipo_grafico = (tipo === 'anio') ? 'bar' : 'line';
         chartProduccion = new Chart(document.getElementById('graficoProduccion'), {
@@ -54,7 +54,7 @@ function cargarDatos(tipo){
             }
         });
 
-        // Ordenar operarios de mayor a menor producción
+        // Ordenar operarios por producción
         let combinado = data.operarios.map((operario, i) => ({
             nombre: operario,
             total:  data.totales_operarios[i]
@@ -103,7 +103,7 @@ function cargarDatos(tipo){
     });
 }
 
-// Aplicar valor de meses y recargar resumenes
+// Recargar resúmenes por mes
 const mes1 = document.getElementById("mes1");
 const mes2 = document.getElementById("mes2");
 
@@ -135,7 +135,7 @@ function actualizarFiltros(){
 }
 actualizarFiltros();
 
-// Cargar gráfico de producción mensual por año
+// Gráfico mensual por año
 function cargarGraficoMeses(){
     let anio = document.getElementById("filtroAnioMes").value;
 
@@ -150,7 +150,7 @@ function cargarGraficoMeses(){
             "Jul","Ago","Sep","Oct","Nov","Dic"
         ];
 
-        // Obtener y mostrar total del año
+        // Total del año
         fetch(`../ajax/productionByYear.php?anio=${anio}`)
         .then(res => res.json())
         .then(data => {

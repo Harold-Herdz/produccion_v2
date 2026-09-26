@@ -20,7 +20,7 @@ function estadoSistemaLeer()
     return is_array($datos) ? $datos : [];
 }
 
-// Actualiza $estado[$grupo][$clave] mezclando $valores (con bloqueo para evitar pisadas)
+// Actualizar estado con bloqueo
 function estadoSistemaGuardar($grupo, $clave, array $valores)
 {
     $fh = @fopen(ESTADO_SISTEMA_ARCHIVO, 'c+');

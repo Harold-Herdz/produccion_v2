@@ -7,7 +7,7 @@
    y se cifran solas en el primer inicio de sesión correcto.
 ===================================================== */
 
-// ¿El valor guardado ya es un hash de password_hash()?
+// ¿Ya es un hash?
 function contrasenaEsHash($valor)
 {
     return is_string($valor) && preg_match('/^\$2[aby]\$\d{2}\$/', $valor) === 1;
@@ -19,7 +19,7 @@ function cifrarContrasena($plana)
     return password_hash($plana, PASSWORD_DEFAULT);
 }
 
-// Compara lo escrito con lo guardado (hash o, por compatibilidad, texto plano antiguo)
+// Comparar con lo guardado
 function verificarContrasena($plana, $guardada)
 {
     if (contrasenaEsHash($guardada)) {

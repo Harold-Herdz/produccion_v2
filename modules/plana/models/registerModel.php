@@ -1,5 +1,5 @@
 <?php
-// Modelo de Register: formulario de registro de pesos de Máquina Plana
+// Modelo del formulario de Plana
 
 date_default_timezone_set('America/Bogota');
 
@@ -16,7 +16,7 @@ function construirIdDiaPlana($fecha){
     return 'MP' . date('Ymd', strtotime($fecha));
 }
 
-// Validar una fecha 'Y-m-d'; devuelve la fecha normalizada o null
+// Validar fecha Y-m-d
 function validarFechaPlana($fecha){
     $fecha = trim((string) $fecha);
     $d = DateTime::createFromFormat('Y-m-d', $fecha);
@@ -26,7 +26,7 @@ function validarFechaPlana($fecha){
     return null;
 }
 
-// Log de un día por su id
+// Log del día
 function obtenerLogPorIdDiaPlana($conexion, $id_dia){
     $stmt = $conexion->prepare("SELECT * FROM plana_sheet WHERE id_dia = ? LIMIT 1");
     $stmt->bind_param('s', $id_dia);
@@ -34,14 +34,13 @@ function obtenerLogPorIdDiaPlana($conexion, $id_dia){
     return $stmt->get_result()->fetch_assoc();
 }
 
-// El día actualmente en proceso: el de fecha más reciente (por fecha, no por orden de
-// creación: un día pasado que se abre después no debe pasar por "el actual")
+// Día en proceso (fecha más reciente)
 function obtenerDiaEnProcesoPlana($conexion){
     $res = $conexion->query("SELECT * FROM plana_sheet WHERE estado = 'en_proceso' ORDER BY fecha DESC, id_log DESC LIMIT 1");
     return $res ? $res->fetch_assoc() : null;
 }
 
-// Abrir el día (o reabrirlo si ya estaba completado: Caso D)
+// Abrir o reabrir día
 function abrirDiaPlana($conexion, $id_dia, $fecha){
     $log = obtenerLogPorIdDiaPlana($conexion, $id_dia);
     if($log){
@@ -58,14 +57,14 @@ function abrirDiaPlana($conexion, $id_dia, $fecha){
     return obtenerLogPorIdDiaPlana($conexion, $id_dia);
 }
 
-// Sumar 1 al contador local de registros del día
+// Sumar 1 al contador
 function incrementarContadorDiaPlana($conexion, $id_dia){
     $stmt = $conexion->prepare("UPDATE plana_sheet SET total_registros = total_registros + 1 WHERE id_dia = ?");
     $stmt->bind_param('s', $id_dia);
     $stmt->execute();
 }
 
-// Cerrar el día: total real (contado del Sheet) y ruta del PDF
+// Cerrar día con total y PDF
 function cerrarDiaPlana($conexion, $id_dia, $total, $rutaPdf){
     $stmt = $conexion->prepare("
         UPDATE plana_sheet
@@ -79,11 +78,9 @@ function cerrarDiaPlana($conexion, $id_dia, $total, $rutaPdf){
 /* =================================================
    CIERRE DE DÍA (lee REGISTROS del Sheet y arma PDF + fila de LOGS)
 ================================================= */
-// Filas de REGISTROS que corresponden a una fecha dada
-// Devuelve null si el Sheet no se pudo leer (nunca un arreglo vacío por error: un PDF
-// "Sin registros" subido por una lectura fallida pisaría el PDF bueno del día).
-// $minimo: cuántas filas se esperan como mínimo (el contador local del día); si el CSV
-// de Google aún no muestra un registro recién escrito, se reintenta unos segundos.
+// Filas de REGISTROS del día
+// null si el Sheet falla
+// Reintenta si faltan filas
 function filasDelDiaPlana($fechaObjetivo, $minimo = 0){
     $delDia = null;
     for($intento = 1; $intento <= 3; $intento++){
@@ -93,7 +90,7 @@ function filasDelDiaPlana($fechaObjetivo, $minimo = 0){
         }
         if($intento < 3){ sleep(2); }
     }
-    return $delDia; // null si nunca se pudo leer; si se leyó pero faltan filas, lo que haya
+    return $delDia; // null si no se pudo leer
 }
 
 function leerFilasDelDiaPlana($fechaObjetivo){
@@ -118,13 +115,13 @@ function leerFilasDelDiaPlana($fechaObjetivo){
     return $delDia;
 }
 
-// Verifica si la fila ya se guardó (evita falso error)
+// ¿La fila ya se guardó?
 function yaExisteRegistroPlana($fecha, $operario, $maquina, $referencia, $pesoRollo, $pesoRetal, $bultos, $pesoTotal){
     $filas = leerFilasDelDiaPlana($fecha);
     if($filas === null){
         return false;
     }
-    $recientes = array_slice($filas, -5); // solo las últimas 5 filas del día
+    $recientes = array_slice($filas, -5); // últimas 5 filas
     foreach($recientes as $fila){
         if($fila['operario'] === $operario
             && $fila['maquina'] === $maquina
@@ -140,8 +137,7 @@ function yaExisteRegistroPlana($fecha, $operario, $maquina, $referencia, $pesoRo
     return false;
 }
 
-// Arma el paquete de cierre (PDF + fila de LOGS) para un día ya presente en el Sheet
-// Devuelve null si no se pudo leer el Sheet (no se debe cerrar con datos vacíos).
+// Paquete de cierre (PDF + LOGS)
 function prepararCierrePlana($logDia){
     $filas = filasDelDiaPlana($logDia['fecha'], (int) ($logDia['total_registros'] ?? 0));
     if($filas === null){
@@ -161,13 +157,8 @@ function prepararCierrePlana($logDia){
     ];
 }
 
-// Reintenta el cierre (PDF + fila de LOGS) de días que quedaron cerrados en local
-// sin que Google lo confirmara (cierre perdido por un error/timeout del Apps Script),
-// o que quedaron "en proceso" aunque ya hay un día más nuevo. El cierre es un upsert
-// en el Apps Script, así que repetirlo no duplica nada.
-// Cierra un día: genera el PDF desde el Sheet, lo manda junto con su fila de LOGS
-// (upsert por id_dia) y SOLO si Google confirma con la URL del PDF lo marca cerrado en
-// local. Si algo falla queda pendiente y reintentarCierresPendientesPlana() lo retoma.
+// Reintenta cierres pendientes
+// Cierra día y confirma con Google
 function cerrarDiaConfirmadoPlana($conexion, $dia){
     $cierre = prepararCierrePlana($dia);
     if($cierre === null){
@@ -207,13 +198,13 @@ function reintentarCierresPendientesPlana($conexion, $limite = 2){
 function obtenerOperariosActivosPlana($conexion){
     return $conexion->query("SELECT id_operario, nombre_operario FROM operarios WHERE estado = 1 ORDER BY nombre_operario");
 }
-// Máquinas (área 'plana') y referencias especiales: ver obtenerMaquinasConReferencias()/
+// Máquinas y referencias: ver catalogosModel
 // obtenerReferenciasEspOrdenadas() en shared/catalogosModel.php
 
 /* =================================================
    NOMBRE ESCRITO A MANO ("Otro" de operario)
 ================================================= */
-// Solo letras y espacios (incluye acentos/ñ); rechaza números y símbolos
+// Solo letras y espacios
 function nombrePropioValidoPlana($texto){
     return (bool) preg_match('/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/u', $texto);
 }
@@ -231,7 +222,7 @@ function capitalizarNombrePlana($texto){
     return implode(' ', $palabras);
 }
 
-// Nombre de un catálogo por id; null si no existe
+// Nombre de catálogo por id
 function nombreCatalogoPlana($conexion, $tabla, $columnaId, $columnaNombre, $id){
     $stmt = $conexion->prepare("SELECT {$columnaNombre} AS n FROM {$tabla} WHERE {$columnaId} = ? LIMIT 1");
     $stmt->bind_param('i', $id);
@@ -243,7 +234,7 @@ function nombreCatalogoPlana($conexion, $tabla, $columnaId, $columnaNombre, $id)
 /* =================================================
    VALIDACIÓN DE PESOS
 ================================================= */
-// Vacío -> 0; rechaza negativos (devuelve null si es inválido)
+// Peso válido (vacío = 0)
 function pesoPlana($valor){
     $valor = trim((string) $valor);
     if($valor === ''){
@@ -255,7 +246,7 @@ function pesoPlana($valor){
     return (float) $valor;
 }
 
-// Bultos: entero cerrado >= 0 (vacío -> 0); null si es inválido
+// Bultos enteros (vacío = 0)
 function bultosPlana($valor){
     $valor = trim((string) $valor);
     if($valor === ''){

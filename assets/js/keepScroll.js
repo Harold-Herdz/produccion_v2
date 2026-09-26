@@ -1,9 +1,7 @@
-// Mantiene la posición del scroll cuando una acción recarga la MISMA página
-// (filtrar, cambiar un mes, activar/desactivar, paginar, guardar...).
-// Se carga desde templates/header.php, así aplica a todas las interfaces.
+// Mantiene el scroll al recargar
 (function () {
     var CLAVE = 'scrollPagina';
-    var VIGENCIA_MS = 20000; // solo se restaura si la recarga ocurre enseguida
+    var VIGENCIA_MS = 20000; // solo si recarga enseguida
 
     function guardar() {
         try {
@@ -14,18 +12,17 @@
             }));
         } catch (e) { /* almacenamiento bloqueado: se ignora */ }
     }
-    // Para código que navega con window.location (ej. selects de mes en los dashboards)
+    // Para navegación con window.location
     window.guardarScrollPagina = guardar;
 
-    // Formularios (registrar, filtrar, activar/desactivar, cambiar supervisor...)
+    // Formularios (guardar scroll)
     document.addEventListener('submit', function (e) {
         var form = e.target;
         if (form && form.hasAttribute && form.hasAttribute('data-sin-scroll')) return;
-        // Formularios que llevan a otra página (ej. login) no aplican: se descarta por la ruta
         guardar();
     }, true);
 
-    // Enlaces que van a la misma página con otros parámetros (paginación, "Limpiar"...)
+    // Enlaces a la misma página
     document.addEventListener('click', function (e) {
         var a = e.target.closest ? e.target.closest('a[href]') : null;
         if (!a || a.target === '_blank' || a.hasAttribute('data-sin-scroll')) return;
@@ -51,7 +48,7 @@
     document.addEventListener('DOMContentLoaded', restaurar);
     window.addEventListener('load', function () {
         restaurar();
-        // Gráficos/tablas que se dibujan después pueden cambiar el alto de la página
+        // Repetir por alto cambiante
         setTimeout(restaurar, 150);
         setTimeout(restaurar, 500);
     });

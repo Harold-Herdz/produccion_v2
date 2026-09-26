@@ -1,14 +1,14 @@
 <?php
-// Iniciar la sesión si no hay una activa
+// Iniciar sesión si falta
 if(session_status() === PHP_SESSION_NONE){
-    session_set_cookie_params(28800); // Duración de la sesión: 8 horas
+    session_set_cookie_params(28800); // Sesión de 8 horas
     session_start();
 }
 
 // Importar config.php
 require_once dirname(__DIR__) . '/includes/config.php';
 
-// Redirigir al Login si no hay sesión activa
+// Redirigir al login sin sesión
 if(!isset($_SESSION['usuario'])){
     header("Location: " . BASE_URL . "/auth/views/login.php");
     exit;

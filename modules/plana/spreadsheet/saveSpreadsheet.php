@@ -1,9 +1,7 @@
 <?php
 /** @var mysqli $conexion */
 
-// Registrar pesos de Máquina Plana: agrega la fila a REGISTROS y, si la fecha
-// avanzó (o se corrige una fecha ya cerrada), cierra el día correspondiente
-// generando su PDF y actualizando LOGS. (AJAX, JSON)
+// Registra pesos y cierra días
 
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
@@ -12,7 +10,7 @@ require_once dirname(__DIR__) . '/models/registerModel.php';
 require_once __DIR__ . '/appsScript.php';
 
 header('Content-Type: application/json');
-set_time_limit(120); // registro + cierre(s) implican varias llamadas a Google
+set_time_limit(120); // varias llamadas a Google
 
 $entrada = json_decode(file_get_contents('php://input'), true) ?: [];
 
@@ -22,7 +20,7 @@ if(!$fecha){
     echo json_encode(['ok' => false, 'error' => 'Fecha inválida.']);
     exit;
 }
-// Operario: numérico = id existente; texto = "Otro" escrito a mano (se busca o se crea)
+// Operario: id o texto Otro
 $avisoOperario = null;
 $valorOperario = trim((string) ($entrada['id_operario'] ?? ''));
 if($valorOperario !== '' && $valorOperario !== 'otro' && is_numeric($valorOperario)){
@@ -43,7 +41,7 @@ if($valorOperario !== '' && $valorOperario !== 'otro' && is_numeric($valorOperar
     $nombreOperario = null;
 }
 
-// Máquina: solo las habilitadas para Plana (Relaciones > Máquinas × Áreas)
+// Solo máquinas de Plana
 $idMaquina = (int) ($entrada['id_maquina'] ?? 0);
 $nombreMaquina = null;
 if($idMaquina){
@@ -55,7 +53,7 @@ if($idMaquina){
     }
 }
 
-// Referencia (especial): numérica = id de la lista; texto = "Otro" escrito a mano
+// Referencia: id o texto Otro
 [$idReferencia, $avisoReferencia] = resolverValorCatalogo(
     $conexion, 'referencias_esp', 'id_referencia_esp', 'nombre_referencia_esp',
     $entrada['id_referencia'] ?? '', 'nueva referencia especial', '', 'plana'
@@ -94,10 +92,9 @@ try {
     $idDia = construirIdDiaPlana($fecha);
     $diaActual = obtenerDiaEnProcesoPlana($conexion);
 
-    // Reglas de cierre (se evalúan ANTES de registrar, con el estado actual):
-    //  - Fecha nueva (posterior al día en curso): el día en curso se cierra.
-    //  - Fecha pasada (anterior al día en curso, ya cerrada o nunca abierta): ese día se
-    //    vuelve a cerrar al final para que su PDF incluya el registro nuevo.
+    // Reglas de cierre (antes de registrar)
+    // Fecha nueva: cierra el día en curso
+    // Fecha pasada: recierra ese día
     $diaACerrar = null;
     $esDiaPasado = false;
     if($diaActual && $diaActual['id_dia'] !== $idDia){
@@ -107,46 +104,43 @@ try {
             $esDiaPasado = true;
         }
     }
-    // Día ya COMPLETADO al que se le agrega un registro (aunque no haya un día en curso)
+    // Día completado que recibe registro
     $logObjetivoPrevio = obtenerLogPorIdDiaPlana($conexion, $idDia);
     $recerrarDia = $esDiaPasado || ($logObjetivoPrevio && $logObjetivoPrevio['estado'] === 'completado');
 
-    // Fila a agregar en REGISTROS (columnas B..I)
+    // Fila para REGISTROS (B..I)
     $fila = [$fecha, $nombreOperario, $nombreMaquina, $nombreReferencia, $pesoRollo, $pesoRetal, $bultos, $pesoTotal];
 
-    // Id único (reservado para futuro chequeo en Apps Script)
+    // Id único del registro
     $idRegistro = bin2hex(random_bytes(8));
 
-    // 1) SOLO el registro. El cierre va aparte: así un fallo del cierre nunca se confunde
-    //    con que el registro se guardó, ni al revés.
+    // 1) Solo el registro; cierre aparte
     $respuesta = enviarAppScriptPlana(['fila' => $fila, 'id_registro' => $idRegistro]);
 
     if(!$respuesta['ok']){
-        // Respuesta no interpretable: confirma si ya se guardó
+        // Confirmar si ya se guardó
         if(!yaExisteRegistroPlana($fecha, $nombreOperario, $nombreMaquina, $nombreReferencia, $pesoRollo, $pesoRetal, $bultos, $pesoTotal)){
             echo json_encode(['ok' => false, 'error' => $respuesta['error'] ?? 'No se pudo registrar en Google.']);
             return;
         }
     }
 
-    // Solo ahora, con la fila ya confirmada en el Sheet, se abre/actualiza el día local
+    // Con la fila confirmada, abrir día
     abrirDiaPlana($conexion, $idDia, $fecha);
     incrementarContadorDiaPlana($conexion, $idDia);
 
-    // 2) Cierres. Un día solo queda cerrado en local cuando Google confirma el PDF; si no,
-    //    queda pendiente y se reintenta solo (aquí mismo en el próximo registro, o al abrir
-    //    el formulario).
+    // 2) Cierres (solo con PDF confirmado)
     $diaCerrado = false;
     if($diaACerrar){
         $diaCerrado = cerrarDiaConfirmadoPlana($conexion, $diaACerrar);
     }
     if($recerrarDia){
-        // El contador local ya incluye el registro nuevo: el PDF espera verlo en el Sheet
+        // Recerrar con el registro nuevo
         $diaCerrado = cerrarDiaConfirmadoPlana($conexion, obtenerLogPorIdDiaPlana($conexion, $idDia)) || $diaCerrado;
     }
 
-    // Auto-reparación de cierres anteriores que hayan quedado pendientes
-    try { reintentarCierresPendientesPlana($conexion); } catch (Throwable $e) { /* no afecta el registro ya guardado */ }
+    // Reparar cierres pendientes
+    try { reintentarCierresPendientesPlana($conexion); } catch (Throwable $e) { /* no afecta lo guardado */ }
 
     echo json_encode(['ok' => true, 'dia_cerrado' => $diaCerrado, 'aviso' => $avisoOperario]);
 

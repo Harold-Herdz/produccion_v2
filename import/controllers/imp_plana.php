@@ -53,7 +53,7 @@ echo "<script>
 </script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
-// Cargar catálogos desde la base de datos
+// Cargar catálogos
 echo "<script>document.getElementById('msg').textContent='Cargando catálogos…';</script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
@@ -69,7 +69,7 @@ $duplicados   = 0;
 $nueva_fecha  = null;
 
 foreach ($filas as $data) {
-    // Limpiar y convertir datos de cada fila
+    // Limpiar datos de la fila
     $id_sheet    = trim($data[0]);
     $fecha       = convertirFecha($data[1]);
     $operario    = trim($data[2]);
@@ -80,12 +80,12 @@ foreach ($filas as $data) {
     $bultos      = (int)$data[7];
     $peso_total  = convertirNumero($data[8]);
 
-    // Obtener IDs de catálogos o crearlos si no existen
+    // IDs de catálogos (o crear)
     $id_operario       = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
     $id_maquina        = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
     $id_referencia_esp = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia);
 
-    // Modo 'todo': Insertar o actualizar si ya existe
+    // Modo todo: insertar/actualizar
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_PLANA
                     (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia_esp,
@@ -102,7 +102,7 @@ foreach ($filas as $data) {
                     peso_retal        = VALUES(peso_retal),
                     bultos            = VALUES(bultos),
                     peso_total        = VALUES(peso_total)";
-    // Modo 'nuevos': Insertar solo si no existe
+    // Modo nuevos: solo insertar
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_PLANA
                     (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia_esp,
@@ -115,6 +115,6 @@ foreach ($filas as $data) {
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
 }
 
-// Al finalizar: Mostrar contadores y guardar última fecha
+// Mostrar contadores al final
 finalizarImportacion($conexion,'plana',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
 ?>

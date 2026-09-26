@@ -28,10 +28,10 @@ $mes2 = $_GET['mes2'] ?? $mes_actual;
 
 // Total histórico de producción
 $total = obtenerTotalHistoricoRollo($conexion);
-// Producción de la semana y del mes actual
+// Producción semana y mes
 $semana = obtenerProduccionSemanaRollo($conexion);
 $mes = obtenerProduccionMesRollo($conexion);
-// Top máquina y top operario (año actual)
+// Top máquina y operario
 $top_maquina = obtenerTopMaquinaRollo($conexion);
 $top_operario = obtenerTopOperarioRollo($conexion);
 
@@ -49,7 +49,7 @@ $peso_rollo_mes2 = $resumen_mes2['peso_rollo'];
 $peso_retal_mes2 = $resumen_mes2['peso_retal'];
 $peso_total_mes2 = $resumen_mes2['peso_total'];
 
-// Mejor y peor día de los meses
+// Mejor y peor día
 $dias_mes1 = obtenerMejorPeorDiaMesRollo($conexion,$mes1);
 $mejor_dia_mes1 = $dias_mes1['mejor'];
 $peor_dia_mes1 = $dias_mes1['peor'];
@@ -67,15 +67,15 @@ $top_maquina_mes2 = obtenerTopMaquinaMesRollo($conexion,$mes2);
 // Filtros de fecha para tablas
 $desde = $_GET['desde'] ?? date('Y-m-01');
 $hasta = $_GET['hasta'] ?? date('Y-m-d');
-// Tablas de producción por fecha y máquina
+// Tablas por fecha y máquina
 $res_tabla_fecha = obtenerTablaFechasRollo($conexion,$desde,$hasta);
 $res_tabla_maquina = obtenerTablaMaquinasRollo($conexion,$desde,$hasta);
 
-// Diferencia y porcentaje de variación entre meses
+// Variación entre meses
 $diferencia = ($total_mes2 ?? 0) - ($total_mes1 ?? 0);
 $porcentaje = ($total_mes1 > 0) ? (($diferencia / $total_mes1) * 100) : 0;
 
-// Calculo de eficiencia de los meses
+// Eficiencia por mes
 $eficiencia_mes1 = ($peso_rollo_mes1 !== null && $peso_rollo_mes1 > 0) ? (($peso_total_mes1 / $peso_rollo_mes1) * 100) : null;
 $eficiencia_mes2 = ($peso_rollo_mes2 !== null && $peso_rollo_mes2 > 0) ? (($peso_total_mes2 / $peso_rollo_mes2) * 100) : null;
 

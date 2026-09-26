@@ -33,7 +33,7 @@ if($tipo === "anio"){
             GROUP BY WEEK(fecha_plana, 1), CONCAT('Sem ', WEEK(fecha_plana, 1))
             ORDER BY WEEK(fecha_plana, 1) ASC";
 }else{
-    // Rango de días de la semana seleccionada
+    // Rango de la semana
     if($semana != ""){
         $inicio = (($semana - 1) * 7) + 1;
         $fin = $semana * 7;

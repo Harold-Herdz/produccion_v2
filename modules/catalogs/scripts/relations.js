@@ -14,7 +14,7 @@ window.addEventListener("click", function (evento) {
     }
 });
 
-// Pinta la lista de resultados en el overlay y lo abre
+// Pintar resultados en overlay
 function mostrarResultadoRelaciones(datos) {
     document.getElementById("tituloResultadoCatalogos").textContent =
         datos.tipo === "exportar" ? "Exportación completada" : "Importación completada";
@@ -36,7 +36,7 @@ function mostrarResultadoRelaciones(datos) {
     abrirModal("modalResultadoCatalogos");
 }
 
-// Exportar / importar las relaciones (AJAX)
+// Exportar / importar (AJAX)
 function accionRelaciones(tipo) {
     const url = document.getElementById("accionesRelaciones").dataset.url;
     const overlayCarga = document.getElementById("overlayCargaCatalogos");
@@ -57,7 +57,7 @@ function accionRelaciones(tipo) {
         .finally(() => { overlayCarga.style.display = "none"; });
 }
 
-// Al cerrar el resultado de una importación, recargar para ver las casillas actualizadas
+// Recargar tras importar
 document.getElementById("modalResultadoCatalogos").addEventListener("click", e => {
     const cerrar = e.target.classList.contains("overlay") || e.target.classList.contains("cerrar-resultado");
     if (cerrar && document.getElementById("tituloResultadoCatalogos").textContent.startsWith("Importación")) {
@@ -69,12 +69,12 @@ document.getElementById("modalResultadoCatalogos").addEventListener("click", e =
 /* =====================================================
    MATRIZ MÁQUINA × ÁREA / REFERENCIA (guardado de un clic)
    ===================================================== */
-// Casillas de datos de una fila (sin "Todas" ni "Especiales")
+// Casillas de datos de la fila
 function casillasFila(fila) {
     return Array.from(fila.querySelectorAll(".chk-matriz")).filter(c => c.dataset.accion !== "toggle_maquina_esp");
 }
 
-// "Todas" queda marcada solo si todas las casillas de la fila lo están
+// "Todas" si todas marcadas
 function sincronizarTodas(fila) {
     const todas = fila.querySelector(".chk-todas");
     if (!todas) return;
@@ -99,7 +99,7 @@ document.addEventListener("change", e => {
     if (!scroll) return;
     const fila = chk.closest("tr");
 
-    // Casilla "Todas": marca o desmarca toda la fila (solo se envían las que cambian)
+    // Marcar/desmarcar fila completa
     if (chk.classList.contains("chk-todas")) {
         casillasFila(fila).filter(c => !c.disabled && c.checked !== chk.checked).forEach(c => {
             c.checked = chk.checked;
@@ -141,6 +141,6 @@ if (buscarMaquina) {
             fila.hidden = texto !== "" && !fila.dataset.maquinaNombre.includes(texto);
         });
     });
-    // Enter en el buscador no debe recargar la página
+    // Enter no recarga
     buscarMaquina.closest("form").addEventListener("submit", e => e.preventDefault());
 }

@@ -1,5 +1,4 @@
-// Campanita de notificaciones: valores de catálogo escritos a mano ("Otro")
-// pendientes de revisión por un admin.
+// Campanita de notificaciones
 (function () {
   const btn = document.getElementById('campanaBtn');
   if (!btn) return;

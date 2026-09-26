@@ -28,10 +28,10 @@ $mes2 = $_GET['mes2'] ?? $mes_actual;
 
 // Total histórico de producción
 $total = obtenerTotalHistoricoPlana($conexion);
-// Producción de la semana y del mes actual
+// Producción semana y mes
 $semana = obtenerProduccionSemanaPlana($conexion);
 $mes = obtenerProduccionMesPlana($conexion);
-// Top máquina y top operario (año actual)
+// Top máquina y operario
 $top_maquina = obtenerTopMaquinaPlana($conexion);
 $top_operario = obtenerTopOperarioPlana($conexion);
 
@@ -51,7 +51,7 @@ $peso_retal_mes2 = $resumen_mes2['peso_retal'];
 $total_mes2  = $resumen_mes2['peso_total'];
 $bultos_mes2  = $resumen_mes2['bultos'];
 
-// Mejor y peor día de los meses
+// Mejor y peor día
 $dias_mes1 = obtenerMejorPeorDiaMesPlana($conexion,$mes1);
 $mejor_dia_mes1 = $dias_mes1['mejor'];
 $peor_dia_mes1 = $dias_mes1['peor'];
@@ -69,12 +69,12 @@ $top_operario_mes2 = obtenerTopOperarioMesPlana($conexion,$mes2);
 // Filtros de fecha para tablas
 $desde = $_GET['desde'] ?? date('Y-m-01');
 $hasta = $_GET['hasta'] ?? date('Y-m-d');
-// Tablas de producción por fecha, referencias y máquina
+// Tablas por fecha y máquina
 $res_tabla_fecha = obtenerTablaFechasPlana($conexion, $desde, $hasta);
 $res_tabla_referencias = obtenerTablaReferenciasPlana($conexion, $desde, $hasta);
 $res_tabla_maquina = obtenerTablaMaquinasPlana($conexion, $desde, $hasta);
 
-// Diferencia y porcentaje de variación entre meses
+// Variación entre meses
 $diferencia = ($total_mes2 ?? 0) - ($total_mes1 ?? 0);
 $porcentaje = ($total_mes1 > 0) ? (($diferencia / $total_mes1) * 100) : 0;
 

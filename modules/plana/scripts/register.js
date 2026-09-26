@@ -1,16 +1,16 @@
-// Register Máquina Plana: registrar y limpiar sin salir
+// Formulario de Plana
 
 const formPlana = document.getElementById("formRegistroPlana");
 
 if (formPlana) {
-    // Al abrir el formulario: completa en segundo plano cualquier cierre de día pendiente
+    // Reparar cierres pendientes
     fetch("../spreadsheet/closeSpreadsheet.php").catch(() => {});
 
     const aviso         = document.getElementById("avisoPlana");
     const btnRegistrar  = document.getElementById("btnRegistrarPlana");
     const btnVolver      = document.getElementById("btnVolverPlana");
     const campoFecha     = document.getElementById("fechaPlana");
-    let enviando = false;        // evita doble clic / doble registro
+    let enviando = false;        // evita doble registro
 
     /* =========================================
        AVISO (toast compartido: ver modules/shared/alertToast.js)
@@ -19,7 +19,7 @@ if (formPlana) {
     function mostrarAviso(texto, tipo, autoOcultar) { avisoToast.mostrar(texto, tipo, autoOcultar); }
     function ocultarAviso() { avisoToast.ocultar(); }
 
-    // Ocultar aviso al retomar el formulario
+    // Ocultar aviso al editar
     formPlana.addEventListener("input", () => {
         if (!enviando && !aviso.hidden) ocultarAviso();
     });
@@ -39,8 +39,8 @@ if (formPlana) {
             .join(" ");
     }
 
-    // Operario: el select se queda visible con "Otro", casilla nueva al lado.
-    // Referencia/Color: la casilla reemplaza al select en el mismo lugar.
+    // Operario: casilla Otro al lado
+    // Referencia/Color: reemplaza el select
     formPlana.addEventListener("change", e => {
         if (!e.target.classList.contains("tiene-otro")) return;
         const libre = e.target.nextElementSibling;
@@ -65,7 +65,7 @@ if (formPlana) {
         }
     });
 
-    // Capitaliza al salir del campo; en Referencia/Color, si queda vacío vuelve al select
+    // Capitalizar al salir del campo
     formPlana.addEventListener("blur", e => {
         if (!e.target.classList.contains("campo-libre")) return;
         e.target.value = capitalizar(e.target.value);
@@ -77,13 +77,13 @@ if (formPlana) {
         }
     }, true); // blur no burbujea
 
-    // Valor del select, o el texto libre capitalizado si eligió "Otro"
+    // Valor del select u Otro
     function valorConOtro(idSelect) {
         const select = document.getElementById(idSelect);
         return select.value === "otro" ? capitalizar(select.nextElementSibling.value) : select.value;
     }
 
-    // Vuelve un campo "Otro" a su estado de select (usado al limpiar el formulario)
+    // Restaurar select tras Otro
     function restaurarCampoConOtro(idSelect) {
         const select = document.getElementById(idSelect);
         const libre = select.nextElementSibling;
@@ -94,7 +94,7 @@ if (formPlana) {
 
     const selectMaquina = document.getElementById("maquinaPlana");
 
-    // Limpiar los campos de un registro, manteniendo la fecha
+    // Limpiar campos, conservar fecha
     function limpiarFormulario() {
         restaurarCampoConOtro("operarioPlana");
         selectMaquina.selectedIndex = 0;
@@ -126,7 +126,7 @@ if (formPlana) {
     ========================================= */
     formPlana.addEventListener("submit", async e => {
         e.preventDefault();
-        if (enviando) return; // doble clic / envío repetido mientras procesa
+        if (enviando) return; // evita envío repetido
         enviando = true;
         btnRegistrar.disabled = true;
         btnRegistrar.textContent = "Registrando…";

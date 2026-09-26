@@ -31,7 +31,7 @@ if($tipo == "semana"){
                 AND YEAR(fecha_sellado) = YEAR(CURDATE())
                 GROUP BY DATE(fecha_sellado)";
     } else {
-        // Rango de días de la semana seleccionada
+        // Rango de la semana
         $inicio = (($semana - 1) * 7) + 1;
         $fin = $semana * 7;
         $sql = "SELECT DATE(fecha_sellado) fecha, SUM(paquetes_total) total
@@ -72,7 +72,7 @@ while($row = mysqli_fetch_assoc($res)){
 ===================== */
 // Mostrar por semana
 if($tipo == "semana"){
-    // Operarios de todas las semanas del mes
+    // Operarios del mes
     if($semana == ""){
         $sql2 = "SELECT o.nombre_operario, SUM(s.paquetes_total) total
                  FROM PRODUCCION_SELLADO s
@@ -82,7 +82,7 @@ if($tipo == "semana"){
                  GROUP BY s.id_operario";
 
     } else {
-        // Operarios por rango de días de la semana seleccionada
+        // Operarios de la semana
         $inicio = (($semana - 1) * 7) + 1;
         $fin = $semana * 7;
         $sql2 = "SELECT o.nombre_operario, SUM(s.paquetes_total) total

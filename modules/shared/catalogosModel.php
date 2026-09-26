@@ -1,15 +1,8 @@
 <?php
-// Catálogos compartidos de Referencia/Color/Máquina y resolución de "Otro"
-// (texto libre -> busca o crea en el catálogo)
+// Catálogos compartidos y resolver Otro
 
-/* =================================================
-   REFERENCIAS POR MÁQUINA
-   Cada máquina solo produce un subconjunto de referencias (ver MAQUINA_REFERENCIAS).
-   Las máquinas marcadas usa_referencias_esp = 1 ("Bolsa Basura") usan el catálogo
-   completo de Referencias Especiales en su lugar, nunca el de Referencias normal.
-   Todas las filas devueltas usan las claves genéricas 'id'/'nombre'.
-================================================= */
-// Referencias normales asignadas a una máquina (catálogo cerrado: se administra en la BD)
+// Referencias por máquina
+// Referencias de una máquina
 function obtenerReferenciasPorMaquina($conexion, $idMaquina){
     $stmt = $conexion->prepare("
         SELECT r.id_referencia AS id, r.nombre_referencia AS nombre
@@ -23,7 +16,7 @@ function obtenerReferenciasPorMaquina($conexion, $idMaquina){
     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
-// Catálogo completo de Referencias Especiales (máquinas "Bolsa Basura")
+// Referencias especiales
 function obtenerReferenciasEspOrdenadas($conexion){
     $res = $conexion->query("
         SELECT id_referencia_esp AS id, nombre_referencia_esp AS nombre
@@ -34,8 +27,7 @@ function obtenerReferenciasEspOrdenadas($conexion){
     return $res->fetch_all(MYSQLI_ASSOC);
 }
 
-// Máquinas de un área (Sellado/Rollo/...), con su lista de referencias ya resuelta.
-// Devuelve ['maquinas' => [...], 'mapaJs' => [id_maquina => ['esp'=>bool,'opciones'=>[...]]]]
+// Máquinas de un área
 function obtenerMaquinasConReferencias($conexion, $nombreArea){
     $stmt = $conexion->prepare("
         SELECT m.id_maquina, m.nombre_maquina, m.usa_referencias_esp,
@@ -62,7 +54,7 @@ function obtenerMaquinasConReferencias($conexion, $nombreArea){
     return ['maquinas' => $maquinas, 'mapaJs' => $mapaJs];
 }
 
-// Colores activos; los que empiezan con "R " (retal) van al final de la lista
+// Colores activos
 function obtenerColoresOrdenados($conexion){
     $res = $conexion->query("
         SELECT id_color, nombre_color
@@ -73,9 +65,7 @@ function obtenerColoresOrdenados($conexion){
     return $res->fetch_all(MYSQLI_ASSOC);
 }
 
-// Busca un id de catálogo por nombre exacto; lo crea si no existe. Devuelve [$id, $fueCreado]
-// $nombre nuevo se crea con verificado = 0 (pendiente de revisión por un admin;
-// ver el aviso/notificación de catálogo). Ya existente no se toca.
+// Buscar o crear en catálogo
 function resolverCatalogoIdONuevo($conexion, $tabla, $colId, $colNombre, $nombre){
     $nombre = trim($nombre);
     $stmt = $conexion->prepare("SELECT {$colId} AS id FROM {$tabla} WHERE {$colNombre} = ? LIMIT 1");
@@ -91,9 +81,7 @@ function resolverCatalogoIdONuevo($conexion, $tabla, $colId, $colNombre, $nombre
     return [$conexion->insert_id, true];
 }
 
-// Registra en CATALOGO_PENDIENTES un valor de catálogo creado a mano ("Otro"), para
-// que un admin lo revise desde la campanita de notificaciones. No detiene el guardado:
-// el valor ya quedó creado y disponible, esto solo deja constancia para revisarlo después.
+// Registrar valor pendiente
 function registrarCatalogoPendiente($conexion, $tabla, $idRegistro, $valor, $etiqueta, $contexto, $modulo){
     $idUsuario     = $_SESSION['id_usuario'] ?? null;
     $usuarioNombre = $_SESSION['usuario'] ?? null;
@@ -106,10 +94,7 @@ function registrarCatalogoPendiente($conexion, $tabla, $idRegistro, $valor, $eti
     $stmt->execute();
 }
 
-// Resuelve un valor de formulario de catálogo: numérico = id existente, texto = "Otro"
-// escrito a mano (busca o crea). $etiqueta ya incluye el género: "nuevo operario",
-// "nueva referencia", "nuevo color". $modulo identifica el formulario de origen
-// ("sellado", "rollo", ...) para la campanita de notificaciones. Devuelve [$id, $avisoONulo]
+// Resolver valor de formulario
 function resolverValorCatalogo($conexion, $tabla, $colId, $colNombre, $valor, $etiqueta, $contexto = '', $modulo = ''){
     $valor = trim((string) $valor);
     if($valor === '' || $valor === 'otro'){
@@ -130,16 +115,13 @@ function resolverValorCatalogo($conexion, $tabla, $colId, $colNombre, $valor, $e
 /* =================================================
    JORNADA: catálogo cerrado de 2 valores (8 Horas / 12 Horas)
 ================================================= */
-// Normaliza cualquier texto de jornada a uno de los 2 valores cerrados del catálogo.
-// Cualquier valor que no sea exactamente "12 Horas" (sin importar mayúsculas/espacios)
-// -incluyendo horarios sueltos como "6pm", "1pm", texto vacío, etc.- cae siempre en "8 Horas".
+// Normalizar jornada
 function normalizarJornada($valor){
     $v = strtolower(trim((string) $valor));
     return ($v === '12 horas') ? '12 Horas' : '8 Horas';
 }
 
-// Id de jornada a partir de cualquier texto crudo, ya normalizado a 8/12 Horas.
-// JORNADAS es un catálogo cerrado de 2 valores fijos llenado a mano; nunca se crea uno aquí.
+// Id de jornada
 function resolverIdJornada($conexion, $valorCrudo){
     $nombre = normalizarJornada($valorCrudo);
     $stmt = $conexion->prepare("SELECT id_jornada FROM jornadas WHERE nombre_jornada = ? LIMIT 1");

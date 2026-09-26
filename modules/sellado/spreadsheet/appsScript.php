@@ -1,17 +1,17 @@
 <?php
-// Config y cliente del Apps Script Web App (recibe REGISTROS + LOGS + PDF al finalizar)
+// Cliente Apps Script Web App
 
 define('SELLADO_APPSCRIPT_URL',   'https://script.google.com/macros/s/AKfycbxnoTaeH-OnppHLsFLcZFKZM-XgYHzGcMYFMwd4atTZHE7NmyT1HeFJXBVVWYYh6fyy/exec');
 define('SELLADO_APPSCRIPT_TOKEN', 'PLASTYPETCO_BODEGA1');
 
-// Valida solo la forma (no compara contra placeholders, para no romperse con un reemplazo)
+// Validar solo la forma
 function appScriptConfigurado(){
     return strncmp(SELLADO_APPSCRIPT_URL, 'https://', 8) === 0
         && strlen(SELLADO_APPSCRIPT_URL) > 20
         && strlen(SELLADO_APPSCRIPT_TOKEN) >= 6;
 }
 
-// POST al Web App; devuelve la respuesta decodificada
+// POST al Web App
 function enviarAppScript($payload){
     $payload['token'] = SELLADO_APPSCRIPT_TOKEN;
 

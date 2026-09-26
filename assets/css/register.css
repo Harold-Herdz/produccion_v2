@@ -32,7 +32,7 @@
   font-size: 14px;
   color: var(--texto);
 }
-/* Especificidad reforzada ante .modal form de main.css */
+/* Refuerza especificidad */
 .form-inicio.form-inicio input,
 .form-inicio.form-inicio select {
   width: 100%;
@@ -59,7 +59,7 @@
   border-color: var(--borde-fuerte);
   opacity: 0.85;
 }
-/* Casilla "Otro": aparece debajo del select, no lo reemplaza */
+/* Casilla Otro bajo el select */
 .form-inicio input.campo-libre {
   margin-top: 8px;
 }
@@ -128,11 +128,21 @@
   border-radius: 50%;
   background: var(--borde-fuerte);
 }
-.indicador-guardado.pendiente .punto { background: var(--warning); }
-.indicador-guardado.guardando .punto { background: var(--azul); }
-.indicador-guardado.ok        .punto { background: var(--success); }
-.indicador-guardado.error     .punto { background: var(--danger); }
-.indicador-guardado.error { color: var(--danger); }
+.indicador-guardado.pendiente .punto {
+  background: var(--warning);
+}
+.indicador-guardado.guardando .punto {
+  background: var(--azul);
+}
+.indicador-guardado.ok .punto {
+  background: var(--success);
+}
+.indicador-guardado.error .punto {
+  background: var(--danger);
+}
+.indicador-guardado.error {
+  color: var(--danger);
+}
 
 /* ===========================
    AVISOS
@@ -154,8 +164,7 @@
   color: var(--danger);
 }
 
-/* Aviso tipo "toast": mensaje con barra de tiempo que se autooculta a los pocos
-   segundos. Compartido entre todos los módulos (ver modules/shared/avisoToast.js) */
+/* Aviso toast */
 .aviso-toast {
   position: relative;
   margin-bottom: 16px;
@@ -197,13 +206,12 @@
   overflow-x: auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  /* Sin border-radius a propósito: con el encabezado sticky, la esquina
-     redondeada dejaba una línea blanca por el recorte del contenedor */
+  /* Sin border-radius (sticky) */
   border: 2px solid var(--azul-oscuro);
   scrollbar-width: thin;
   scrollbar-color: var(--azul-oscuro) var(--fondo-secundario);
 }
-/* Barra de desplazamiento: mismo estilo que .tabla-dashboard en main.css */
+/* Scroll como .tabla-dashboard */
 .planilla-scroll::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -220,39 +228,51 @@
 }
 .planilla {
   width: 100%;
-  min-width: 900px;        /* debajo de esto la tabla se desplaza (responsive) */
+  min-width: 900px; /* tabla con scroll (responsive) */
   table-layout: fixed;
-  /* "separate" a propósito: con "collapse" + encabezado sticky, Chrome deja
-     una línea blanca (bug de compositing) justo en el borde izquierdo del
-     encabezado al hacer scroll. Con spacing en 0 se ve igual que collapse. */
+  /* Separate por el sticky */
   border-collapse: separate;
   border-spacing: 0;
   background: var(--fondo-superficie);
-  font-size: 12px;
+  font-size: 14px;
 }
 
-/* Anchos de columna (Máquina más ancha: número grande, celda cuadrada) */
-.c-maq   { width: 80px; }
-.c-op    { width: 134px; }
-.c-ref   { width: 108px; }
-.c-color { width: 86px; }
-.c-x     { width: 54px; }
-.c-p     { width: 52px; }
-.c-obs   { width: auto; }
-.c-del   { width: 36px; }
+/* Anchos de columna */
+.c-maq {
+  width: 80px;
+}
+.c-op {
+  width: 134px;
+}
+.c-ref {
+  width: 108px;
+}
+.c-color {
+  width: 86px;
+}
+.c-x {
+  width: 54px;
+}
+.c-p {
+  width: 60px;
+}
+.c-obs {
+  width: auto;
+}
+.c-del {
+  width: 36px;
+}
 
-/* Encabezado fijo: se queda visible mientras se baja por las máquinas.
-   Sin "border" a propósito: mezclado con position:sticky, border-collapse
-   deja líneas blancas entre celdas; el fondo sólido ya las separa bien. */
+/* Encabezado fijo */
 .planilla thead th {
   position: sticky;
   top: 0;
   z-index: 2;
   background: var(--azul-oscuro);
   color: var(--texto-claro);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 11px 4px;
+  padding: 12px 4px;
   border: none;
   text-align: center;
   white-space: nowrap;
@@ -263,28 +283,26 @@
   vertical-align: middle;
 }
 
-/* Inputs y selects estilo "celda de tabla": sin borde ni fondo propios,
-   se apoyan en el borde de la celda; solo el foco se resalta */
+/* Inputs estilo celda */
 .planilla input,
 .planilla select {
   display: block;
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  height: 20px;
+  height: 26px;
   padding: 1px 6px;
   border: none;
   border-radius: 0;
   background-color: transparent;
   color: var(--texto);
-  font-size: 11px;
+  font-size: 14px;
 }
-/* Borde fino en los dropdown (select): los distingue de las celdas de texto
-   y evita el reborde blanco raro que dejaba el outline al abrirse */
+/* Borde fino en selects */
 .planilla select {
   border: 1px solid var(--borde-fuerte);
 }
-/* El atributo hidden debe ganarle siempre a "display:block" de arriba */
+/* hidden gana a display */
 .planilla [hidden] {
   display: none;
 }
@@ -299,9 +317,7 @@
   background-color: var(--azul-claro);
 }
 
-/* Envoltorio select + "Otro". Referencia/Color/Jornada: fila (la casilla
-   reemplaza al select, con botón para volver a la lista). Operario: columna
-   (casilla nueva debajo, el select se queda visible mostrando "Otro"). */
+/* Select + Otro */
 .campo-otro-wrap {
   display: flex;
   align-items: center;
@@ -318,12 +334,12 @@
   flex-direction: column;
   align-items: stretch;
 }
-/* En modo apilado la altura la da el height fijo, no el crecimiento flex */
+/* Altura fija en modo apilado */
 .campo-otro-apilado select,
 .campo-otro-apilado input {
   flex: 0 0 auto;
 }
-/* Casilla de Operario: el espacio queda reservado siempre (visibility, no display) */
+/* Espacio reservado (visibility) */
 .campo-libre-reservado {
   visibility: hidden;
   margin-top: 1px;
@@ -350,7 +366,7 @@
   color: var(--texto-claro);
 }
 
-/* Flecha del select (indica que es una celda con lista desplegable) */
+/* Flecha del select */
 .planilla select {
   appearance: none;
   -webkit-appearance: none;
@@ -373,7 +389,7 @@
   margin: 0;
 }
 
-/* Columna máquina: número grande, celda ancha y compacta (cuadrada) */
+/* Columna máquina compacta */
 .col-maquina {
   background: var(--azul-muy-claro);
   color: var(--texto);
@@ -385,12 +401,12 @@
   border-right: 3px solid var(--azul-oscuro) !important;
 }
 
-/* Bloque operario/jornada: sin color propio, se apoya en el fondo normal de la fila */
+/* Bloque operario/jornada */
 .col-operario {
   vertical-align: middle;
   padding: 3px 4px !important;
 }
-/* Fijo arriba: no se corre al centro cuando el bloque crece con "+ Entrada" */
+/* Fijo arriba */
 .op-bloque {
   display: flex;
   flex-direction: column;
@@ -403,7 +419,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -411,22 +427,22 @@
 }
 .op-sub select,
 .op-sub input {
-  height: 20px;
+  height: 26px;
 }
 
-/* Líneas gruesas que agrupan columnas: Máquina | Operario·Referencia·Color |
-   X70·X90·X98 | Pesos 1-5 | Observaciones (solo en el cuerpo; el encabezado
-   ya es un bloque de color sólido, sin bordes por el bug de sticky+collapse) */
+/* Líneas gruesas de grupo */
 .td-grueso {
   border-right: 3px solid var(--azul-oscuro) !important;
 }
 
-/* Separación entre máquinas: más gruesa para distinguir cada bloque de registros */
-.grupo-maquina {
-  border-bottom: 4px solid var(--azul-oscuro);
+/* Separación entre máquinas (línea azul gruesa bajo la última fila del grupo) */
+.planilla .grupo-maquina .fila-add td,
+.planilla .grupo-maquina .col-maquina,
+.planilla .grupo-maquina .col-operario {
+  border-bottom: 4px solid var(--azul-oscuro) !important;
 }
 
-/* Zebra por entrada: mismo azul muy claro de la columna Máquina, alternado */
+/* Zebra por entrada */
 .fila-entrada:nth-of-type(even) td:not(.col-maquina) {
   background: var(--azul-muy-claro);
 }
@@ -437,19 +453,26 @@
   border-right: 3px solid var(--azul-oscuro) !important;
 }
 .btn-quitar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
   border: none;
-  background: transparent;
-  color: var(--danger);
-  font-size: 16px;
+  background: var(--danger);
+  color: var(--texto-claro);
+  font-size: 15px;
   line-height: 1;
   cursor: pointer;
-  padding: 1px 4px;
-  border-radius: 6px;
+  padding: 0;
+  border-radius: var(--radio-s);
   transition: var(--transicion);
 }
-.btn-quitar:hover { background: var(--danger-bg); }
+.btn-quitar:hover {
+  background: var(--danger-hover);
+}
 
-/* Fila con el botón "+ Entrada" */
+/* Fila del botón + Agregar */
 .fila-add td {
   background: var(--fondo-secundario);
   text-align: left;
@@ -462,19 +485,26 @@
   background: transparent;
   color: var(--azul-oscuro);
   font-weight: 600;
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
   transition: var(--transicion);
 }
-.btn-entrada:hover { background: var(--azul-claro); }
+.btn-entrada:hover {
+  background: var(--azul-claro);
+}
 .tope-entradas {
   display: none;
   margin-left: 12px;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--warning);
 }
-.grupo-maquina.tope .btn-entrada { opacity: 0.4; pointer-events: none; }
-.grupo-maquina.tope .tope-entradas { display: inline; }
+.grupo-maquina.tope .btn-entrada {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.grupo-maquina.tope .tope-entradas {
+  display: inline;
+}
 
 /* ===========================
    NOTA GENERAL
@@ -516,7 +546,9 @@
   gap: 12px;
   margin-top: 22px;
 }
-.form-cancelar { margin: 0; }
+.form-cancelar {
+  margin: 0;
+}
 .btn-cancelar-turno {
   background: var(--fondo-secundario);
   color: var(--texto);
@@ -530,7 +562,9 @@
   font-size: 16px;
   padding: 14px 28px;
 }
-.btn-finalizar:hover { background: var(--verde); }
+.btn-finalizar:hover {
+  background: var(--verde);
+}
 .btn-finalizar:disabled,
 #btnConfirmarFinalizar:disabled {
   opacity: 0.55;
@@ -566,20 +600,36 @@
   color: var(--texto-secundario);
   cursor: pointer;
 }
-.btn-cancelar { background: var(--fondo-secundario); color: var(--texto); border: 1px solid var(--borde-fuerte); }
+.btn-cancelar {
+  background: var(--fondo-secundario);
+  color: var(--texto);
+  border: 1px solid var(--borde-fuerte);
+}
 
 /* ===========================
    RESPONSIVE
 =========================== */
 @media (max-width: 900px) {
-  #containerRegister { padding: 24px; }
-  .encabezado-turno { gap: 16px; }
-  .indicador-guardado { margin-left: 0; }
+  #containerRegister {
+    padding: 24px;
+  }
+  .encabezado-turno {
+    gap: 16px;
+  }
+  .indicador-guardado {
+    margin-left: 0;
+  }
 }
 @media (max-width: 700px) {
-  .acciones-planilla { flex-direction: column-reverse; align-items: stretch; }
+  .acciones-planilla {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
   .acciones-planilla .form-cancelar,
-  .acciones-planilla .btn { width: 100%; text-align: center; }
+  .acciones-planilla .btn {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 /* ===========================
@@ -639,4 +689,363 @@
 #btnRegistrarPlana:disabled {
   opacity: 0.65;
   pointer-events: none;
+}
+
+/* ===========================
+   EXTRUSIÓN: PLANILLA DE TURNO
+=========================== */
+.ext-subtitulo {
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: var(--azul-oscuro);
+}
+.ext-tabla {
+  width: 100%;
+  margin-top: 16px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--azul-oscuro);
+  border-radius: var(--radio-s);
+  background: var(--fondo-superficie);
+}
+.ext-tabla thead th:first-child {
+  border-top-left-radius: var(--radio-s);
+}
+.ext-tabla thead th:last-child {
+  border-top-right-radius: var(--radio-s);
+}
+.ext-tabla th {
+  padding: 9px 12px;
+  background: var(--azul-oscuro);
+  color: var(--texto-claro);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.ext-tabla th + th,
+.ext-tabla td + td {
+  border-left: 1px solid var(--azul-oscuro);
+}
+.ext-tabla td {
+  padding: 12px;
+  vertical-align: top;
+}
+.ext-tabla td select {
+  width: 100%;
+}
+.ext-tabla-cuerpo .ext-col-pesos {
+  width: 65%;
+  background: var(--azul-muy-claro);
+}
+.ext-tabla-cuerpo .ext-col-cambios {
+  width: 35%;
+}
+/* Los botones de cambio crecen con la altura de la tabla */
+.ext-tabla-cuerpo td {
+  height: 1px;
+}
+.ext-tabla-cuerpo .ext-col-cambios {
+  padding: 46px 62px;
+}
+.ext-cambios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  height: 100%;
+  min-height: 250px;
+}
+.ext-cambios-lista .btn {
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 52px;
+  margin: 0;
+  font-size: 17px;
+  font-weight: bold;
+}
+.ext-campo select,
+.ext-bloque-cambio select,
+.ext-tabla select {
+  min-width: 150px;
+  padding: 8px 34px 8px 10px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  background-color: var(--fondo-superficie);
+  font-size: 14px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a4a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+}
+.ext-fila-peso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.ext-rollo {
+  width: 90px;
+  font-weight: 600;
+  font-size: 14px;
+}
+.ext-fila-peso input {
+  width: 130px;
+  padding: 8px 10px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  font-size: 14px;
+}
+.ext-quitar {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radio-s);
+  background: var(--danger);
+  color: var(--texto-claro);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.ext-bloque-cambio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 8px;
+  padding: 8px 10px;
+  background: var(--azul-claro);
+  border-left: 4px solid var(--azul);
+}
+.ext-bloque-cambio select {
+  flex: none;
+  width: 130px;
+  min-width: 0;
+}
+.ext-quitar-bloque {
+  flex: 0 0 auto;
+}
+.ext-bloque-cambio label {
+  width: 90px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--azul-oscuro);
+}
+.btn-entrada-grande {
+  margin-top: 6px;
+  padding: 7px 20px;
+  font-size: 14px;
+}
+.btn-entrada-grande:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ext-abiertas {
+  margin-top: 16px;
+  padding: 18px 22px;
+}
+.ext-abierta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--borde-fuerte);
+  border-left: 4px solid var(--azul);
+  border-radius: var(--radio-s);
+  color: var(--texto);
+  text-decoration: none;
+  font-size: 14px;
+}
+.ext-abierta:hover {
+  background: var(--azul-muy-claro);
+}
+.ext-continuar {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--azul);
+}
+@media (max-width: 800px) {
+  .ext-tabla-cuerpo .ext-col-pesos,
+  .ext-tabla-cuerpo .ext-col-cambios {
+    width: auto;
+  }
+}
+
+/* Resumen en vivo (junto a la lista de pesos) */
+.ext-pesos-fila {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.ext-pesos-lista {
+  align-self: flex-start;
+}
+.ext-resumen {
+  flex: 0 0 340px;
+  align-self: center;
+  margin-left: 90px;
+  padding: 20px 24px;
+  background: var(--fondo-superficie);
+  border: 1px solid var(--azul-oscuro);
+  border-top: 4px solid var(--azul-oscuro);
+  border-radius: var(--radio-s);
+  font-size: 16px;
+}
+.ext-resumen-titulo {
+  margin-bottom: 12px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--azul-oscuro);
+}
+.ext-resumen-sub {
+  margin: 12px 0 4px;
+  padding-top: 8px;
+  border-top: 2px solid var(--azul-claro);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--texto-tenue);
+}
+.ext-resumen-linea {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  border-top: 1px dashed var(--borde-fuerte);
+}
+.ext-resumen-linea:first-of-type {
+  border-top: none;
+}
+.ext-resumen-linea strong {
+  text-align: right;
+}
+@media (max-width: 1000px) {
+  .ext-pesos-fila {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+  }
+  .ext-resumen {
+    flex: none;
+    width: 100%;
+    margin: 16px 0 0;
+  }
+}
+
+/* Select con buscador (referencias) */
+.ext-buscable {
+  position: relative;
+  z-index: 5;
+}
+.ext-buscable:focus-within {
+  z-index: 60;
+}
+.ext-tabla .ext-buscable-input,
+.ext-bloque-cambio .ext-buscable-input {
+  width: 100%;
+  padding: 8px 34px 8px 10px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  background-color: var(--fondo-superficie);
+  font-size: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a4a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+}
+.ext-buscable-input:focus {
+  outline: none;
+  border-color: var(--azul);
+}
+.ext-bloque-cambio .ext-buscable {
+  flex: none;
+  width: 130px;
+}
+.ext-buscable-lista {
+  position: absolute;
+  z-index: 40;
+  top: 100%;
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  max-width: 320px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin-top: 2px;
+  background: var(--fondo-superficie);
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  box-shadow: var(--sombra-modal);
+  font-size: 14px;
+  text-align: left;
+}
+.ext-buscable-lista[hidden] {
+  display: none;
+}
+.ext-buscable-grupo {
+  padding: 6px 10px;
+  background: var(--azul-claro);
+  color: var(--azul-oscuro);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ext-buscable-op {
+  padding: 7px 10px;
+  cursor: pointer;
+}
+.ext-buscable-op:hover {
+  background: var(--azul-muy-claro);
+}
+.ext-buscable-op.activa {
+  font-weight: 700;
+  color: var(--azul-oscuro);
+}
+.ext-buscable-vacio {
+  padding: 8px 10px;
+  color: var(--texto-tenue);
+}
+
+/* Campo "Otro" de Extrusión (texto libre) */
+.ext-otro {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+.ext-otro > select,
+.ext-otro > .ext-buscable {
+  flex: 1;
+  min-width: 0;
+}
+.ext-libre {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--azul);
+  border-radius: var(--radio-s);
+  background: var(--fondo-superficie);
+  font-size: 14px;
+}
+.ext-libre[hidden],
+.ext-volver[hidden] { display: none; }
+.ext-volver {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  background: var(--fondo-superficie);
+  color: var(--azul-oscuro);
+  font-size: 15px;
+  cursor: pointer;
+}
+.ext-volver:hover { background: var(--azul-claro); }
+.ext-bloque-cambio .ext-otro {
+  flex: none;
+  width: 190px;
 }

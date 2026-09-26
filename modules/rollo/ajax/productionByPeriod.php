@@ -44,7 +44,7 @@ if($tipo === "anio"){
                 AND YEAR(fecha_rollo) = YEAR(CURDATE())
                 GROUP BY DATE(fecha_rollo)";
     }else{
-        // Rango de días de la semana seleccionada
+        // Rango de la semana
         $inicio = (($semana - 1) * 7) + 1;
         $fin = $semana * 7;
 
@@ -76,7 +76,7 @@ while($row = mysqli_fetch_assoc($res)){
 ===================== */
 // Mostrar por año
 if($tipo === "anio") {
-    // Máquinas del año ordenadas por total
+    // Máquinas del año
     $sql_maquinas = "SELECT m.nombre_maquina, 
                         SUM(r.peso_total) total
                     FROM PRODUCCION_ROLLO r

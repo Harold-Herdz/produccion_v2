@@ -8,7 +8,7 @@ require_once dirname(__DIR__) . '/models/registerModel.php';
 
 $hoy = date('Y-m-d');
 
-// Catálogos para los selectores del formulario
+// Catálogos del formulario
 $operarios      = mysqli_fetch_all(obtenerOperariosActivosPlana($conexion), MYSQLI_ASSOC);
 $maquinas       = obtenerMaquinasConReferencias($conexion, 'plana')['maquinas']; // solo las de Plana
 $referenciasEsp = obtenerReferenciasEspOrdenadas($conexion);                     // referencias especiales

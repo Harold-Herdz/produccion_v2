@@ -1,15 +1,15 @@
 <?php
 /** @var mysqli $conexion */
 
-// Datos del panel de Inicio (AJAX, JSON). Solo administradores.
-//   ?accion=meta                                     -> módulos, dimensiones y medidas
-//   ?accion=general                                  -> tarjetas de arriba (mes actual + estado)
-//   ?accion=catalogos                                -> estado de los catálogos
-//   ?accion=resumen&modulo=&desde=&hasta=            -> resumen de un módulo en un rango
-//   ?accion=estado&modulo=                           -> estado (importación, planillas...) de un módulo
-//   ?accion=pendientes&modulo=[&forzar=1]            -> registros del Sheet por importar
-//   ?accion=opciones&modulo=&dim=                    -> valores para filtrar
-//   ?accion=datos&modulo=&dims[]=&desde=&hasta=&f[dim][]=valor -> filas agrupadas
+// Datos del panel Inicio (solo admin)
+// meta: módulos y medidas
+// general: tarjetas superiores
+// catalogos: estado de catálogos
+// resumen: módulo en un rango
+// estado: importación y planillas
+// pendientes: registros por importar
+// opciones: valores para filtrar
+// datos: filas agrupadas
 
 $soloAdmin = true;
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
@@ -67,7 +67,7 @@ if ($accion === 'opciones') {
 }
 
 if ($accion === 'datos') {
-    // Solo dimensiones válidas, sin repetir, máximo 4
+    // Dimensiones válidas (máx. 4)
     $dims = [];
     foreach ((array) ($_GET['dims'] ?? []) as $d) {
         if (isset($mod['dims'][$d]) && !in_array($d, $dims, true)) {

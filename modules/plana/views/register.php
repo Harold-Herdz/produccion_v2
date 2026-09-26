@@ -20,8 +20,7 @@ if(!function_exists('opcionesCatalogoPlana')){
     }
 }
 
-// Select de catálogo + "Otro". En Operario aparece una casilla nueva al lado;
-// en Referencia la casilla reemplaza al select (ver register.js)
+// Select de catálogo + Otro
 if(!function_exists('campoConOtroPlana')){
     function campoConOtroPlana($lista, $idKey, $nombreKey, $id, $nombre){
         ob_start(); ?>

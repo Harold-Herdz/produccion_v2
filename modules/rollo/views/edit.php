@@ -101,7 +101,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 class="form-control"
                 value="<?php echo $fila['peso_retal']; ?>">
 
-            <!-- Peso total: columna generada (peso_rollo - peso_retal), no se envía -->
+            <!-- Peso total: columna generada -->
             <label>Peso Total (kg)</label>
             <input
                 type="number"

@@ -1,5 +1,5 @@
 <?php
-// Cliente del Apps Script de Máquina Plana
+// Cliente Apps Script de Plana
 
 // CSV de la hoja REGISTROS
 define('PLANA_REGISTROS_CSV_URL', 'https://docs.google.com/spreadsheets/d/1DO_G6MHfoMagMMEOUOipTiE6W1UC-65f7BamJZQwGSc/export?format=csv&gid=1759801026');
@@ -14,7 +14,7 @@ function appScriptConfiguradoPlana(){
         && strlen(PLANA_APPSCRIPT_TOKEN) >= 6;
 }
 
-// POST al Web App de Máquina Plana
+// POST al Web App
 function enviarAppScriptPlana($payload){
     $payload['token'] = PLANA_APPSCRIPT_TOKEN;
 

@@ -10,7 +10,7 @@
    una reimportación de los catálogos.
 ===================================================== */
 
-// Máquinas activas en orden por número real (no por id)
+// Máquinas activas por número
 function maquinasOrdenadas($conexion)
 {
     return mysqli_fetch_all(mysqli_query($conexion, "
@@ -21,7 +21,7 @@ function maquinasOrdenadas($conexion)
     "), MYSQLI_ASSOC);
 }
 
-// Máquinas x Áreas: qué máquinas están habilitadas en cada módulo
+// Matriz máquinas × áreas
 function obtenerMatrizMaquinaAreas($conexion)
 {
     $areas = mysqli_fetch_all(mysqli_query($conexion, "SELECT id_area, nombre_area FROM AREAS ORDER BY id_area"), MYSQLI_ASSOC);
@@ -33,7 +33,7 @@ function obtenerMatrizMaquinaAreas($conexion)
     return ['maquinas' => maquinasOrdenadas($conexion), 'areas' => $areas, 'relaciones' => $relaciones];
 }
 
-// Alterna si una máquina pertenece a un área
+// Alternar máquina-área
 function alternarMaquinaArea($conexion, $idMaquina, $idArea)
 {
     $idMaquina = (int) $idMaquina;
@@ -45,7 +45,7 @@ function alternarMaquinaArea($conexion, $idMaquina, $idArea)
     return mysqli_query($conexion, "INSERT INTO MAQUINA_AREAS (id_maquina, id_area) VALUES ($idMaquina, $idArea)");
 }
 
-// Máquinas x Referencias: qué referencias normales produce cada máquina
+// Matriz máquinas × referencias
 function obtenerMatrizMaquinaReferencias($conexion)
 {
     $referencias = mysqli_fetch_all(mysqli_query($conexion, "SELECT id_referencia, nombre_referencia FROM REFERENCIAS WHERE estado = 1 ORDER BY id_referencia"), MYSQLI_ASSOC);
@@ -57,7 +57,7 @@ function obtenerMatrizMaquinaReferencias($conexion)
     return ['maquinas' => maquinasOrdenadas($conexion), 'referencias' => $referencias, 'relaciones' => $relaciones];
 }
 
-// Alterna si una máquina produce una referencia
+// Alternar máquina-referencia
 function alternarMaquinaReferencia($conexion, $idMaquina, $idReferencia)
 {
     $idMaquina    = (int) $idMaquina;
@@ -69,7 +69,7 @@ function alternarMaquinaReferencia($conexion, $idMaquina, $idReferencia)
     return mysqli_query($conexion, "INSERT INTO MAQUINA_REFERENCIAS (id_maquina, id_referencia) VALUES ($idMaquina, $idReferencia)");
 }
 
-// Alterna si una máquina usa el catálogo completo de Referencias Especiales ("Bolsa Basura")
+// Alternar Referencias Especiales
 function alternarUsaReferenciasEsp($conexion, $idMaquina)
 {
     $idMaquina = (int) $idMaquina;
@@ -103,7 +103,7 @@ function guardarSeedRelaciones($nombre, array $lineas)
     file_put_contents(rutaSeedRelaciones($nombre), implode("\n", $lineas) . "\n");
 }
 
-// Guarda Máquina × Área y Máquina × Referencia (+ Especiales). Devuelve los totales.
+// Exportar relaciones
 function exportarRelaciones($conexion)
 {
     $fecha = date('Y-m-d H:i');
@@ -150,8 +150,7 @@ function exportarRelaciones($conexion)
     return ['areas' => $totalAreas, 'referencias' => $totalRefs, 'especiales' => $totalEsp];
 }
 
-// Agrega desde los archivos semilla las relaciones que falten (nunca quita ninguna).
-// Devuelve ['agregados' => n, 'existentes' => n, 'omitidos' => n, 'error' => ?string]
+// Importar relaciones faltantes
 function importarRelaciones($conexion)
 {
     $rutaAreas = rutaSeedRelaciones('maquina_areas');
@@ -163,7 +162,7 @@ function importarRelaciones($conexion)
     $agregados = $existentes = $omitidos = 0;
     $par = "VALUES\\s*\\('((?:[^']|'')*)'\\s*,\\s*'((?:[^']|'')*)'\\)";
 
-    // Máquina × Área / Máquina × Referencia: se resuelven por nombre
+    // Resolver por nombre
     $tareas = [
         [$rutaAreas, "/INSERT INTO MAQUINA_AREAS \\(maquina, area\\) {$par}/i",
             'MAQUINA_AREAS', 'id_area', 'AREAS', 'id_area', 'nombre_area'],
@@ -186,7 +185,7 @@ function importarRelaciones($conexion)
                        (SELECT {$colIdCat} FROM {$tablaCat} WHERE {$colNombreCat} = '{$otro}' LIMIT 1) AS id_o
             "));
             if (!$ids['id_m'] || !$ids['id_o']) {
-                $omitidos++; // la máquina/área/referencia ya no existe en el catálogo
+                $omitidos++; // ya no existe en el catálogo
                 continue;
             }
             $existe = mysqli_query($conexion, "SELECT 1 FROM {$tablaRel} WHERE id_maquina = {$ids['id_m']} AND {$colRel} = {$ids['id_o']}");

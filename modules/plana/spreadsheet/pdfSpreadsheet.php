@@ -1,16 +1,16 @@
 <?php
-// Genera el PDF del día de Máquina Plana
+// PDF del día de Plana
 
 require_once dirname(__DIR__, 2) . '/shared/fpdf/fpdf.php';
 
-// Pasar texto UTF-8 a la codificación de las fuentes base de FPDF
+// UTF-8 a codificación FPDF
 function pdfTxtPlana($texto){
     $texto = (string) $texto;
     $conv = @iconv('UTF-8', 'windows-1252//TRANSLIT', $texto);
     return $conv !== false ? $conv : $texto;
 }
 
-// Colores corporativos (ver assets/css/root.css) — mismos que usa el PDF de Sellado
+// Colores corporativos
 function pdfColoresPlana(){
     return [
         'azul_oscuro'    => [22, 74, 125],
@@ -107,7 +107,7 @@ function generarPdfDiaPlana($fecha, $filas){
     return $pdf->Output('S');
 }
 
-// Nombre del archivo PDF del día: el id del día ya viene como "MP20260925"
+// Nombre del PDF del día
 function nombrePdfDiaPlana($id_dia){
     return $id_dia . '.pdf';
 }

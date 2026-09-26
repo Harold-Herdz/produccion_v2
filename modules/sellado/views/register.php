@@ -13,10 +13,10 @@ require_once dirname(__DIR__, 3) . '/includes/config.php';
 require_once dirname(__DIR__) . '/controllers/registerController.php';
 include dirname(__DIR__, 3) . '/templates/header.php';
 
-// Ayudante: opciones <option> de un catálogo
+// Ayudante: opciones de catálogo
 if(!function_exists('opcionesCatalogo')){
     function opcionesCatalogo($lista, $idKey, $nombreKey, $seleccionado, $incluirVacio = true){
-        // Primera opción realmente vacía (sin "-" ni guion)
+        // Primera opción vacía
         $html = $incluirVacio ? '<option value=""></option>' : '';
         foreach($lista as $item){
             $sel = ((string) $item[$idKey] === (string) $seleccionado) ? ' selected' : '';
@@ -27,48 +27,44 @@ if(!function_exists('opcionesCatalogo')){
     }
 }
 
-// Ayudante: select de catálogo + "Otro". En Operario aparece una casilla
-// nueva al lado; en los demás la casilla reemplaza al select (ver register.js).
-// El botón "volver" solo se usa/aparece en el modo de reemplazo (no Operario).
+// Ayudante: select + Otro
 if(!function_exists('campoCatalogoConOtro')){
-    function campoCatalogoConOtro($lista, $idKey, $nombreKey, $seleccionado, $clase, $titulo = ''){
+    function campoCatalogoConOtro($lista, $idKey, $nombreKey, $seleccionado, $clase, $titulo = '', $textoLibre = ''){
         $esOperario = ($clase === 'f-operario');
+        $conTexto = ($textoLibre !== '' && $textoLibre !== null); // "Otro" escrito y aún sin crear
         ob_start(); ?>
         <span class="campo-otro-wrap <?= $esOperario ? 'campo-otro-apilado' : '' ?>">
-            <select class="<?= $clase ?> tiene-otro" <?= $titulo ? 'title="' . htmlspecialchars($titulo) . '"' : '' ?>>
+            <select class="<?= $clase ?> tiene-otro" <?= $titulo ? 'title="' . htmlspecialchars($titulo) . '"' : '' ?> <?= ($conTexto && !$esOperario) ? 'hidden' : '' ?>>
                 <option value=""></option>
-                <option value="otro">Otro</option>
-                <?= opcionesCatalogo($lista, $idKey, $nombreKey, $seleccionado, false) ?>
+                <option value="otro" <?= $conTexto ? 'selected' : '' ?>>Otro</option>
+                <?= opcionesCatalogo($lista, $idKey, $nombreKey, $conTexto ? '' : $seleccionado, false) ?>
             </select>
             <?php if($esOperario): ?>
-                <!-- El espacio de esta casilla queda reservado siempre (visibility, no display) -->
-                <input type="text" class="<?= $clase ?> campo-libre campo-libre-reservado" autocomplete="off" placeholder="Escribe...">
+                <!-- Espacio siempre reservado -->
+                <input type="text" class="<?= $clase ?> campo-libre campo-libre-reservado <?= $conTexto ? 'activo' : '' ?>" autocomplete="off" placeholder="Escribe..." value="<?= $conTexto ? htmlspecialchars($textoLibre) : '' ?>">
             <?php else: ?>
-                <input type="text" class="<?= $clase ?> campo-libre" hidden autocomplete="off" placeholder="Escribe...">
-                <button type="button" class="btn-volver-lista" hidden title="Volver a la lista">&#8634;</button>
+                <input type="text" class="<?= $clase ?> campo-libre" <?= $conTexto ? '' : 'hidden' ?> autocomplete="off" placeholder="Escribe..." value="<?= $conTexto ? htmlspecialchars($textoLibre) : '' ?>">
+                <button type="button" class="btn-volver-lista" <?= $conTexto ? '' : 'hidden' ?> title="Volver a la lista">&#8634;</button>
             <?php endif; ?>
         </span>
         <?php return ob_get_clean();
     }
 }
 
-// Ayudante: valor limpio para inputs (evita mostrar NULL / 0.00 innecesario)
+// Ayudante: valor limpio
 if(!function_exists('valPlanilla')){
     function valPlanilla($v){
         return ($v === null || $v === '') ? '' : htmlspecialchars($v);
     }
 }
 
-// Ayudante: las celdas de una entrada (referencia..observaciones + eliminar).
-// $referenciasMaquina ya viene filtrada a lo que produce esa máquina (o el catálogo
-// completo de Referencias Especiales si $esEsp); el valor preseleccionado sale de
-// id_referencia_esp en vez de id_referencia cuando corresponde.
+// Ayudante: celdas de entrada
 if(!function_exists('celdasEntradaPlanilla')){
     function celdasEntradaPlanilla($ent, $referenciasMaquina, $colores, $esEsp = false){
         $seleccionadoRef = $esEsp ? ($ent['id_referencia_esp'] ?? '') : ($ent['id_referencia'] ?? '');
         ob_start(); ?>
-        <td><?= campoCatalogoConOtro($referenciasMaquina, 'id', 'nombre', $seleccionadoRef, 'f-ref') ?></td>
-        <td class="td-grueso"><?= campoCatalogoConOtro($colores, 'id_color', 'nombre_color', $ent['id_color'] ?? '', 'f-color') ?></td>
+        <td><?= campoCatalogoConOtro($referenciasMaquina, 'id', 'nombre', $seleccionadoRef, 'f-ref', '', $ent['txt_ref'] ?? '') ?></td>
+        <td class="td-grueso"><?= campoCatalogoConOtro($colores, 'id_color', 'nombre_color', $ent['id_color'] ?? '', 'f-color', '', $ent['txt_color'] ?? '') ?></td>
         <td><input type="number" class="f-x70" min="0" step="1" value="<?= valPlanilla($ent['x70'] ?? '') ?>"></td>
         <td><input type="number" class="f-x90" min="0" step="1" value="<?= valPlanilla($ent['x90'] ?? '') ?>"></td>
         <td class="td-grueso"><input type="number" class="f-x98" min="0" step="1" value="<?= valPlanilla($ent['x98'] ?? '') ?>"></td>
@@ -88,7 +84,7 @@ if(!function_exists('celdasEntradaPlanilla')){
 
 <?php if(!$planilla): ?>
 
-<!-- Sin turno abierto: formulario para iniciar uno nuevo -->
+<!-- Formulario de inicio de turno -->
 <div class="container container-formulario" id="containerRegister">
     <h2 class="titulo-vista">Registro de Producción · Sellado</h2>
 
@@ -132,6 +128,20 @@ if(!function_exists('celdasEntradaPlanilla')){
             <button type="submit" class="btn" id="btnIniciar" <?= empty($supervisores) ? 'disabled' : '' ?>>Iniciar planilla</button>
         </form>
     </div>
+
+    <?php if(!empty($abiertas)): ?>
+    <!-- Turnos abiertos para continuar -->
+    <div class="card ext-abiertas">
+        <h3 class="ext-subtitulo">Turnos abiertos</h3>
+        <?php foreach($abiertas as $a): ?>
+            <a class="ext-abierta" href="<?= BASE_URL ?>/modules/sellado/views/register.php?codigo=<?= urlencode($a['codigo']) ?>">
+                <strong><?= htmlspecialchars($a['codigo']) ?></strong>
+                <span><?= htmlspecialchars(date('d/m/Y', strtotime($a['fecha_planilla']))) ?> · <?= htmlspecialchars($a['bloque']) ?> · <?= htmlspecialchars($a['supervisor_nombre']) ?></span>
+                <span class="ext-continuar">Continuar</span>
+            </a>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
 </div>
 
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
@@ -153,8 +163,9 @@ if(!function_exists('celdasEntradaPlanilla')){
     <div class="card encabezado-turno">
         <div class="dato-turno">
             <span class="dato-label">Fecha</span>
-            <!-- Solo se puede elegir al iniciar el turno, no mientras se llena la planilla -->
-            <input type="date" id="fechaPlanilla" value="<?= htmlspecialchars($planilla['fecha_planilla']) ?>" disabled>
+            <!-- Solo al iniciar el turno -->
+            <span class="dato-valor"><?= htmlspecialchars(date('d/m/Y', strtotime($planilla['fecha_planilla']))) ?></span>
+            <input type="hidden" id="fechaPlanilla" value="<?= htmlspecialchars($planilla['fecha_planilla']) ?>">
         </div>
         <div class="dato-turno">
             <span class="dato-label">Turno</span>
@@ -174,7 +185,7 @@ if(!function_exists('celdasEntradaPlanilla')){
         </div>
     </div>
 
-    <!-- Zona de avisos (operarios nuevos, errores) -->
+    <!-- Zona de avisos -->
     <div id="zonaAvisos"></div>
 
     <!-- Planilla -->
@@ -196,19 +207,14 @@ if(!function_exists('celdasEntradaPlanilla')){
                     <th>X70</th>
                     <th>X90</th>
                     <th>X98</th>
-                    <th>PESO 1</th>
-                    <th>PESO 2</th>
-                    <th>PESO 3</th>
-                    <th>PESO 4</th>
-                    <th>PESO 5</th>
+                    <th colspan="5">PESOS POR HORA</th>
                     <th>OBSERVACIONES</th>
                     <th></th>
                 </tr>
             </thead>
 
             <?php foreach($maquinas as $m):
-                // numero_maquina (1-17) es solo para agrupar/etiquetar; id_maquina es el id
-                // real del catálogo (no coincide con el número) y es el que se guarda como FK.
+                // numero_maquina solo etiqueta
                 $num       = (int) $m['numero_maquina'];
                 $idMaquina = (int) $m['id_maquina'];
                 $esEsp     = (bool) $m['usa_referencias_esp'];
@@ -216,26 +222,26 @@ if(!function_exists('celdasEntradaPlanilla')){
                 $etq      = str_pad($num, 2, '0', STR_PAD_LEFT);
                 $datos    = $datosMaquinas[$num] ?? null;
                 $entradas = $datos['entradas'] ?? [];
-                // Cada máquina arranca con al menos 3 filas de producción visibles
+                // Mínimo 3 filas por máquina
                 while(count($entradas) < 3){
                     $entradas[] = [];
                 }
-                $span = count($entradas) + 1; // + fila del botón "+ Entrada"
+                $span = count($entradas) + 1; // Fila del botón + Agregar
             ?>
             <tbody class="grupo-maquina" data-maquina="<?= $num ?>" data-id-maquina="<?= $idMaquina ?>">
                 <?php foreach($entradas as $i => $ent): ?>
                 <tr class="fila-entrada">
                     <?php if($i === 0): ?>
-                        <!-- Número de máquina agrupando visualmente todas sus entradas (visual: sin cero a la izquierda; lo guardado no depende de este texto) -->
+                        <!-- Número de máquina -->
                         <td class="col-maquina" rowspan="<?= $span ?>"><?= $num ?></td>
-                        <!-- Bloque de operario / jornada de la máquina -->
+                        <!-- Bloque operario / jornada -->
                         <td class="col-operario" rowspan="<?= $span ?>">
                             <div class="op-bloque">
-                                <!-- Operario: "Otro" agrega una casilla nueva debajo (no reemplaza) -->
+                                <!-- Operario: Otro agrega casilla -->
                                 <label class="op-sub">Nombre
-                                    <?= campoCatalogoConOtro($operarios, 'id_operario', 'nombre_operario', $datos['id_operario'] ?? '', 'f-operario', 'Operario') ?>
+                                    <?= campoCatalogoConOtro($operarios, 'id_operario', 'nombre_operario', $datos['id_operario'] ?? '', 'f-operario', 'Operario', $datos['txt_operario'] ?? '') ?>
                                 </label>
-                                <!-- Jornada: "Otro" reemplaza el select en el mismo lugar -->
+                                <!-- Jornada: Otro reemplaza select -->
                                 <label class="op-sub">Jornada
                                     <span class="campo-otro-wrap">
                                         <select class="f-jornada tiene-otro">
@@ -255,11 +261,10 @@ if(!function_exists('celdasEntradaPlanilla')){
                 </tr>
                 <?php endforeach; ?>
 
-                <!-- Agregar otra entrada a esta máquina -->
+                <!-- Agregar entrada -->
                 <tr class="fila-add">
                     <td colspan="2" class="td-grueso">
-                        <button type="button" class="btn-entrada">+ Entrada</button>
-                        <span class="tope-entradas">Máximo 6 entradas por máquina</span>
+                        <button type="button" class="btn-entrada">+ Agregar</button>
                     </td>
                     <td colspan="3" class="td-grueso"></td>
                     <td colspan="5" class="td-grueso"></td>
@@ -271,7 +276,7 @@ if(!function_exists('celdasEntradaPlanilla')){
         </table>
     </div>
 
-    <!-- Nota general del turno (aparece en el PDF, NO se guarda en la base de datos) -->
+    <!-- Nota del turno (solo PDF) -->
     <div class="nota-general">
         <label for="notaGeneral">NOTA:</label>
         <textarea id="notaGeneral" rows="3"></textarea>
@@ -279,16 +284,17 @@ if(!function_exists('celdasEntradaPlanilla')){
 
     <!-- Acciones -->
     <div class="acciones-planilla">
-        <!-- Cancelar: descarta el turno y vuelve a la pantalla de inicio -->
+        <!-- Cancelar turno -->
         <form method="POST" id="formCancelarTurno" class="form-cancelar"
               onsubmit="return confirm('¿Cancelar el turno? Se perderán los datos no finalizados de esta planilla.');">
             <input type="hidden" name="accion" value="cancelar">
+            <input type="hidden" name="codigo" value="<?= htmlspecialchars($planilla['codigo']) ?>">
             <button type="submit" class="btn btn-cancelar-turno">Cancelar</button>
         </form>
         <button type="button" class="btn btn-finalizar" id="btnFinalizar">Finalizar turno</button>
     </div>
 
-    <!-- Plantilla de una entrada nueva (para el botón "+ Entrada"); la referencia
+    <!-- Plantilla de una entrada nueva (para el botón "+ Agregar"); la referencia
          se llena vacía y register.js la puebla según la máquina al clonar la fila -->
     <template id="tplEntrada">
         <tr class="fila-entrada"><?= celdasEntradaPlanilla([], [], $colores) ?></tr>
@@ -300,7 +306,7 @@ if(!function_exists('celdasEntradaPlanilla')){
 <div class="overlay" id="modalFinalizar">
     <div class="modal">
         <div class="modal-header">
-            <h2>Confirmar finalización de turno</h2>
+            <h2>Confirmar finalización</h2>
             <button type="button" onclick="cerrarModal('modalFinalizar')">X</button>
         </div>
         <div class="btn-row">

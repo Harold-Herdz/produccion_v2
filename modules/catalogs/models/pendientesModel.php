@@ -1,27 +1,25 @@
 <?php
-// Modelo: valores de catálogo escritos a mano ("Otro") pendientes de revisión por un admin
-// (campanita de notificaciones, ver templates/notificaciones.php)
+// Valores "Otro" por revisar
 
-// Tablas de catálogo válidas (columna id de cada una) — lista blanca, nunca se usa
-// el nombre de tabla que llega de afuera sin pasar por aquí
+// Tablas válidas (lista blanca)
 function tablasCatalogoPendiente(){
     return [
         'operarios'       => 'id_operario',
         'referencias'     => 'id_referencia',
         'referencias_esp' => 'id_referencia_esp',
         'colores'         => 'id_color',
+        'lamina_p'        => 'id_lamina_p',
     ];
 }
 
-// Cantidad de valores aún sin revisar (número de la campanita)
+// Cantidad sin revisar
 function contarCatalogoPendientes($conexion){
     $res = $conexion->query("SELECT COUNT(*) AS total FROM catalogo_pendientes WHERE decision = 'pendiente'");
     $fila = $res->fetch_assoc();
     return (int) ($fila['total'] ?? 0);
 }
 
-// Lista para el panel de la campanita: primero lo pendiente (más nuevo arriba),
-// luego el historial ya revisado (últimos 30)
+// Pendientes e historial
 function listarCatalogoPendientes($conexion){
     $pendientes = $conexion->query("
         SELECT * FROM catalogo_pendientes
@@ -39,7 +37,7 @@ function listarCatalogoPendientes($conexion){
     return ['pendientes' => $pendientes, 'historial' => $historial];
 }
 
-// Confirmar: el valor queda marcado como verificado en su catálogo (ya era usable; esto solo lo valida)
+// Confirmar valor
 function aprobarCatalogoPendiente($conexion, $id){
     $tablas = tablasCatalogoPendiente();
     $stmt = $conexion->prepare("SELECT * FROM catalogo_pendientes WHERE id = ? AND decision = 'pendiente' LIMIT 1");
@@ -59,8 +57,7 @@ function aprobarCatalogoPendiente($conexion, $id){
     return true;
 }
 
-// Rechazar: se oculta del catálogo (estado = 0, igual que "inhabilitar" en Catálogos) sin
-// borrarlo, para no romper los registros/PDFs ya guardados que lo usaron
+// Rechazar (estado = 0)
 function rechazarCatalogoPendiente($conexion, $id){
     $tablas = tablasCatalogoPendiente();
     $stmt = $conexion->prepare("SELECT * FROM catalogo_pendientes WHERE id = ? AND decision = 'pendiente' LIMIT 1");

@@ -54,7 +54,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     </tr>
                 </thead>
                 
-                <!-- Filas de registros de la base de datos -->
+                <!-- Filas de registros -->
                 <tbody>
                     <?php while($fila = mysqli_fetch_assoc($resultado)): ?>
                         <tr>
@@ -67,7 +67,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <td><?php echo $fila['nombre_color']; ?></td>
                             <td><?php echo $fila['rollos']; ?></td>
                             <td><?php echo $fila['peso_total']; ?></td>
-                             <!-- Botones de editar o eliminar registros -->
+                             <!-- Editar / eliminar -->
                             <td>
                                 <a class="btn"
                                 href="edit.php?id=<?php echo $fila['id']; ?>">
@@ -92,7 +92,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <!-- Paginación -->
     <div class="paginacion" style="text-align:center;">
         <?php
-            // Rango de páginas visibles en la paginación
+            // Rango de páginas
             $rango = 5;
             $inicio = max(1, $pagina - $rango);
             $fin = min($total_paginas, $pagina + $rango);
@@ -100,7 +100,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             if($pagina > 1){
                 echo '<a href="?pagina='.($pagina-1).'&buscar='.$busqueda.'&fecha='.$fecha.'">«</a> ';
             }
-            // Primera página si el rango no empieza en 1
+            // Primera página
             if($inicio > 1){
                 echo '<a href="?pagina=1&buscar='.$busqueda.'&fecha='.$fecha.'">1</a> ... ';
             }
@@ -112,7 +112,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     echo '<a href="?pagina='.$i.'&buscar='.$busqueda.'&fecha='.$fecha.'">'.$i.'</a> ';
                 }
             }
-            // Última página si faltan páginas al final
+            // Última página
             if($fin < $total_paginas){
                 echo ' ... <a href="?pagina='.$total_paginas.'&buscar='.$busqueda.'&fecha='.$fecha.'">'.$total_paginas.'</a>';
             }

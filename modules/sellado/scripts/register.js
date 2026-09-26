@@ -1,8 +1,8 @@
-// Register: planilla digital de turno (entradas, autoguardado, finalizar)
+// Planilla de turno (autoguardado)
 
 const planilla = document.getElementById("planilla");
 
-// Solo corre si hay un turno abierto en pantalla
+// Solo con turno abierto
 if (planilla) {
 
     const indicador    = document.getElementById("indicadorGuardado");
@@ -44,7 +44,7 @@ if (planilla) {
        CAMPOS "OTRO" (el select sigue visible mostrando "Otro"; aparece
        una casilla nueva al lado para escribir el nombre)
     ========================================= */
-    // Valor activo: el select, o la casilla de texto libre si eligió "Otro"
+    // Valor activo (select u Otro)
     function valorConOtro(contenedor, clase) {
         const select = contenedor.querySelector("select." + clase);
         if (!select) return "";
@@ -108,7 +108,7 @@ if (planilla) {
         }
     }
 
-    // Actualizar el código si cambió la fecha (recodificación)
+    // Recodificar si cambia la fecha
     function aplicarCodigo(codigo) {
         if (!codigo || codigo === planilla.dataset.codigo) return;
         const nuevaKey = "sellado_nota_" + codigo;
@@ -153,7 +153,7 @@ if (planilla) {
         }
     }
 
-    // Autoguardado con retardo tras cada cambio
+    // Autoguardado con retardo
     function marcarCambio() {
         sinGuardar = true;
         if (!guardando) setIndicador("pendiente", "Cambios sin guardar");
@@ -181,7 +181,7 @@ if (planilla) {
        ROWSPAN DE LA COLUMNA MÁQUINA / OPERARIO
     ========================================= */
     function recalcularRowspan(tb) {
-        const span = tb.querySelectorAll(".fila-entrada").length + 1; // + fila "+ Entrada"
+        const span = tb.querySelectorAll(".fila-entrada").length + 1; // + fila "+ Agregar"
         tb.querySelector(".col-maquina").rowSpan  = span;
         tb.querySelector(".col-operario").rowSpan = span;
     }
@@ -220,10 +220,10 @@ if (planilla) {
             const esOperario = e.target.classList.contains("f-operario");
             if (e.target.value === "otro") {
                 if (esOperario) {
-                    // Operario: el espacio ya está reservado; solo se activa (visibility)
+                    // Operario: espacio reservado
                     libre.classList.add("activo");
                 } else {
-                    // Referencia/Color/Jornada: la casilla reemplaza al select en el mismo lugar
+                    // Reemplaza el select por Otro
                     e.target.hidden = true;
                     libre.hidden = false;
                     volver.hidden = false;
@@ -242,17 +242,17 @@ if (planilla) {
         }
         marcarCambio();
     });
-    // Capitaliza el nombre libre de Operario al salir del campo
+    // Capitalizar nombre libre
     planilla.addEventListener("blur", e => {
         if (e.target.classList.contains("f-operario") && e.target.classList.contains("campo-libre")) {
             e.target.value = capitalizarNombre(e.target.value);
         }
     }, true); // blur no burbujea
 
-    // Agregar / quitar entradas, y volver de "Otro" a la lista
+    // Agregar/quitar entradas
     planilla.addEventListener("click", e => {
 
-        // Referencia/Color/Jornada: volver a mostrar el select (por si "Otro" fue un error)
+        // Volver al select
         if (e.target.classList.contains("btn-volver-lista")) {
             const wrap   = e.target.closest(".campo-otro-wrap");
             const select = wrap.querySelector("select");
@@ -265,7 +265,7 @@ if (planilla) {
             marcarCambio();
         }
 
-        // + Entrada
+        // + Agregar
         if (e.target.classList.contains("btn-entrada")) {
             const tb = e.target.closest(".grupo-maquina");
             if (tb.querySelectorAll(".fila-entrada").length >= MAX_ENTRADAS) {
@@ -291,7 +291,7 @@ if (planilla) {
                 fila.querySelectorAll("input").forEach(i => i.value = "");
                 fila.querySelectorAll("select").forEach(s => s.selectedIndex = 0);
             } else {
-                // Si se quita la primera, mover las celdas máquina/operario a la siguiente
+                // Mover celdas a la siguiente
                 if (fila === filas[0]) {
                     const sig = filas[1];
                     sig.insertBefore(fila.querySelector(".col-operario"), sig.firstChild);
@@ -339,7 +339,7 @@ if (planilla) {
                 return;
             }
 
-            // Éxito: la nota ya está en el PDF, se limpia el borrador local
+            // Éxito: limpiar borrador local
             sinGuardar = false;
             try { sessionStorage.removeItem(notaKey); } catch (e) {}
             cerrarModal("modalFinalizar");
@@ -357,8 +357,7 @@ if (planilla) {
                     : "Turno finalizado correctamente";
             mostrarAvisos(data.avisos);
             abrirModal("modalResultado");
-            // No se reactivan los botones: el turno ya quedó finalizado,
-            // el usuario debe salir por "Ver PDF" o "Nueva planilla".
+            // Turno ya finalizado
 
         } catch (e) {
             alert("Error de conexión al finalizar. Intenta de nuevo.");
@@ -369,7 +368,7 @@ if (planilla) {
     /* =========================================
        PROTECCIONES
     ========================================= */
-    // No avisar de cambios sin guardar tras confirmar "Cancelar"
+    // Sin aviso tras cancelar
     const formCancelar = document.getElementById("formCancelarTurno");
     if (formCancelar) {
         formCancelar.addEventListener("submit", e => {
@@ -377,7 +376,7 @@ if (planilla) {
         });
     }
 
-    // Avisar si hay cambios sin guardar
+    // Avisar cambios sin guardar
     window.addEventListener("beforeunload", e => {
         if (sinGuardar && !finalizando) {
             e.preventDefault();

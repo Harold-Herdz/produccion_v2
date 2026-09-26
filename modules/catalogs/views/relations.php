@@ -6,7 +6,7 @@
 $soloAdmin = true;
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
-// Importar relationsController.php  (prepara $rel y atiende los POST)
+// Prepara $rel y atiende POST
 include dirname(__DIR__) . '/controllers/relationsController.php';
 
 $urlControlador = BASE_URL . '/modules/catalogs/controllers/relationsController.php';
@@ -30,14 +30,14 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </select>
             </div>
 
-            <!-- Búsqueda por nombre de máquina (filtra las filas al escribir) -->
+            <!-- Búsqueda por máquina -->
             <div class="grupo-campo">
                 <label for="buscarMaquina">Buscar</label>
                 <input type="text" id="buscarMaquina" autocomplete="off" placeholder="Buscar máquina...">
             </div>
         </form>
 
-        <!-- Guardar / restaurar las relaciones (archivos semilla, por nombre) -->
+        <!-- Exportar / importar relaciones -->
         <div class="acciones" id="accionesRelaciones" data-url="<?= $urlControlador ?>">
             <a class="btn btn-secundario" onclick="accionRelaciones('exportar')">Exportar</a>
             <a class="btn btn-secundario" onclick="accionRelaciones('importar')">Importar</a>
@@ -46,7 +46,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <?php if ($rel === 'areas') {
             $matriz = obtenerMatrizMaquinaAreas($conexion);
         ?>
-        <!-- Matriz: en qué área (módulo) se usa cada máquina -->
+        <!-- Matriz máquina × área -->
         <div class="matriz-scroll" data-url="<?= $urlControlador ?>">
             <table class="tabla tabla-matriz tabla-matriz-igual">
                 <thead>
@@ -83,7 +83,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <?php } else {
             $matriz = obtenerMatrizMaquinaReferencias($conexion);
         ?>
-        <!-- Matriz: qué referencias produce cada máquina ("Especiales" = usa Referencias Especiales completas) -->
+        <!-- Matriz máquina × referencia -->
         <div class="matriz-scroll" data-url="<?= $urlControlador ?>">
             <table class="tabla tabla-matriz tabla-matriz-igual">
                 <thead>
@@ -128,7 +128,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     </div>
 
-    <!-- Overlay de carga (exportar/importar en curso) -->
+    <!-- Overlay de carga -->
     <div class="overlay" id="overlayCargaCatalogos">
         <div class="tarjeta-carga">
             <span class="spinner-carga"></span>

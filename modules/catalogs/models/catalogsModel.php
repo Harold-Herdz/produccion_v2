@@ -1,29 +1,7 @@
 <?php
-/**
- * =====================================================
- *  MODELO DE CATÁLOGOS
- * =====================================================
- *  Define las tablas maestras que se pueden administrar
- *  desde el módulo y concentra todas las consultas SQL:
- *    - listar registros existentes            (GET)
- *    - crear nuevos registros                 (POST)
- *    - activar / inhabilitar el estado        (POST)
- *
- *  Todas las tablas cuentan con el campo
- *  `estado TINYINT(1) DEFAULT 1` (1 = activo, 0 = inhabilitado).
- */
+// Modelo de catálogos
 
-/* =====================================================
-   CONFIGURACIÓN DE CATÁLOGOS
-   -----------------------------------------------------
-   Cada clave describe un catálogo:
-     - etiqueta : nombre visible en la interfaz
-     - tabla    : nombre real de la tabla en la base de datos
-     - id       : columna de llave primaria
-     - nombre   : columna que se muestra como "Nombre"
-     - campos   : columnas editables en el formulario de creación
-                  (columna => [etiqueta, tipo, opciones])
-===================================================== */
+// Configuración de catálogos
 function catalogosDisponibles()
 {
     return [
@@ -74,7 +52,7 @@ function catalogosDisponibles()
             ],
         ],
 
-        // Referencias especiales (usadas por Plana y como segunda referencia de Sellado/Extrusión)
+        // Referencias especiales
         'referencias_esp' => [
             'etiqueta' => 'Referencias Especiales',
             'tabla'    => 'REFERENCIAS_ESP',
@@ -102,8 +80,7 @@ function catalogosDisponibles()
             ],
         ],
 
-        // Turnos: catálogo cerrado de 4 valores fijos (Día, Tarde, Noche, 18 Horas).
-        // Se llena manualmente; el código nunca crea turnos nuevos.
+        // Turnos: catálogo cerrado
         'turnos' => [
             'etiqueta' => 'Turnos',
             'tabla'    => 'TURNOS',
@@ -117,7 +94,7 @@ function catalogosDisponibles()
             ],
         ],
 
-        // Jornadas (8 Horas, 12 Horas, ...)
+        // Jornadas
         'jornadas' => [
             'etiqueta' => 'Jornadas',
             'tabla'    => 'JORNADAS',
@@ -163,8 +140,7 @@ function catalogosDisponibles()
 }
 
 /**
- * Obtener la configuración de un catálogo por su clave.
- * Devuelve null si la clave recibida no corresponde a ningún catálogo válido.
+ * Configuración por clave
  */
 function obtenerConfigCatalogo($clave)
 {
@@ -179,19 +155,19 @@ require_once dirname(__DIR__, 2) . '/shared/systemState.php';
 require_once dirname(__DIR__, 3) . '/auth/shared/passwords.php';
 define('CATALOGOS_SEED_DIR', dirname(__DIR__) . '/seed');
 
-// Ruta del archivo semilla del catálogo
+// Ruta del archivo semilla
 function rutaSeedCatalogo($cfg)
 {
     return CATALOGOS_SEED_DIR . '/' . strtolower($cfg['tabla']) . '.sql';
 }
 
-// Líneas INSERT que representan el contenido actual del catálogo (sin el comentario de cabecera)
+// Líneas INSERT del catálogo
 function lineasExportCatalogo($conexion, $cfg)
 {
     $tabla     = $cfg['tabla'];
     $colNombre = $cfg['nombre'];
 
-    // Operarios: también se guarda si es supervisor
+    // Operarios: incluye supervisor
     $conSupervisor = ($tabla === 'OPERARIOS');
     $colExtra = $conSupervisor ? ', es_supervisor' : '';
 
@@ -212,7 +188,7 @@ function lineasExportCatalogo($conexion, $cfg)
     return $lineas;
 }
 
-// Vuelca todos los registros al archivo semilla
+// Volcar al archivo semilla
 function exportarCatalogo($conexion, $cfg)
 {
     $filas  = lineasExportCatalogo($conexion, $cfg);
@@ -227,7 +203,7 @@ function exportarCatalogo($conexion, $cfg)
     return count($filas);
 }
 
-// ¿El archivo semilla ya refleja el contenido actual? (false = hay cambios sin exportar)
+// ¿Semilla al día?
 function catalogoAlDia($conexion, $cfg)
 {
     $ruta = rutaSeedCatalogo($cfg);
@@ -239,7 +215,7 @@ function catalogoAlDia($conexion, $cfg)
     return $guardadas === lineasExportCatalogo($conexion, $cfg);
 }
 
-// Agrega desde el archivo semilla lo que falte
+// Importar lo que falte
 function importarCatalogo($conexion, $cfg)
 {
     $ruta = rutaSeedCatalogo($cfg);
@@ -256,7 +232,7 @@ function importarCatalogo($conexion, $cfg)
 
     $lineas = file($ruta, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lineas as $linea) {
-        // Tercer valor opcional (es_supervisor, solo en Operarios)
+        // Tercer valor: es_supervisor
         if (!preg_match("/VALUES\s*\('((?:[^']|'')*)'\s*,\s*(\d)(?:\s*,\s*(\d))?\)/i", $linea, $m)) {
             continue; // línea no reconocida
         }
@@ -270,7 +246,7 @@ function importarCatalogo($conexion, $cfg)
 
         $res = mysqli_query($conexion, "SELECT {$colId} FROM {$tabla} WHERE {$colNombre} = '{$valorEsc}' LIMIT 1");
         if ($res && mysqli_num_rows($res) > 0) {
-            // Ya existe: si el archivo lo marca como supervisor, se conserva esa marca (nunca se quita)
+            // Conservar marca de supervisor
             if ($supervisor === 1) {
                 mysqli_query($conexion, "UPDATE {$tabla} SET es_supervisor = 1 WHERE {$colNombre} = '{$valorEsc}'");
             }
@@ -291,13 +267,13 @@ function importarCatalogo($conexion, $cfg)
     return ['agregados' => $agregados, 'existentes' => $existentes, 'error' => null];
 }
 
-// Ruta del archivo semilla de usuarios
+// Ruta semilla de usuarios
 function rutaSeedUsuarios()
 {
     return CATALOGOS_SEED_DIR . '/usuarios.sql';
 }
 
-// Vuelca todos los usuarios (con contraseña y rol) al archivo semilla
+// Volcar usuarios a la semilla
 function exportarUsuarios($conexion)
 {
     $res = mysqli_query($conexion, "SELECT usuario, contrasena, rol, estado FROM USUARIOS ORDER BY usuario ASC");
@@ -306,7 +282,7 @@ function exportarUsuarios($conexion)
     if ($res) {
         while ($fila = mysqli_fetch_assoc($res)) {
             $usuario = str_replace("'", "''", $fila['usuario']);
-            // Nunca se exporta texto plano: si aún es una contraseña antigua, se cifra al exportar
+            // Nunca texto plano
             $guardada = contrasenaEsHash($fila['contrasena']) ? $fila['contrasena'] : cifrarContrasena($fila['contrasena']);
             $pass    = str_replace("'", "''", $guardada);
             $rol     = str_replace("'", "''", $fila['rol']);
@@ -324,7 +300,7 @@ function exportarUsuarios($conexion)
     return $total;
 }
 
-// Agrega usuarios desde el archivo semilla lo que falte (por nombre de usuario exacto)
+// Importar usuarios faltantes
 function importarUsuarios($conexion)
 {
     $ruta = rutaSeedUsuarios();
@@ -355,7 +331,7 @@ function importarUsuarios($conexion)
             continue;
         }
 
-        // Si el archivo trae una contraseña en texto plano (archivo antiguo), se cifra al importar
+        // Cifrar si viene en texto
         $passEsc = mysqli_real_escape_string($conexion, contrasenaEsHash($pass) ? $pass : cifrarContrasena($pass));
         $rolEsc  = mysqli_real_escape_string($conexion, $rol);
         mysqli_query($conexion, "INSERT INTO USUARIOS (usuario, contrasena, rol, estado) VALUES ('{$usuarioEsc}', '{$passEsc}', '{$rolEsc}', {$estado})");
@@ -379,13 +355,13 @@ function listarRegistros($conexion, $cfg, $busqueda = '')
 
     $sql = "SELECT * FROM $tabla";
 
-    // Aplicar filtro de búsqueda por nombre (si se envió texto)
+    // Filtro por nombre
     if ($busqueda !== '') {
         $busqueda = mysqli_real_escape_string($conexion, $busqueda);
         $sql .= " WHERE $nombre LIKE '%$busqueda%'";
     }
 
-    // Ordenar por ID (orden de creación), de menor a mayor
+    // Orden por ID
     $sql .= " ORDER BY $id ASC";
 
     return mysqli_query($conexion, $sql);
@@ -404,9 +380,9 @@ function crearRegistro($conexion, $cfg, $datos)
     $columnas = [];
     $valores  = [];
 
-    // Recorrer los campos editables definidos para este catálogo
+    // Campos editables
     foreach ($cfg['campos'] as $columna => $meta) {
-        // Checkbox: nunca obligatorio, 1 si vino marcado, 0 si no
+        // Checkbox: 1 o 0
         if (($meta['tipo'] ?? '') === 'checkbox') {
             $columnas[] = $columna;
             $valores[]  = isset($datos[$columna]) ? '1' : '0';
@@ -415,7 +391,7 @@ function crearRegistro($conexion, $cfg, $datos)
 
         $valor = trim($datos[$columna] ?? '');
 
-        // Todos los demás campos del formulario son obligatorios
+        // Demás campos obligatorios
         if ($valor === '') {
             return false;
         }
@@ -451,7 +427,7 @@ function cambiarEstadoRegistro($conexion, $cfg, $idRegistro)
     return mysqli_query($conexion, $sql);
 }
 
-// Alterna si un operario es supervisor (para Sellado: dropdown de "Supervisor")
+// Alternar supervisor
 function alternarSupervisorOperario($conexion, $idOperario)
 {
     $idOperario = (int) $idOperario;

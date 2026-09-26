@@ -12,9 +12,7 @@ function cerrarModal(idModal) {
     document.getElementById(idModal).style.display = "none";
 }
 
-// Confirmar el cambio de estado antes de enviar el formulario
-// estadoActual = 1 (activo)  -> se va a inhabilitar
-// estadoActual = 0 (inactivo) -> se va a activar
+// Confirmar cambio de estado
 function confirmarEstado(estadoActual) {
     var mensaje = (estadoActual === 1)
         ? "¿Deseas inhabilitar este registro?"
@@ -22,14 +20,14 @@ function confirmarEstado(estadoActual) {
     return confirm(mensaje);
 }
 
-// Cerrar el modal al hacer clic fuera de la tarjeta
+// Cerrar modal al hacer clic fuera
 window.addEventListener("click", function (evento) {
     if (evento.target.classList.contains("overlay")) {
         evento.target.style.display = "none";
     }
 });
 
-// Mostrar panel de exportar/importar en lugar de la tabla
+// Mostrar panel exportar/importar
 function mostrarPanelCatalogos(tipo) {
     document.getElementById("containerHistorial").style.display = "none";
     document.getElementById("accionesCatalogos").style.display = "none";
@@ -45,7 +43,7 @@ function ocultarPanelesCatalogos() {
     document.getElementById("accionesCatalogos").style.display = "flex";
 }
 
-// Pinta la lista de resultados en el overlay y lo abre
+// Pintar resultados en overlay
 function mostrarResultadoCatalogos(datos) {
     document.getElementById("tituloResultadoCatalogos").textContent =
         datos.tipo === "exportar" ? "Exportación completada" : "Importación completada";
@@ -69,7 +67,7 @@ function mostrarResultadoCatalogos(datos) {
     abrirModal("modalResultadoCatalogos");
 }
 
-// Enviar exportar/importar por AJAX: overlay de carga, luego el de resultado
+// Enviar por AJAX
 function enviarFormularioCatalogos(form, tipo) {
     const overlayCarga = document.getElementById("overlayCargaCatalogos");
     document.getElementById("textoCargaCatalogos").textContent =

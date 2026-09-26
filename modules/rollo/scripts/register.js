@@ -1,16 +1,16 @@
-// Register Rollos: registrar y limpiar sin salir
+// Formulario de Rollos
 
 const formRollo = document.getElementById("formRegistroRollo");
 
 if (formRollo) {
-    // Al abrir el formulario: completa en segundo plano cualquier cierre de día pendiente
+    // Reparar cierres pendientes
     fetch("../spreadsheet/closeSpreadsheet.php").catch(() => {});
 
     const aviso         = document.getElementById("avisoRollo");
     const btnRegistrar  = document.getElementById("btnRegistrarRollo");
     const btnVolver      = document.getElementById("btnVolverRollo");
     const campoFecha     = document.getElementById("fechaRollo");
-    let enviando = false;        // evita doble clic / doble registro
+    let enviando = false;        // evita doble registro
 
     /* =========================================
        AVISO (toast compartido: ver modules/shared/alertToast.js)
@@ -19,7 +19,7 @@ if (formRollo) {
     function mostrarAviso(texto, tipo, autoOcultar) { avisoToast.mostrar(texto, tipo, autoOcultar); }
     function ocultarAviso() { avisoToast.ocultar(); }
 
-    // Ocultar aviso al retomar el formulario
+    // Ocultar aviso al editar
     formRollo.addEventListener("input", () => {
         if (!enviando && !aviso.hidden) ocultarAviso();
     });
@@ -39,8 +39,8 @@ if (formRollo) {
             .join(" ");
     }
 
-    // Operario: el select se queda visible con "Otro", casilla nueva al lado.
-    // Referencia/Color: la casilla reemplaza al select en el mismo lugar.
+    // Operario: casilla Otro al lado
+    // Referencia/Color: reemplaza el select
     formRollo.addEventListener("change", e => {
         if (!e.target.classList.contains("tiene-otro")) return;
         const libre = e.target.nextElementSibling;
@@ -65,7 +65,7 @@ if (formRollo) {
         }
     });
 
-    // Capitaliza al salir del campo; en Referencia/Color, si queda vacío vuelve al select
+    // Capitalizar al salir del campo
     formRollo.addEventListener("blur", e => {
         if (!e.target.classList.contains("campo-libre")) return;
         e.target.value = capitalizar(e.target.value);
@@ -77,13 +77,13 @@ if (formRollo) {
         }
     }, true); // blur no burbujea
 
-    // Valor del select, o el texto libre capitalizado si eligió "Otro"
+    // Valor del select u Otro
     function valorConOtro(idSelect) {
         const select = document.getElementById(idSelect);
         return select.value === "otro" ? capitalizar(select.nextElementSibling.value) : select.value;
     }
 
-    // Vuelve un campo "Otro" a su estado de select (usado al limpiar el formulario)
+    // Restaurar select tras Otro
     function restaurarCampoConOtro(idSelect) {
         const select = document.getElementById(idSelect);
         const libre = select.nextElementSibling;
@@ -113,7 +113,7 @@ if (formRollo) {
 
     selectMaquina.addEventListener("change", () => poblarReferenciasRollo(Number(selectMaquina.value)));
 
-    // Limpiar los campos de un registro, manteniendo la fecha
+    // Limpiar campos, conservar fecha
     function limpiarFormulario() {
         restaurarCampoConOtro("operarioRollo");
         selectMaquina.selectedIndex = 0;
@@ -147,7 +147,7 @@ if (formRollo) {
     ========================================= */
     formRollo.addEventListener("submit", async e => {
         e.preventDefault();
-        if (enviando) return; // doble clic / envío repetido mientras procesa
+        if (enviando) return; // evita envío repetido
         enviando = true;
         btnRegistrar.disabled = true;
         btnRegistrar.textContent = "Registrando…";

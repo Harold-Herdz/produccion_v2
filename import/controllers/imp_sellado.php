@@ -55,7 +55,7 @@ echo "<script>
 </script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
-// Cargar catálogos desde la base de datos
+// Cargar catálogos
 echo "<script>document.getElementById('msg').textContent='Cargando catálogos…';</script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
@@ -73,7 +73,7 @@ $actualizados = 0;
 $duplicados   = 0;
 
 foreach ($filas as $data) {
-    // Limpiar y convertir datos de cada fila
+    // Limpiar datos de la fila
     $id_sheet   = trim($data[0]);
     $fecha      = convertirFecha($data[1]);
     $turno      = $data[2];
@@ -92,22 +92,20 @@ foreach ($filas as $data) {
     $peso_h5    = ($data[15] === "") ? null : convertirNumero($data[15]);
     $obs_sellado        = mysqli_real_escape_string($conexion, $data[16]);
 
-    // Obtener IDs de catálogos o crearlos si no existen
+    // IDs de catálogos (o crear)
     $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
     $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
     $id_referencia = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
     $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
 
-    // Por si el peso es NULL
+    // Peso NULL
     $peso1 = is_null($peso_h1) ? "NULL" : $peso_h1;
     $peso2 = is_null($peso_h2) ? "NULL" : $peso_h2;
     $peso3 = is_null($peso_h3) ? "NULL" : $peso_h3;
     $peso4 = is_null($peso_h4) ? "NULL" : $peso_h4;
     $peso5 = is_null($peso_h5) ? "NULL" : $peso_h5;
 
-    // Turno: catálogo cerrado de 4 valores (Día/Tarde/Noche/18 Horas), nunca se crea aquí.
-    // Si no se reconoce o el catálogo aún no lo tiene, la fila se guarda igual con el
-    // turno vacío (NULL) en vez de perderse; al llenar el catálogo y reimportar se completa solo.
+    // Turno: catálogo cerrado
     $nombreTurno = convertirBloque($turno);
     $id_turno = ($nombreTurno !== null) ? ($turnos[$nombreTurno] ?? null) : null;
     $id_turno_sql = ($id_turno === null) ? "NULL" : "'{$id_turno}'";
@@ -118,8 +116,7 @@ foreach ($filas as $data) {
         flush();
     }
 
-    // Jornada: catálogo cerrado de 2 valores (8 Horas / 12 Horas), nunca se crea aquí.
-    // Cualquier otro texto (horarios sueltos como "6pm", "1pm", etc.) siempre cae en "8 Horas".
+    // Jornada: catálogo cerrado
     $nombreJornada = normalizarJornada($jornada);
     $id_jornada = $jornadas[$nombreJornada] ?? null;
     $id_jornada_sql = ($id_jornada === null) ? "NULL" : "'{$id_jornada}'";
@@ -130,7 +127,7 @@ foreach ($filas as $data) {
         flush();
     }
 
-    // Modo 'todo': Insertar o actualizar si ya existe
+    // Modo todo: insertar/actualizar
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_SELLADO
                     (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,id_jornada,
@@ -157,7 +154,7 @@ foreach ($filas as $data) {
                     peso_hora4      = VALUES(peso_hora4),
                     peso_hora5      = VALUES(peso_hora5),
                     obs_sellado     = VALUES(obs_sellado)";
-    // Modo 'nuevos': Insertar solo si no existe
+    // Modo nuevos: solo insertar
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_SELLADO
                     (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,id_jornada,
@@ -172,6 +169,6 @@ foreach ($filas as $data) {
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
 }
 
-// Al finalizar: Mostrar contadores y guardar última fecha
+// Mostrar contadores al final
 finalizarImportacion($conexion,'sellado',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
 ?>

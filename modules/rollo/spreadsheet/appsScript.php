@@ -1,5 +1,5 @@
 <?php
-// Cliente del Apps Script de Rollos
+// Cliente Apps Script de Rollos
 
 // CSV de la hoja REGISTROS
 define('ROLLO_REGISTROS_CSV_URL', 'https://docs.google.com/spreadsheets/d/1LtibtaYF6GEsXE5Mxgq6uq8BR_ZEQ1idlqFUof5mgRo/export?format=csv&gid=46026898');
@@ -14,7 +14,7 @@ function appScriptConfiguradoRollo(){
         && strlen(ROLLO_APPSCRIPT_TOKEN) >= 6;
 }
 
-// POST al Web App de Rollos
+// POST al Web App
 function enviarAppScriptRollo($payload){
     $payload['token'] = ROLLO_APPSCRIPT_TOKEN;
 

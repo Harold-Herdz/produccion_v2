@@ -24,16 +24,16 @@ $esAdmin = ($_SESSION['rol'] == 'admin');
 
     <h2 class="titulo-vista">Panel General</h2>
 
-    <!-- Acceso directo a cada módulo (hace scroll hasta su sección) -->
+    <!-- Acceso directo a módulos -->
     <div class="home-nav" id="homeNav"></div>
 
-    <!-- Resumen general: General + un resumen por módulo (3 y 3) -->
+    <!-- Resumen general (3 y 3) -->
     <div class="home-resumen" id="homeResumen"></div>
 
     <!-- Catálogos (tablas maestras) -->
     <section class="home-modulo" id="homeCatalogos"></section>
 
-    <!-- Una sección por módulo: resumen, filtro, gráfico y tabla dinámicos -->
+    <!-- Sección por módulo -->
     <div id="homeModulos"></div>
 
 </div>
@@ -42,7 +42,7 @@ $esAdmin = ($_SESSION['rol'] == 'admin');
 <script src="<?= BASE_URL ?>/modules/home/scripts/home.js"></script>
 
 <?php } else { ?>
-<!-- Usuarios no admin: selector de módulos -->
+<!-- Selector para no admin -->
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/index.css">
 
 <!-- Contenedor principal -->

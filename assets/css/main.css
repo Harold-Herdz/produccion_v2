@@ -19,7 +19,7 @@ body {
   padding-top: 50px;
 }
 
-/* Empuja el footer al fondo cuando la página es corta */
+/* Footer al fondo */
 .contenido {
   flex: 1 0 auto;
   display: flex;
@@ -58,7 +58,7 @@ body {
 .navbar-logo img {
   height: 75px;
   width: auto;
-  /* Contorno blanco: contraste con el navbar */
+  /* Contorno blanco */
   filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
     drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff);
 }
@@ -219,7 +219,7 @@ body {
    CONTENEDOR PRINCIPAL
 =========================== */
 .container {
-  /* Mismo ancho en todas las interfaces (el body es flex: sin width se encogería al contenido) */
+  /* Mismo ancho en todas las vistas */
   width: calc(100% - 32px);
   max-width: 1350px;
   margin: 96px auto 48px auto;
@@ -276,7 +276,7 @@ body {
   font-size: 26px;
   color: var(--texto);
 }
-/* Fila Top: mismo ancho que los KPIs */
+/* Fila superior de KPIs */
 .kpis-top {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -734,7 +734,7 @@ canvas {
   overflow: auto;
   margin-top: 16px;
 }
-/* Título de bloque: fondo apenas más oscuro */
+/* Título de bloque */
 .tabla-dashboard h3 {
   margin: 0;
   padding: 12px 16px;
@@ -1157,19 +1157,25 @@ input::placeholder {
 /* ===========================
    VARIANTES DE ANCHO DEL CONTENEDOR
 =========================== */
-/* Formularios de registro/creación (Rollos y nueva planilla de Sellado) */
+/* Contenedor de formularios */
 .container.container-formulario {
   max-width: 620px;
 }
-/* Planilla de Sellado ya creada: ancho según su contenido (como antes) */
+/* Planilla: ancho por contenido */
 .container.container-planilla {
-  width: auto;
+  width: calc(100% - 32px);
+  max-width: 1350px;
 }
 
-/* Acceso directo "Inicio" del menú lateral (sin subtítulo) */
+/* Acceso "Inicio" del menú */
 .side-menu-module a.side-menu-inicio {
   padding: 10px 14px;
   color: var(--texto);
   font-weight: 600;
   font-size: 18px;
+}
+
+/* Planilla de Extrusión */
+.container.container-extrusion {
+  max-width: 1350px;
 }

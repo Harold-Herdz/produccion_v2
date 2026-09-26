@@ -12,7 +12,7 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 // Importar passwords.php (cifrado de contraseñas)
 require_once dirname(__DIR__) . '/shared/passwords.php';
 
-// Obtener ID y datos del formulario
+// Datos del formulario
 $id = (int)($_POST['id_usuario'] ?? 0);
 $usuario = trim($_POST['usuario'] ?? '');
 $contrasena = trim($_POST['contrasena'] ?? '');
@@ -23,7 +23,7 @@ $estado = (int)($_POST['estado'] ?? 1);
 $usuario = mysqli_real_escape_string($conexion, $usuario);
 $rol = mysqli_real_escape_string($conexion, $rol);
 
-// Actualizar sin cambiar contraseña si viene vacía
+// Sin cambiar contraseña si viene vacía
 if(empty($contrasena)){
     $sql = "UPDATE USUARIOS
             SET

@@ -1,5 +1,4 @@
-/* Campanita de notificaciones: valores de catálogo escritos a mano ("Otro")
-   pendientes de revisión por un admin. Solo visible para rol admin. */
+/* Campanita de notificaciones */
 
 .rol {
   display: flex;

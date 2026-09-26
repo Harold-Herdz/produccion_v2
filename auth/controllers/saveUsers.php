@@ -12,7 +12,7 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 // Importar passwords.php (cifrado de contraseñas)
 require_once dirname(__DIR__) . '/shared/passwords.php';
 
-// Obtener y limpiar datos del formulario
+// Datos del formulario
 $usuario = trim($_POST['usuario'] ?? '');
 $contrasena = trim($_POST['contrasena'] ?? '');
 $rol = trim($_POST['rol'] ?? '');

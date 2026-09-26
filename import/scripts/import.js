@@ -6,7 +6,7 @@ function up(pct, msg) {
     document.getElementById('dot').className           = 'dot';
     document.getElementById('status-lbl').textContent  = 'Procesando';
 }
-// Actualizar contadores y log por cada fila procesada
+// Actualizar contadores y log
 function tick(cur, total, ok, upd, dup, msgLog, type) {
     // Actualizar contadores de estado
     document.getElementById('s-ok').textContent  = ok;
@@ -56,7 +56,7 @@ function toggleLog() {
     document.getElementById('toggle-btn').classList.toggle('open');
     document.getElementById('log').classList.toggle('open');
 }
-// Volver a la página anterior o al inicio
+// Volver atrás o al inicio
 function volverAtras() {
     if (window.history.length > 2) {
         window.history.back();

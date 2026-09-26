@@ -19,14 +19,14 @@ $limite = 10;
 $pagina = $_GET['pagina'] ?? 1;
 $inicio = ($pagina - 1) * $limite;
 
-// Base de la consulta con JOINs
+// Consulta base con JOINs
 $sql_base = "FROM PRODUCCION_PLANA p
 LEFT JOIN MAQUINAS m ON p.id_maquina = m.id_maquina
 LEFT JOIN OPERARIOS o ON p.id_operario = o.id_operario
 LEFT JOIN REFERENCIAS_ESP r ON p.id_referencia_esp = r.id_referencia_esp
 WHERE 1=1";
 
-// Aplicar filtro de búsqueda por texto
+// Filtro de búsqueda
 if(!empty($busqueda)){
     $sql_base .= " AND (
         r.nombre_referencia_esp LIKE '%$busqueda%' OR
@@ -45,14 +45,14 @@ if(!empty($fecha)){
     $sql_base .= " AND DATE(p.fecha_plana) = '$fecha'";
 }
 
-// Contar total de registros para la paginación
+// Total para paginación
 $total_sql = "SELECT COUNT(*) as total $sql_base";
 $total_resultado = mysqli_query($conexion, $total_sql);
 $total_fila = mysqli_fetch_assoc($total_resultado);
 $total_registros = $total_fila['total'];
 $total_paginas = ceil($total_registros / $limite);
 
-// Consulta final con campos y límite de página
+// Consulta final paginada
 $sql = "SELECT p.*,
             m.nombre_maquina,
             o.nombre_operario,
@@ -64,7 +64,7 @@ $sql = "SELECT p.*,
 $resultado = mysqli_query($conexion, $sql);
 
 if($_SERVER['REQUEST_METHOD']=="POST"){
-    // Obtener ID del registro a actualizar
+    // ID a actualizar
     $id = $_POST['id'];
 
     // Recopilar datos del formulario
@@ -95,7 +95,7 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
 }
 
 if(isset($_GET['id'])){
-    // Obtener ID del registro a eliminar
+    // ID a eliminar
     $id = intval($_GET['id'] ?? 0);
 
     // Eliminar registro

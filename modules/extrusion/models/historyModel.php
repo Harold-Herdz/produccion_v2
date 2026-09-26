@@ -2,7 +2,7 @@
 /* =================================================
    CONSULTAS
 ================================================= */
-// Obtener registro de producción por ID
+// Registro por ID
 function obtenerRegistroExtrusionPorId($conexion, $id){
     $sql = "SELECT * FROM PRODUCCION_EXTRUSION WHERE id = $id";
     $res = mysqli_query($conexion, $sql);
@@ -32,7 +32,7 @@ function obtenerLaminaPExtrusion($conexion){
 /* =================================================
    ACTUALIZAR
 ================================================= */
-// Actualizar registro de producción por ID
+// Actualizar registro
 function actualizarProduccion($conexion, $id, $datos){
     $sql = "UPDATE PRODUCCION_EXTRUSION SET
             fecha_extrusion = '{$datos['fecha']}',
@@ -51,7 +51,7 @@ function actualizarProduccion($conexion, $id, $datos){
 /* =================================================
    ELIMINAR
 ================================================= */
-// Eliminar registro de producción por ID
+// Eliminar registro
 function eliminarProduccion($conexion, $id){
     $sql = "DELETE FROM PRODUCCION_EXTRUSION 
             WHERE id = $id";

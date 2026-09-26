@@ -1,4 +1,4 @@
-/* Inicio: panel general (el resto viene de main.css) */
+/* Inicio: panel general */
 
 /* ===========================
    ACCESO DIRECTO A MÓDULOS
@@ -115,7 +115,7 @@
   gap: 8px;
 }
 
-/* Resumen detallado del módulo: 3 columnas */
+/* Resumen del módulo (3 columnas) */
 .home-resumen-modulo {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -141,7 +141,7 @@
 }
 .home-enlace:hover { text-decoration: underline; }
 
-/* Botón + panel de filtro por fechas */
+/* Botón y panel de fechas */
 .home-filtrar-barra {
   display: flex;
   align-items: center;
@@ -198,7 +198,7 @@
   color: var(--azul-oscuro);
 }
 
-/* Controles repartidos a todo el ancho */
+/* Controles a todo el ancho */
 .home-controles {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -304,7 +304,7 @@
   color: var(--texto-tenue);
 }
 
-/* Desplegable con buscador (rectangular, como los demás selects) */
+/* Desplegable con buscador */
 .home-dd {
   position: relative;
 }
@@ -503,7 +503,7 @@
   .home-lienzo { height: 300px; }
 }
 
-/* Botón verde (mismo verde que "Importar Registros") */
+/* Botón verde */
 .btn.btn-verde {
   background: var(--verde-oscuro);
   color: var(--texto-claro);
@@ -520,10 +520,10 @@
   .home-filtro-fechas { grid-template-columns: 1fr 1fr; }
 }
 
-/* El atributo hidden debe ganarle a los display de .btn, etc. */
+/* hidden gana a display */
 #homePanel [hidden] { display: none !important; }
 
-/* Flecha hacia abajo en todos los selects del panel (igual que el resto de formularios) */
+/* Flecha en los selects */
 #homePanel select {
   appearance: none;
   -webkit-appearance: none;
@@ -610,7 +610,7 @@
   background: var(--azul-claro);
 }
 
-/* Botón para quitar un filtro (rojo) */
+/* Botón rojo de quitar */
 .home-filtro-quitar {
   width: 28px;
   height: 28px;
@@ -631,7 +631,7 @@
   background: var(--danger-hover);
 }
 
-/* Barra del botón Filtrar: texto del período centrado en vertical */
+/* Texto del período centrado */
 .home-filtrar-barra {
   align-items: center;
 }
@@ -671,7 +671,7 @@
   font-size: 24px;
   letter-spacing: 0.02em;
 }
-/* Botones del banner: blancos (y el verde de Ver Registros/PDFs se mantiene) */
+/* Botones blancos del banner */
 .home-modulo-cab a.btn:not(.btn-verde) {
   background: var(--fondo-superficie);
   color: var(--azul-oscuro);
@@ -687,7 +687,7 @@
   background: var(--verde-oscuro);
 }
 
-/* Ver Registros / Ver PDFs: igual que Ver Panel (fondo blanco, texto azul oscuro) */
+/* Ver Registros/PDFs como Ver Panel */
 .home-modulo-cab a.btn.btn-verde {
   background: var(--fondo-superficie);
   color: var(--azul-oscuro);
@@ -696,7 +696,7 @@
   background: var(--azul-claro);
 }
 
-/* Tabla de Catálogos: encabezado y bordes en el verde oscuro de su sección */
+/* Tabla de Catálogos en verde */
 #homeCatalogos .home-card {
   border: 1px solid var(--verde-oscuro);
   border-top: 4px solid var(--verde-oscuro);
@@ -715,7 +715,7 @@
   background: var(--verde-claro);
 }
 
-/* Tarjeta General: borde izquierdo, título y número grande en verde */
+/* Tarjeta General en verde */
 .home-kpi.home-kpi-general {
   border-left-color: var(--verde-oscuro);
 }

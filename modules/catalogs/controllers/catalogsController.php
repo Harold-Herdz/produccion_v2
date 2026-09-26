@@ -5,19 +5,15 @@
  * =====================================================
  *  CONTROLADOR DE CATÁLOGOS
  * =====================================================
- *  Coordina la administración de las tablas maestras:
- *    - GET  : listar los registros del catálogo seleccionado
- *    - POST : crear un registro           (accion = "crear")
- *    - POST : activar / inhabilitar       (accion = "estado")
+ * Administra las tablas maestras
  *
- *  Tras cada POST se redirige a la vista (patrón PRG)
- *  para evitar el reenvío del formulario al recargar.
+ * Redirige tras cada POST
  */
 
 // Restringir acceso solo a administradores
 $soloAdmin = true;
 
-// Importar authMiddleware.php  (valida sesión y rol admin)
+// Valida sesión y rol admin
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 // Importar conexion.php
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
@@ -26,7 +22,7 @@ require_once dirname(__DIR__, 3) . '/includes/config.php';
 // Importar catalogsModel.php
 require_once dirname(__DIR__) . '/models/catalogsModel.php';
 
-// Ruta de la vista para las redirecciones
+// Ruta de la vista
 $rutaVista = BASE_URL . '/modules/catalogs/views/catalogs.php';
 
 /* =====================================================
@@ -37,7 +33,7 @@ $rutaVista = BASE_URL . '/modules/catalogs/views/catalogs.php';
 ===================================================== */
 $clave = $_POST['cat'] ?? $_GET['cat'] ?? 'operarios';
 
-// (Las relaciones máquina↔área / máquina↔referencia se administran en relationsController.php)
+// Relaciones: relationsController.php
 $cfg = obtenerConfigCatalogo($clave);
 
 if ($cfg === null) {
@@ -52,23 +48,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $accion = $_POST['accion'] ?? '';
 
-    // Crear un nuevo registro dentro del catálogo actual
+    // Crear registro
     if ($accion === 'crear') {
         crearRegistro($conexion, $cfg, $_POST);
     }
 
-    // Activar / inhabilitar un registro existente
+    // Activar / inhabilitar
     if ($accion === 'estado') {
         $idRegistro = $_POST['id'] ?? 0;
         cambiarEstadoRegistro($conexion, $cfg, $idRegistro);
     }
 
-    // Marcar / desmarcar un operario como supervisor
+    // Marcar supervisor
     if ($accion === 'toggle_supervisor' && $clave === 'operarios') {
         alternarSupervisorOperario($conexion, $_POST['id'] ?? 0);
     }
 
-    // Exportar / importar varios catálogos (AJAX; responde JSON, sin recargar la página)
+    // Exportar / importar (AJAX)
     if ($accion === 'exportar' || $accion === 'importar') {
         $seleccionados = $_POST['catalogos'] ?? [];
         $resultados = [];
@@ -87,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Usuarios: exporta/importa con contraseña y rol (no es un catálogo genérico)
+        // Usuarios: exportar/importar
         if (in_array('usuarios', $seleccionados, true)) {
             if ($accion === 'exportar') {
                 $total = exportarUsuarios($conexion);
@@ -105,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Redirigir de vuelta a la vista con el catálogo seleccionado
+    // Volver a la vista
     header('Location: ' . $rutaVista . '?cat=' . urlencode($clave));
     exit;
 }

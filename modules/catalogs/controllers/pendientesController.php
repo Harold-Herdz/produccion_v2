@@ -3,12 +3,11 @@
 
 /**
  * =====================================================
- *  CAMPANITA DE NOTIFICACIONES — valores de catálogo
- *  escritos a mano ("Otro") pendientes de revisión
+ * Campanita de notificaciones
  * =====================================================
- *  GET  ?accion=listar   -> JSON con pendientes + historial + contador
- *  POST accion=aprobar   -> confirma un valor (id)
- *  POST accion=rechazar  -> rechaza un valor (id)
+ * GET listar: pendientes e historial
+ * POST aprobar
+ * POST rechazar
  */
 
 $soloAdmin = true;

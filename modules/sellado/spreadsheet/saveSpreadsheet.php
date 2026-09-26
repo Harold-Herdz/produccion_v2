@@ -1,7 +1,7 @@
 <?php
 /** @var mysqli $conexion */
 
-// Guardado progresivo de la planilla (AJAX, JSON)
+// Guardado progresivo (AJAX)
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 require_once dirname(__DIR__) . '/models/registerModel.php';
@@ -21,7 +21,7 @@ if(!$planilla || $planilla['estado'] !== 'abierta'){
     exit;
 }
 
-// Fecha cambiada: recodificar antes de guardar
+// Recodificar antes de guardar
 $fecha = validarFechaPlanilla($entrada['fecha'] ?? '');
 if($fecha){
     [$planilla, $errFecha] = recodificarPlanilla($conexion, $planilla, $fecha);

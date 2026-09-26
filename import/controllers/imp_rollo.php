@@ -53,7 +53,7 @@ echo "<script>
 </script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
-// Cargar catálogos desde la base de datos
+// Cargar catálogos
 echo "<script>document.getElementById('msg').textContent='Cargando catálogos…';</script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
@@ -69,7 +69,7 @@ $actualizados = 0;
 $duplicados   = 0;
 
 foreach ($filas as $data) {
-    // Limpiar y convertir datos de cada fila
+    // Limpiar datos de la fila
     $id_sheet    = trim($data[0]);
     $fecha       = convertirFecha($data[1]);
     $operario    = limpiarNombre($data[2]);
@@ -79,13 +79,13 @@ foreach ($filas as $data) {
     $peso_rollo  = convertirNumero($data[6]);
     $peso_retal  = convertirNumero($data[7]);
 
-    // Obtener IDs de catálogos o crearlos si no existen
+    // IDs de catálogos (o crear)
     $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
     $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
     $id_referencia = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
     $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
 
-    // Modo 'todo': Insertar o actualizar si ya existe
+    // Modo todo: insertar/actualizar
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_ROLLO
                     (id_sheet,fecha_rollo,id_operario,id_maquina,
@@ -101,7 +101,7 @@ foreach ($filas as $data) {
                     id_color      = VALUES(id_color),
                     peso_rollo    = VALUES(peso_rollo),
                     peso_retal    = VALUES(peso_retal)";
-    // Modo 'nuevos': Insertar solo si no existe
+    // Modo nuevos: solo insertar
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_ROLLO
                     (id_sheet,fecha_rollo,id_operario,id_maquina,
@@ -114,6 +114,6 @@ foreach ($filas as $data) {
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
 }
 
-// Al finalizar: Mostrar contadores y guardar última fecha
+// Mostrar contadores al final
 finalizarImportacion($conexion,'rollo',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
 ?>

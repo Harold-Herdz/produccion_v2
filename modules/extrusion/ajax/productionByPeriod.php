@@ -33,7 +33,7 @@ if($tipo === "anio"){
             GROUP BY WEEK(fecha_extrusion, 1), CONCAT('Sem ', WEEK(fecha_extrusion, 1))
             ORDER BY WEEK(fecha_extrusion, 1) ASC";
 }else{
-    // Rango de días de la semana seleccionada
+    // Rango de la semana
     if($semana != ""){
         $inicio = (($semana - 1) * 7) + 1;
         $fin = $semana * 7;
@@ -70,7 +70,7 @@ while($row = mysqli_fetch_assoc($res)){
 ===================== */
 // Mostrar por año
 if($tipo == "anio"){
-    // Máquinas del año ordenadas por total
+    // Máquinas del año
     $sql2 = "SELECT m.nombre_maquina, 
                 SUM(e.peso_total) total
             FROM PRODUCCION_EXTRUSION e

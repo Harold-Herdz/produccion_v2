@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/modules/shared/systemState.php';
-// Límite de memoria y tiempo de ejecución
+// Límites de memoria y tiempo
 ini_set('memory_limit', '512M');
 set_time_limit(0);
 
@@ -15,7 +15,7 @@ if(function_exists('apache_setenv')){
 /* =====================
    FUNCIONES DE TEXTO
 ===================== */
-// Limpiar nombre: si tiene ' - ', retorna solo la parte derecha
+// Nombre: parte tras " - "
 function limpiarNombre($texto) {
     $texto = trim($texto);
     if (strpos($texto, ' - ') !== false) {
@@ -24,8 +24,7 @@ function limpiarNombre($texto) {
     }
     return $texto;
 }
-// Convertir el horario del Sheet al nombre de turno fijo del catálogo TURNOS
-// (Día/Tarde/Noche); TURNOS es un catálogo cerrado de 4 valores, nunca se crea aquí
+// Horario a turno del catálogo
 function convertirBloque($turno) {
     switch (strtolower(trim($turno))) {
         case "6am - 2pm":
@@ -38,7 +37,7 @@ function convertirBloque($turno) {
             return null;
     }
 }
-// Convertir número con formato colombiano (puntos y comas) a float
+// Número colombiano a float
 function convertirNumero($valor) {
     $valor = trim($valor);
     if ($valor === '' || $valor === null) {
@@ -53,7 +52,7 @@ function convertirNumero($valor) {
 /* =====================
    FUNCIONES DE FECHA
 ===================== */
-// Convertir fecha en múltiples formatos posibles a formato MySQL
+// Fecha a formato MySQL
 function convertirFecha($fecha) {
     $fecha = trim($fecha);
     if (empty($fecha)) {
@@ -72,7 +71,7 @@ function convertirFecha($fecha) {
 /* =====================
    FUNCIONES DE BD
 ===================== */
-// Cargar catálogo como arreglo asociativo [nombre => id]
+// Catálogo como [nombre => id]
 function cargarCatalogo($conexion, $tabla, $campo_nombre, $campo_id) {
     $lista = [];
     $res = mysqli_query($conexion, "SELECT $campo_id, $campo_nombre FROM $tabla");
@@ -81,7 +80,7 @@ function cargarCatalogo($conexion, $tabla, $campo_nombre, $campo_id) {
     }
     return $lista;
 }
-// Insertar nuevo registro en catálogo si no existe y retornar su ID
+// Crear en catálogo si falta
 function autoCrear($conexion, &$catalogo, $tabla, $campo, $valor) {
     $valor_esc = mysqli_real_escape_string($conexion, $valor);
     mysqli_query($conexion, "INSERT INTO $tabla ($campo) VALUES ('$valor_esc')");
@@ -106,14 +105,14 @@ function actualizarUltimoIdSheet($conexion, $nombre, $id_sheet) {
 /* =====================
    FUNCIONES DE PROGRESO
 ===================== */
-// Enviar actualización de progreso al navegador en tiempo real
+// Progreso al navegador
 function sendProgress($pct, $msg) {
     $msg = addslashes($msg);
     echo "<script>up($pct,'$msg');</script>\n";
     if (ob_get_level()) ob_flush();
     flush();
 }
-// Leer filas del Google Sheet y filtrar según modo de importación
+// Leer Sheet según modo
 function leerSheet($url, $modo, $ultimo_id_sheet) {
     $archivo = fopen($url, 'r');
     if (!$archivo) {
@@ -125,7 +124,7 @@ function leerSheet($url, $modo, $ultimo_id_sheet) {
     while (($data = fgetcsv($archivo, 1000, ',')) !== false) {
         if ($primera) { $primera = false; continue; }
 
-        // En modo 'nuevos', omitir filas ya importadas
+        // Omitir filas ya importadas
         if ($modo === 'nuevos') {
             $id_sheet = trim($data[0]);
             if ($ultimo_id_sheet && strcmp($id_sheet, $ultimo_id_sheet) <= 0) {
@@ -138,7 +137,7 @@ function leerSheet($url, $modo, $ultimo_id_sheet) {
     fclose($archivo);
     return [$filas, $omitidas];
 }
-// Ejecutar SQL, clasificar resultado e informar progreso al navegador
+// Ejecutar SQL e informar
 function procesarFila($conexion, $sql, $id_sheet, &$contador, $total,
     &$insertados, &$actualizados, &$duplicados, &$ultimo_id_sheet) {
     $contador++;
@@ -161,18 +160,18 @@ function procesarFila($conexion, $sql, $id_sheet, &$contador, $total,
         $tipo   = 'dup';
         $logMsg = addslashes("⚠ Duplicado · $id_sheet");
     }
-    // Enviar resultado al navegador en tiempo real
+    // Resultado al navegador
     echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,'$logMsg','$tipo');</script>\n";
     if (ob_get_level()) ob_flush();
     flush();
 }
-// Guardar última fecha e enviar señal de finalización al navegador
+// Guardar y avisar fin
 function finalizarImportacion($conexion, $nombre, $insertados, $actualizados, $duplicados, $total, $ultimo_id_sheet = null) {
 
     if (!empty($ultimo_id_sheet)) {
         actualizarUltimoIdSheet($conexion, $nombre, $ultimo_id_sheet);
     }
-    // Para el panel de Inicio: cuándo se importó por última vez y qué resultó
+    // Estado para Inicio
     estadoSistemaGuardar('importaciones', $nombre, [
         'fecha' => date('Y-m-d H:i:s'), 'insertados' => $insertados, 'actualizados' => $actualizados,
         'duplicados' => $duplicados, 'total' => $total,

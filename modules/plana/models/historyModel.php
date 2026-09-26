@@ -2,7 +2,7 @@
 /* =================================================
    CONSULTAS
 ================================================= */
-// Obtener registro de producción por ID
+// Registro por ID
 function obtenerRegistroPlanaPorId($conexion, $id){
     $sql = "SELECT * FROM PRODUCCION_PLANA WHERE id = $id";
     $res = mysqli_query($conexion, $sql);
@@ -23,7 +23,7 @@ function obtenerReferenciasPlana($conexion){
 /* =================================================
    ACTUALIZAR
 ================================================= */
-// Actualizar registro de producción por ID
+// Actualizar registro
 function actualizarProduccion($conexion, $id, $datos){
     $sql = "UPDATE PRODUCCION_PLANA SET
             fecha_plana = '{$datos['fecha']}',
@@ -41,7 +41,7 @@ function actualizarProduccion($conexion, $id, $datos){
 /* =================================================
    ELIMINAR
 ================================================= */
-// Eliminar registro de producción por ID
+// Eliminar registro
 function eliminarProduccion($conexion, $id){
     $sql = "DELETE FROM PRODUCCION_PLANA 
             WHERE id = $id";

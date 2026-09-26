@@ -1,9 +1,9 @@
-// Variables globales para instancias de gráficos
+// Instancias de gráficos
 window.chartProduccion  = window.chartProduccion  || null;
 window.chartMaquinas    = window.chartMaquinas    || null;
 window.chartMeses       = window.chartMeses       || null;
 
-// Cargar gráficos de producción y operarios según filtros
+// Cargar gráficos según filtros
 function cargarDatos(tipo){
     let mes    = document.getElementById("filtroMes").value;
     let semana = document.getElementById("filtroSemana").value;
@@ -12,7 +12,7 @@ function cargarDatos(tipo){
     .then(res => res.json())
     .then(data => {
 
-        // Gráfico de producción y rollos (línea por mes/semana, barras por año)
+        // Gráfico de producción
         if(chartProduccion) chartProduccion.destroy();
         const tipo_grafico = (tipo === 'anio') ? 'bar' : 'line';
         chartProduccion = new Chart(document.getElementById('graficoProduccion'), {
@@ -55,7 +55,7 @@ function cargarDatos(tipo){
             }
         });
 
-        // Ordenar máquinas de mayor a menor producción
+        // Ordenar máquinas por producción
         let maquinasOrdenadas = data.maquinas.map((maq, i) => ({
             maquina: maq,
             total:   data.totales_maquinas[i]
@@ -104,7 +104,7 @@ function cargarDatos(tipo){
     });
 }
 
-// Aplicar valor de meses y recargar resumenes
+// Recargar resúmenes por mes
 const mes1 = document.getElementById("mes1");
 const mes2 = document.getElementById("mes2");
 
@@ -136,7 +136,7 @@ function actualizarFiltros(){
 }
 actualizarFiltros();
 
-// Cargar gráfico de producción mensual por año
+// Gráfico mensual por año
 function cargarGraficoMeses(){
     let anio = document.getElementById("filtroAnioMes").value;
 
@@ -182,7 +182,7 @@ function cargarGraficoMeses(){
         });
     });
 
-    // Obtener y mostrar total del año en kg
+    // Total del año (kg)
     fetch(`../ajax/productionByYear.php?anio=${anio}`)
     .then(res => res.json())
     .then(data => {

@@ -14,7 +14,7 @@ $filtros = [
 ];
 $anio = $filtros['anio'];
 
-// Total de producción en el año
+// Total del año
 $sql = "SELECT SUM(peso_total) total
         FROM PRODUCCION_ROLLO
         WHERE YEAR(fecha_rollo) = $anio";

@@ -27,7 +27,7 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 
         <div class="top">
 
-            <!-- Título y subtítulo de la importación -->
+            <!-- Título de la importación -->
             <div>
                 <h1><?php echo $titulo; ?></h1>
                 <p>Google Sheets &rarr; MySQL &middot; <?php echo $subtitulo; ?></p>

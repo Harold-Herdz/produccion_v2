@@ -3,7 +3,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Variables de la base de datos
+// Variables de la BD
 if ($_SERVER['HTTP_HOST'] === 'localhost') {
     $host     = "localhost";
     $usuario  = "root";
@@ -16,7 +16,7 @@ if ($_SERVER['HTTP_HOST'] === 'localhost') {
     $database = "if0_42142771_produccion";
 }
 
-// Conectar a la base de datos
+// Conectar a la BD
 $conexion = mysqli_connect($host, $usuario, $password, $database);
 
 // Verificar conexión

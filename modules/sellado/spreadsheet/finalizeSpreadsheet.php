@@ -1,7 +1,7 @@
 <?php
 /** @var mysqli $conexion */
 
-// Finaliza el turno: envía REGISTROS + LOGS + PDF al Apps Script y limpia el borrador (AJAX, JSON)
+// Finaliza turno y limpia borrador
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
@@ -12,7 +12,7 @@ require_once __DIR__ . '/appsScript.php';
 header('Content-Type: application/json');$entrada  = json_decode(file_get_contents('php://input'), true) ?: [];
 $codigo   = $entrada['codigo'] ?? '';
 $maquinas = $entrada['maquinas'] ?? [];
-// La nota va al PDF, no a la base de datos
+// Nota solo al PDF
 $nota     = trim((string) ($entrada['nota'] ?? ''));
 
 // Candado anti doble finalización
@@ -43,7 +43,7 @@ try {
         return;
     }
 
-    // Fecha cambiada: recodificar antes de cerrar
+    // Recodificar antes de cerrar
     $fecha = validarFechaPlanilla($entrada['fecha'] ?? '');
     if($fecha){
         [$planilla, $errFecha] = recodificarPlanilla($conexion, $planilla, $fecha);
@@ -54,7 +54,7 @@ try {
     }
     $codigo = $planilla['codigo'];
 
-    $resultado = guardarPlanilla($conexion, $planilla, $maquinas);
+    $resultado = guardarPlanilla($conexion, $planilla, $maquinas, true);
 
     $total = contarRegistrosPlanilla($conexion, $codigo);
     if($total === 0){
@@ -81,7 +81,7 @@ try {
     $yaExportado = (!$respuesta['ok'] && ($respuesta['error'] ?? '') === 'yaExportado');
 
     if(!$respuesta['ok'] && !$yaExportado){
-        // Envío falló: el borrador queda intacto para reintentar
+        // Falló envío: conservar borrador
         echo json_encode(['ok' => false, 'error' => $respuesta['error'] ?? 'No se pudo enviar el turno a Google.']);
         return;
     }

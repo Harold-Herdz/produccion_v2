@@ -8,7 +8,7 @@ require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 // Importar conexion.php
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 
-// Producción total y bultos por referencia especial
+// Producción por referencia
 $sql = "SELECT r.nombre_referencia_esp,
             SUM(p.peso_total) totales,
             SUM(p.bultos) bultos

@@ -2,7 +2,7 @@
 /* =================================================
    CONSULTAS
 ================================================= */
-// Obtener registro de producción por ID
+// Registro por ID
 function obtenerProduccionPorId($conexion, $id){
     $sql = "SELECT * 
             FROM PRODUCCION_SELLADO 
@@ -46,7 +46,7 @@ function obtenerJornadas($conexion){
 /* =================================================
    ACTUALIZAR
 ================================================= */
-// Actualizar registro de producción por ID
+// Actualizar registro
 function actualizarProduccion($conexion, $id, $datos){
     $sql = "UPDATE PRODUCCION_SELLADO SET
             fecha_sellado='{$datos['fecha']}',
@@ -72,7 +72,7 @@ function actualizarProduccion($conexion, $id, $datos){
 /* =================================================
    ELIMINAR
 ================================================= */
-// Eliminar registro de producción por ID
+// Eliminar registro
 function eliminarProduccion($conexion, $id){
     $sql = "DELETE FROM PRODUCCION_SELLADO 
             WHERE id = $id";

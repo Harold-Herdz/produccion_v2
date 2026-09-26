@@ -51,17 +51,17 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <!-- KPIs principales -->
     <div class="kpis">
-        <!-- KPI de total historico de producción -->
+        <!-- KPI total histórico -->
         <div class="card-kpi">
             <p>Total histórico</p>
             <h2><?php echo number_format($total); ?> kg</h2>
         </div>
-        <!-- KPI de producción de la semana actual -->
+        <!-- KPI semana actual -->
         <div class="card-kpi">
             <p>Peso semanal</p>
             <h2><?php echo number_format($semana); ?> kg</h2>
         </div>
-        <!-- KPI de producción del mes actual -->
+        <!-- KPI mes actual -->
         <div class="card-kpi">
             <p>Peso mensual</p>
             <h2><?php echo number_format($mes); ?> kg</h2>
@@ -100,12 +100,12 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <hr class="seccion-divisor">
 
-    <!-- Comparativo mes 1 y mes 2 -->
+    <!-- Comparativo de meses -->
     <div class="resumenes">
         <!-- Resumen mes 1 -->
         <div class="resumen-mes1">
             <h3>Resumen de 
-                <!-- Selección del mes 1 a comparar -->
+                <!-- Mes 1 -->
                 <select name="mes1" id="mes1">
                     <?php foreach($meses as $num => $nombre) { ?>
                         <option
@@ -201,7 +201,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <!-- Resumen mes 2 -->
         <div class="resumen-mes2">
             <h3>Resumen de 
-                <!-- Selección del mes 2 a comparar -->
+                <!-- Mes 2 -->
                 <select name="mes2" id="mes2">
                     <?php foreach($meses as $num => $nombre) { ?>
                         <option
@@ -273,7 +273,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <hr class="seccion-divisor">
 
-    <!-- Botón para abrir modal de importación -->
+    <!-- Botón de importar -->
     <a class="btn" id="btnImportar" onclick="abrirModal('modalImportar')">Importar Registros</a>
 
     <!-- Sección de gráficos -->
@@ -298,7 +298,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label class="label" for="filtroSemana">
                 Semana:
                 <select id="filtroSemana" onchange="actualizarFiltros()">
-                    <!-- Todas las semanas del mes seleccionado-->
+                    <!-- Semanas del mes-->
                     <option value = "" <?php if($semana_actual == "") echo "selected"; ?> >
                         Todas
                     </option>
@@ -309,7 +309,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     <option value="5" <?php if($semana_actual == 5) echo "selected"; ?>>Semana 5</option>
                 </select>
             </label>
-            <!-- Filtro de año agrupado por semanas -->
+            <!-- Filtro de año por semanas -->
             <button class="btn" id="btnAnio" onclick="cargarDatos('anio')">Año</button>
         </div>
 
@@ -336,7 +336,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     </div>
 
 
-    <!-- Gráfico de producción mensual por año -->
+    <!-- Gráfico mensual por año -->
     <div class="contenedor-grafico">
         <h3>Peso por año (Máquina Plana)</h3>
             <div class="header-grafico-meses">

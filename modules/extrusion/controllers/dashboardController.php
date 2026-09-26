@@ -28,10 +28,10 @@ $mes2 = $_GET['mes2'] ?? $mes_actual;
 
 // Total histórico de producción
 $total = obtenerTotalHistoricoExtrusion($conexion);
-// Producción de la semana y del mes actual
+// Producción semana y mes
 $semana = obtenerProduccionSemanaExtrusion($conexion);
 $mes = obtenerProduccionMesExtrusion($conexion);
-// Top máquina y top operario (año actual)
+// Top máquina y operario
 $top_maquina = obtenerTopMaquinaExtrusion($conexion);
 $top_operario = obtenerTopOperarioExtrusion($conexion);
 
@@ -44,7 +44,7 @@ $rollos_mes1 = $resumen_mes1['rollos'];
 $resumen_mes2 = obtenerRollosMesExtrusion($conexion,$mes2);
 $rollos_mes2 = $resumen_mes2['rollos'];
 
-// Mejor y peor día de los meses
+// Mejor y peor día
 $dias_mes1 = obtenerMejorPeorDiaMesExtrusion($conexion,$mes1);
 $mejor_dia_mes1 = $dias_mes1['mejor'];
 $peor_dia_mes1 = $dias_mes1['peor'];
@@ -59,11 +59,11 @@ $top_maquina_mes2 = obtenerTopMaquinaMesExtrusion($conexion,$mes2);
 // Filtros de fecha para tablas
 $desde = $_GET['desde'] ?? date('Y-m-01');
 $hasta = $_GET['hasta'] ?? date('Y-m-d');
-// Tablas de producción por fecha, referencias y máquina
+// Tablas por fecha y máquina
 $res_tabla_fecha = obtenerTablaFechasExtrusion($conexion, $desde, $hasta);
 $res_tabla_maquina = obtenerTablaMaquinasExtrusion($conexion, $desde, $hasta);
 
-// Diferencia y porcentaje de variación entre meses
+// Variación entre meses
 $diferencia = ($total_mes2 ?? 0) - ($total_mes1 ?? 0);
 $porcentaje = ($total_mes1 > 0) ? (($diferencia / $total_mes1) * 100) : 0;
 

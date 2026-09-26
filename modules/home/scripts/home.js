@@ -9,13 +9,13 @@
     const BASE = panel.dataset.base;
     const CLAVE_ALMACEN = "homeEstado4:" + panel.dataset.usuario;
 
-    const ACENTOS = { sellado: "#2f7ec2", rollo: "#2f7ec2", plana: "#2f7ec2", extrusion: "#2f7ec2", peletizado: "#2f7ec2" }; // mismo azul en todos los módulos
+    const ACENTOS = { sellado: "#2f7ec2", rollo: "#2f7ec2", plana: "#2f7ec2", extrusion: "#2f7ec2", peletizado: "#2f7ec2" }; // mismo azul en todos
 
     const nf = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 2 });
     const fmt = n => nf.format(n);
 
-    let meta = {};                    // módulos, dimensiones y medidas (del servidor)
-    const estado = cargarEstado();    // configuración del usuario (se guarda en el navegador)
+    let meta = {};                    // módulos y medidas
+    const estado = cargarEstado();    // configuración del usuario
     const graficos = {};              // instancias Chart.js por módulo
     const cacheGrafico = {};          // filas del gráfico por módulo
     const opcionesCache = {};         // "modulo|dim" -> valores
@@ -51,7 +51,7 @@
     const MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const nombreMes = ym => (/^\d{4}-\d{2}$/.test(ym) ? MESES[parseInt(ym.slice(5, 7), 10) - 1] + " " + ym.slice(0, 4) : ym);
 
-    // "2026-09-24" -> "24/09/2026"; "2026-09" -> "Septiembre 2026"; "2026-09 S2" -> "Septiembre 2026 · Semana 2"
+    // Formato de etiquetas
     function etiquetaValor(tipoDim, v) {
         if (tipoDim === "fecha" && /^\d{4}-\d{2}-\d{2}$/.test(v)) return fechaCorta(v);
         if (tipoDim === "mes") return nombreMes(v);
@@ -133,14 +133,14 @@
         if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    // Línea "etiqueta: valor" de una tarjeta
+    // Línea etiqueta: valor
     function linea(etiqueta, valor, clase) {
         const l = el("div", "home-linea" + (clase ? " " + clase : ""));
         l.append(el("span", "home-linea-etq", etiqueta), el("span", "home-linea-val", valor));
         return l;
     }
 
-    // Pinta (y consulta en segundo plano) los registros pendientes de importar de un módulo
+    // Pendientes de importar
     function lineaPendientes(m, forzar) {
         const cont = el("div", "home-linea");
         cont.append(el("span", "home-linea-etq", "Pendientes por importar"));
@@ -177,7 +177,7 @@
                 cat.classList.add(c.sin_exportar ? "alerta" : "ok");
             });
 
-            // Una tarjeta por módulo (mes actual + estado)
+            // Tarjeta por módulo
             Object.keys(meta).forEach(m => {
                 const info = meta[m], d = r.modulos[m], est = d.estado;
                 const kpi = el("div", "home-kpi");
@@ -247,14 +247,14 @@
        buscador y casillas. "Nuevo filtro" agrega otra tabla. Solo un desplegable
        abierto a la vez.
     ===================================================== */
-    let ddAbierto = null; // { cerrar() } del desplegable abierto
+    let ddAbierto = null; // desplegable abierto
     document.addEventListener("click", e => {
         if (ddAbierto && !e.target.closest(".home-dd")) { ddAbierto.cerrar(); ddAbierto = null; }
     });
 
     const sinTildes = t => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-    // obj = estado {filtros:{dim:[valores]}, activos:[dims]}; alCambiar() se llama tras cambiar la selección
+    // Filtros por dimensión
     function crearFiltros(modulo, obj, alCambiar) {
         obj.filtros = obj.filtros || {};
         obj.activos = obj.activos || Object.keys(obj.filtros);
@@ -269,7 +269,7 @@
         const activosDiv = el("div", "home-filtros-activos");
         caja.append(fila, activosDiv);
 
-        const refrescos = {};       // dim -> función que repinta su lista (Semana depende de Mes)
+        const refrescos = {};       // dim -> repintar lista
         let agregando = false;
         let temporizador = null;
         const notificar = () => {
@@ -290,7 +290,7 @@
         }
         selDim.addEventListener("change", () => {
             if (!selDim.value) return;
-            // Semana depende de Mes: si Mes aún no está, se agrega primero
+            // Semana requiere Mes
             if (selDim.value === "semana" && !obj.activos.includes("mes")) obj.activos.push("mes");
             obj.activos.push(selDim.value);
             agregando = false;
@@ -308,7 +308,7 @@
                 const bloque = el("div", "home-filtro-bloque");
                 bloque.appendChild(el("span", "home-filtro-nombre", d.etiqueta));
                 const dd = crearDesplegable(modulo, d, obj, () => {
-                    // Semana depende de Mes: se descartan semanas de meses no elegidos
+                    // Podar semanas sin mes
                     if (d.clave === "mes") podarSemanas();
                     Object.values(refrescos).forEach(f => f());
                     notificar();
@@ -343,7 +343,7 @@
         return caja;
     }
 
-    // Desplegable de selección múltiple con buscador
+    // Desplegable con buscador
     function crearDesplegable(modulo, d, obj, alCambiarSel) {
         const raiz = el("div", "home-dd");
         const btn = el("button", "home-dd-btn");
@@ -373,7 +373,7 @@
         }
         function pintarBoton() { btn.textContent = titulo(); }
 
-        // Valores que se pueden mostrar (Semana solo de los meses elegidos en el filtro Mes)
+        // Valores mostrables
         function disponibles() {
             if (d.clave !== "semana") return valores;
             const meses = obj.filtros.mes || [];
@@ -427,7 +427,7 @@
         };
         btn.addEventListener("click", () => {
             if (!panel.hidden) { control.cerrar(); ddAbierto = null; return; }
-            if (ddAbierto) ddAbierto.cerrar();   // solo uno abierto a la vez
+            if (ddAbierto) ddAbierto.cerrar();   // solo uno abierto
             panel.hidden = false;
             btn.classList.add("abierto");
             ddAbierto = control;
@@ -510,7 +510,7 @@
         resumen.id = "res-" + m;
         sec.appendChild(resumen);
 
-        // ----- Botón + panel de filtro por fechas -----
+        // Botón y panel de fechas
         const barra = el("div", "home-filtrar-barra");
         const btnFiltrar = el("button", "btn", "Filtrar fecha");
         btnFiltrar.type = "button";
@@ -529,7 +529,7 @@
         const oPers = el("option", "", "Personalizado"); oPers.value = "personalizado"; selPreset.appendChild(oPers);
         selPreset.value = e.preset;
 
-        // Casilla de "Últimos: N días": ocupa siempre su espacio (visibility) para que Desde/Hasta no se muevan
+        // Espacio fijo para Días atrás
         const inUlt = el("input"); inUlt.type = "number"; inUlt.min = "1"; inUlt.max = "3650"; inUlt.value = e.ultimos;
         const campoUlt = campo("Días atrás", inUlt);
         campoUlt.classList.add("home-campo-ultimos");
@@ -563,7 +563,7 @@
             rellenarDesdePreset();
             aplicar();
         });
-        // El mismo botón muestra u oculta el panel y cambia su texto
+        // Mostrar/ocultar panel
         btnFiltrar.addEventListener("click", () => {
             e.visible = panelF.hidden;
             panelF.hidden = !e.visible;
@@ -669,7 +669,7 @@
         return sec;
     }
 
-    // ¿El gráfico/tabla tiene un filtro de fecha, semana o mes? Entonces el período de arriba no aplica
+    // Filtro de fecha anula período
     const DIMS_FECHA = ["fecha", "semana", "mes"];
     const filtroDeFecha = obj => DIMS_FECHA.some(k => ((obj.filtros || {})[k] || []).length > 0);
     function rangoAplicado(m, obj) {
@@ -686,7 +686,7 @@
             : "Período aplicado: " + textoRango(m) + (e.desde || e.hasta ? " (" + fechaCorta(e.desde) + " – " + fechaCorta(e.hasta) + ")" : "") + " (Cámbialo con el botón Filtrar fecha)";
     }
 
-    // Recarga resumen, gráfico y tabla de un módulo con su rango
+    // Recargar módulo
     function refrescarModulo(m) {
         const e = estadoModulo(m);
         document.getElementById("rango-" + m).textContent =
@@ -735,7 +735,7 @@
                 if (est.ultima_importacion_detalle) colImport.appendChild(linea("Resultado", est.ultima_importacion_detalle));
                 colImport.appendChild(lineaPendientes(m));
                 const a = el("a", "home-enlace", "Ir a importar");
-                a.href = BASE + meta[m].url + "?importar=1"; // abre el overlay para elegir "nuevos" o "todo"
+                a.href = BASE + meta[m].url + "?importar=1"; // abre overlay de importar
                 colImport.appendChild(a);
             } else {
                 colImport.appendChild(el("div", "home-linea-etq", "Este módulo aún no tiene Sheet ni importación."));
@@ -788,7 +788,7 @@
             graficos[m] = new Chart(document.getElementById("grafico-" + m), config);
         };
 
-        // Al cambiar solo el rango X / series / tipo se reutilizan los datos ya pedidos
+        // Reusar datos ya pedidos
         if (sinRecargar && cacheGrafico[m]) { pintar(cacheGrafico[m]); return; }
         pintarNota(m, "g", g);
         const rg = rangoAplicado(m, g);
@@ -908,7 +908,7 @@
         Object.keys(meta).forEach(m => cont.appendChild(construirModulo(m)));
         Object.keys(meta).forEach(refrescarModulo);
 
-        // Llegada desde el visor de hojas (#home-modulo)
+        // Llegada desde enlace
         if (location.hash.startsWith("#home-")) {
             setTimeout(() => irAModulo(location.hash.slice(6)), 400);
         }

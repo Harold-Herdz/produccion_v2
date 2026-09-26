@@ -11,13 +11,13 @@ $soloAdmin = true;
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 // Importar config.php
 require_once dirname(__DIR__, 3) . '/includes/config.php';
-// Importar catalogsController.php  (prepara $cfg, $clave, $busqueda, $registros)
+// Prepara $cfg, $clave, $registros
 include dirname(__DIR__) . '/controllers/catalogsController.php';
 
-// Lista de catálogos disponibles para el selector superior
+// Catálogos del selector
 $catalogos = catalogosDisponibles();
 
-// Número de columnas de la tabla (Operarios suma la columna "Supervisor")
+// Columnas de la tabla
 $totalColumnas = ($clave === 'operarios') ? 5 : 4;
 
 // Importar header.php
@@ -32,7 +32,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <!-- Título -->
         <h2 class="titulo-vista">Administrar Tablas Maestras</h2>
 
-        <!-- Barra superior: selector de catálogo + búsqueda -->
+        <!-- Selector y búsqueda -->
         <form class="barra-superior" method="GET">
             <!-- Selector del catálogo a administrar -->
             <div class="grupo-campo">
@@ -74,7 +74,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </a>
         </div>
 
-        <!-- Panel de exportar (reemplaza la tabla mientras está abierto) -->
+        <!-- Panel de exportar -->
         <div id="panelExportar" class="panel-catalogos" style="display:none;">
             <h3 class="subtitulo-panel">Exportar catálogos</h3>
             <p class="texto-panel">Guardar el contenido actual de cada catálogo.</p>
@@ -108,7 +108,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </form>
         </div>
 
-        <!-- Panel de importar (reemplaza la tabla mientras está abierto) -->
+        <!-- Panel de importar -->
         <div id="panelImportar" class="panel-catalogos" style="display:none;">
             <h3 class="subtitulo-panel">Importar catálogos</h3>
             <p class="texto-panel">Agrega a cada catálogo su contenido guardado.</p>
@@ -157,7 +157,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                     </tr>
                 </thead>
 
-                <!-- Filas del catálogo traídas de la base de datos -->
+                <!-- Filas del catálogo -->
                 <tbody>
                     <?php if ($registros && mysqli_num_rows($registros) > 0) { ?>
                         <?php while ($fila = mysqli_fetch_assoc($registros)) { ?>
@@ -223,7 +223,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     </div>
 
-    <!-- Overlay de carga (exportar/importar en curso) -->
+    <!-- Overlay de carga -->
     <div class="overlay" id="overlayCargaCatalogos">
         <div class="tarjeta-carga">
             <span class="spinner-carga"></span>
