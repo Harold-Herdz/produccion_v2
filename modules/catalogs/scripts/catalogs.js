@@ -101,35 +101,3 @@ if (formImportarCatalogos) {
         enviarFormularioCatalogos(formImportarCatalogos, "importar");
     });
 }
-
-/* =====================================================
-   MATRIZ MÁQUINA × ÁREA / REFERENCIA (guardado de un clic)
-   ===================================================== */
-document.addEventListener("change", e => {
-    if (!e.target.classList.contains("chk-matriz")) return;
-    const chk = e.target;
-    const scroll = chk.closest(".matriz-scroll");
-    if (!scroll) return;
-
-    const esEsp = chk.dataset.accion === "toggle_maquina_esp";
-    const alternarFila = marcado => {
-        const fila = chk.closest("tr");
-        fila.classList.toggle("fila-usa-esp", marcado);
-        fila.querySelectorAll('input[data-accion="toggle_maquina_referencia"]').forEach(ref => {
-            ref.disabled = marcado;
-        });
-    };
-    if (esEsp) alternarFila(chk.checked);
-
-    const datos = new URLSearchParams();
-    datos.set("accion", chk.dataset.accion);
-    datos.set("id_maquina", chk.dataset.maquina);
-    if (chk.dataset.area) datos.set("id_area", chk.dataset.area);
-    if (chk.dataset.referencia) datos.set("id_referencia", chk.dataset.referencia);
-
-    fetch(scroll.dataset.url, { method: "POST", body: datos })
-        .catch(() => {
-            chk.checked = !chk.checked;
-            if (esEsp) alternarFila(chk.checked);
-        });
-});

@@ -72,7 +72,9 @@ function generarPdfPlanilla($conexion, $planilla, $nota = '', $maquinasFijas = n
     $paginas = [array_slice($maquinas, 0, $primeraPagina), array_slice($maquinas, $primeraPagina)];
 
     $pdf = new FPDF('L', 'mm', 'Letter');
-    $pdf->SetMargins(10, 10, 10);
+    // Márgenes chicos (lados 5 mm, arriba 7 mm): el espacio extra va a las observaciones
+    $margenLado = 5;
+    $pdf->SetMargins($margenLado, 7, $margenLado);
     $pdf->SetAutoPageBreak(false);
     $lineaNormal = 0.2; // ancho de línea por defecto (bordes finos de celda)
     $pdf->SetDrawColor(...$col['borde']);
@@ -89,7 +91,7 @@ function generarPdfPlanilla($conexion, $planilla, $nota = '', $maquinasFijas = n
         'X98'        => 11,
         'P1' => 12, 'P2' => 12, 'P3' => 12, 'P4' => 12, 'P5' => 12,
     ];
-    $anchoTotal      = $pdf->GetPageWidth() - 20;
+    $anchoTotal      = $pdf->GetPageWidth() - 2 * $margenLado;
     $cols['OBSERV']  = $anchoTotal - array_sum($cols);
     $anchoPeso       = $cols['P1'] + $cols['P2'] + $cols['P3'] + $cols['P4'] + $cols['P5'];
 
@@ -124,9 +126,7 @@ function generarPdfPlanilla($conexion, $planilla, $nota = '', $maquinasFijas = n
         $pdf->Cell($cols['X70'], $altoCab, 'X70', 1, 0, 'C', true);
         $pdf->Cell($cols['X90'], $altoCab, 'X90', 1, 0, 'C', true);
         $pdf->Cell($cols['X98'], $altoCab, 'X98', 1, 0, 'C', true);
-        $pdf->SetFont('Helvetica', 'B', 6.5);
         $pdf->Cell($anchoPeso, $altoCab, pdfTxt('PESO POR HORA'), 1, 0, 'C', true);
-        $pdf->SetFont('Helvetica', 'B', 8);
         $pdf->Cell($cols['OBSERV'], $altoCab, pdfTxt('OBSERVACIONES'), 1, 1, 'C', true);
         $pdf->SetTextColor(...$col['texto']);
         $pdf->SetFont('Helvetica', '', 8);
@@ -136,7 +136,16 @@ function generarPdfPlanilla($conexion, $planilla, $nota = '', $maquinasFijas = n
     $celda = function($ancho, $alto, $texto, $align = 'C', $colorRelleno = null) use ($pdf, $col){
         $relleno = $colorRelleno !== null;
         if($relleno){ $pdf->SetFillColor(...$colorRelleno); }
+        // Si el texto no cabe se achica la letra (hasta 5 pt) antes de recortarlo
+        $tamOriginal = 8; // tamaño de las celdas de datos
+        $tam = $tamOriginal;
+        $conv = pdfTxt((string) $texto);
+        while($tam > 5 && $pdf->GetStringWidth($conv) > $ancho - 2){
+            $tam -= 0.5;
+            $pdf->SetFontSize($tam);
+        }
         $pdf->Cell($ancho, $alto, pdfTxtRecortado($pdf, (string) $texto, $ancho - 2), 1, 0, $align, $relleno);
+        $pdf->SetFontSize($tamOriginal);
     };
 
     // Línea gruesa (mismo azul de los demás elementos) que separa cada bloque de máquina
@@ -149,7 +158,7 @@ function generarPdfPlanilla($conexion, $planilla, $nota = '', $maquinasFijas = n
     };
 
     // Dibuja el bloque de una máquina (número fusionado a la izquierda + sus filas)
-    $dibujarMaquina = function($numMaq, $datos, $filaAlto) use ($pdf, $cols, $col, $celda){
+    $dibujarMaquina = function($numMaq, $datos, $filaAlto) use ($pdf, $cols, $col, $celda, $anchoTotal){
         $entradas = $datos['entradas'] ?? [];
         $filasDatos = max(2, count($entradas)); // mínimo 2 filas de datos por máquina
         $filasTotal = $filasDatos + 2;           // + JORNADA (etiqueta y valor)
@@ -201,7 +210,7 @@ function generarPdfPlanilla($conexion, $planilla, $nota = '', $maquinasFijas = n
         }
 
         // JORNADA: etiqueta + valor, cada una en una fila fusionada de ancho completo
-        $anchoResto = $pdf->GetPageWidth() - 20 - $cols['MÁQUINA'];
+        $anchoResto = $anchoTotal - $cols['MÁQUINA'];
         $pdf->SetXY($x0 + $cols['MÁQUINA'], $y0 + $filasDatos * $filaAlto);
         $pdf->SetFont('Helvetica', 'B', 7);
         $pdf->SetFillColor(...$col['azul_claro']);
@@ -224,14 +233,26 @@ function generarPdfPlanilla($conexion, $planilla, $nota = '', $maquinasFijas = n
 
         // Altura de fila: se ajusta para que las máquinas (y, en la última página,
         // también la nota) quepan siempre dentro de la página, sin páginas de más
-        $reservaNota = $esUltimaPagina ? 32 : 0;
+        // La nota ocupa 10 mm (espacio + título) + 5 mm por línea de texto
+        $reservaNota = 0;
+        if($esUltimaPagina){
+            $pdf->SetFont('Helvetica', '', 9);
+            $textoNota = pdfTxt(trim((string) $nota) !== '' ? trim((string) $nota) : '(Sin nota)');
+            $lineasNota = 0;
+            foreach(explode("\n", $textoNota) as $parrafo){
+                $lineasNota += max(1, (int) ceil($pdf->GetStringWidth($parrafo) / ($anchoTotal - 2)));
+            }
+            $reservaNota = 11 + 5 * $lineasNota;
+        }
         $totalFilas = 0;
         foreach($maquinasPagina as $m){
             $entradas = $porMaquina[$m['numero_maquina']]['entradas'] ?? [];
             $totalFilas += max(2, count($entradas)) + 2;
         }
-        $altoDisponible = $pdf->GetPageHeight() - $pdf->GetY() - 12 - $reservaNota;
-        $filaAlto = $totalFilas > 0 ? min(7, max(4.2, $altoDisponible / $totalFilas)) : 7;
+        // Margen inferior de 7 mm. Las filas se comprimen hasta 2,8 mm (con letra de 8 pt
+        // aún se leen): así caben ~60 filas por página antes de que algo se salga.
+        $altoDisponible = $pdf->GetPageHeight() - $pdf->GetY() - 7 - $reservaNota;
+        $filaAlto = $totalFilas > 0 ? min(7, max(2.8, $altoDisponible / $totalFilas)) : 7;
 
         foreach($maquinasPagina as $m){
             $num = (int) $m['numero_maquina'];

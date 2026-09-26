@@ -219,6 +219,8 @@ body {
    CONTENEDOR PRINCIPAL
 =========================== */
 .container {
+  /* Mismo ancho en todas las interfaces (el body es flex: sin width se encogería al contenido) */
+  width: calc(100% - 32px);
   max-width: 1350px;
   margin: 96px auto 48px auto;
   padding: 32px;
@@ -1150,4 +1152,24 @@ input::placeholder {
     font-size: 10px;
     padding: 10px;
   }
+}
+
+/* ===========================
+   VARIANTES DE ANCHO DEL CONTENEDOR
+=========================== */
+/* Formularios de registro/creación (Rollos y nueva planilla de Sellado) */
+.container.container-formulario {
+  max-width: 620px;
+}
+/* Planilla de Sellado ya creada: ancho según su contenido (como antes) */
+.container.container-planilla {
+  width: auto;
+}
+
+/* Acceso directo "Inicio" del menú lateral (sin subtítulo) */
+.side-menu-module a.side-menu-inicio {
+  padding: 10px 14px;
+  color: var(--texto);
+  font-weight: 600;
+  font-size: 18px;
 }

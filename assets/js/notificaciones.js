@@ -52,7 +52,7 @@
 
     body.appendChild(Object.assign(document.createElement('div'), { className: 'campana-seccion-titulo', textContent: `Pendientes (${data.pendientes.length})` }));
     if (data.pendientes.length === 0) {
-      body.appendChild(Object.assign(document.createElement('div'), { className: 'campana-vacio', textContent: 'Nada por revisar.' }));
+      body.appendChild(Object.assign(document.createElement('div'), { className: 'campana-vacio', textContent: 'No tienes notificaciones pendientes.' }));
     } else {
       data.pendientes.forEach(item => body.appendChild(filaPendiente(item)));
     }

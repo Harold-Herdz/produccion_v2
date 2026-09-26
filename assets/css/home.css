@@ -1,0 +1,725 @@
+/* Inicio: panel general (el resto viene de main.css) */
+
+/* ===========================
+   ACCESO DIRECTO A MÓDULOS
+=========================== */
+.home-nav {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.home-nav .btn {
+  flex: 1;
+  padding: 14px 10px;
+  font-size: 16px;
+}
+
+/* ===========================
+   TARJETAS DE RESUMEN (3 y 3)
+=========================== */
+.home-resumen {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.home-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px 18px;
+  border-radius: var(--radio-m);
+  background: var(--azul-muy-claro);
+  border: 1px solid var(--borde);
+  border-left: 5px solid var(--azul);
+  box-shadow: var(--sombra-card);
+  font-size: 14px;
+  color: var(--texto);
+}
+.home-resumen .home-kpi {
+  cursor: pointer;
+  transition: var(--transicion);
+}
+.home-resumen .home-kpi:hover {
+  box-shadow: var(--sombra-card-hover);
+}
+.home-kpi-general {
+  background: var(--verde-claro);
+  border-left-color: var(--verde-oscuro);
+  cursor: default !important;
+}
+.home-kpi-titulo {
+  font-size: 16px;
+  font-weight: 700;
+}
+.home-kpi-valor {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--azul-oscuro);
+}
+.home-kpi-general .home-kpi-valor {
+  color: var(--verde-oscuro);
+}
+.home-kpi-sub {
+  margin-bottom: 6px;
+  color: var(--texto-secundario);
+}
+
+/* Línea "etiqueta ....... valor" */
+.home-linea {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  border-top: 1px dashed var(--borde-fuerte);
+}
+.home-linea-etq {
+  color: var(--texto-secundario);
+}
+.home-linea-val {
+  font-weight: 600;
+  text-align: right;
+}
+.home-linea.destacada .home-linea-val { color: var(--azul-oscuro); }
+.home-linea-val.alerta,
+.home-linea.alerta .home-linea-val { color: var(--danger); }
+.home-linea-val.ok,
+.home-linea.ok .home-linea-val { color: var(--verde-oscuro); }
+
+/* ===========================
+   SECCIÓN POR MÓDULO
+=========================== */
+.home-modulo {
+  margin-top: 34px;
+  scroll-margin-top: 110px;
+}
+.home-modulo-cab {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--azul-oscuro);
+}
+.home-modulo-cab h3 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--azul-oscuro);
+}
+.home-accesos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Resumen detallado del módulo: 3 columnas */
+.home-resumen-modulo {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 16px;
+}
+.home-res-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.home-res-titulo {
+  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--azul-oscuro);
+}
+.home-enlace {
+  margin-top: 8px;
+  color: var(--azul);
+  font-weight: 600;
+  text-decoration: none;
+}
+.home-enlace:hover { text-decoration: underline; }
+
+/* Botón + panel de filtro por fechas */
+.home-filtrar-barra {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.home-rango-actual {
+  font-size: 14px;
+  color: var(--texto-secundario);
+  font-weight: 600;
+}
+.home-filtro-fechas {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.2fr 1.2fr auto;
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radio-m);
+  background: var(--fondo-superficie);
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra-card);
+}
+.home-filtro-fechas[hidden] { display: none; }
+.home-filtro-acciones {
+  display: flex;
+  gap: 8px;
+}
+.home-filtro-fechas .home-campo input,
+.home-filtro-fechas .home-campo select {
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--radio-s);
+  border: 1px solid var(--borde-fuerte);
+  background: var(--fondo-superficie);
+  font-size: 14px;
+}
+
+/* ===========================
+   TARJETAS DE GRÁFICO / TABLA
+=========================== */
+.home-card {
+  margin-bottom: 18px;
+  padding: 16px;
+  border-radius: var(--radio-m);
+  background: var(--fondo-superficie);
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra-card);
+}
+.home-card-titulo {
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--azul-oscuro);
+}
+
+/* Controles repartidos a todo el ancho */
+.home-controles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  align-items: end;
+}
+.home-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.home-campo label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-secundario);
+}
+.home-campo select,
+.home-campo input,
+.home-controles select {
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--radio-s);
+  border: 1px solid var(--borde-fuerte);
+  background: var(--fondo-superficie);
+  font-size: 14px;
+}
+
+.home-series {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+.home-filtros-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-secundario);
+}
+.home-serie {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.home-serie-punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Filtros por dimensión */
+.home-filtros {
+  margin-top: 14px;
+}
+.home-filtros-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.home-filtros-fila select {
+  min-width: 200px;
+  padding: 8px 10px;
+  border-radius: var(--radio-s);
+  border: 1px solid var(--borde-fuerte);
+  background: var(--fondo-superficie);
+  font-size: 14px;
+}
+.home-filtros-fila .btn { padding: 7px 16px; }
+.home-filtros-activos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 10px;
+}
+.home-filtro-bloque {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.home-filtro-nombre {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-secundario);
+}
+.home-filtro-quitar {
+  padding: 4px 8px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  background: var(--fondo-superficie);
+  color: var(--danger);
+  font-size: 13px;
+  cursor: pointer;
+}
+.home-filtro-quitar:hover { background: var(--danger-bg); }
+.home-nota-periodo {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--texto-tenue);
+}
+
+/* Desplegable con buscador (rectangular, como los demás selects) */
+.home-dd {
+  position: relative;
+}
+.home-dd-btn {
+  min-width: 220px;
+  padding: 8px 30px 8px 10px;
+  text-align: left;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  background: var(--fondo-superficie);
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+}
+.home-dd-btn::after {
+  content: "";
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--texto-secundario);
+  border-bottom: 2px solid var(--texto-secundario);
+  transform: translateY(-70%) rotate(45deg);
+}
+.home-dd-btn.abierto { border-color: var(--azul); }
+.home-dd-panel {
+  position: absolute;
+  z-index: 30;
+  top: 100%;
+  left: 0;
+  width: 280px;
+  margin-top: 2px;
+  padding: 8px;
+  background: var(--fondo-superficie);
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  box-shadow: var(--sombra-modal);
+  font-size: 14px;
+}
+.home-dd-panel[hidden] { display: none; }
+.home-dd-buscar {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  font-size: 14px;
+}
+.home-dd-acciones {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+}
+.home-dd-acciones button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--azul);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.home-dd-lista {
+  max-height: 240px;
+  overflow-y: auto;
+}
+.home-dd-op {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 2px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.home-dd-op:hover { background: var(--azul-muy-claro); }
+.home-dd-subtitulo {
+  margin-top: 6px;
+  padding: 4px 2px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--azul-oscuro);
+  border-bottom: 1px solid var(--borde);
+}
+.home-dd-vacio {
+  padding: 8px 2px;
+  color: var(--texto-tenue);
+}
+
+/* Gráfico a todo el ancho */
+.home-lienzo {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  margin-top: 14px;
+}
+.home-vacio {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--texto-tenue);
+  background: rgba(255, 255, 255, 0.7);
+}
+.home-vacio[hidden] { display: none; }
+
+/* Tablas */
+.home-tabla-scroll {
+  max-height: 460px;
+  overflow: auto;
+  margin-top: 14px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-m);
+}
+.home-visor-scroll { max-height: 70vh; }
+.home-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.home-tabla thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--azul-oscuro);
+  color: var(--texto-claro);
+  white-space: nowrap;
+}
+.home-tabla th.ordenable { cursor: pointer; user-select: none; }
+.home-tabla th.num,
+.home-tabla td.num { text-align: right; }
+.home-tabla tfoot td {
+  position: sticky;
+  bottom: 0;
+  background: var(--azul-claro);
+  font-weight: 700;
+}
+.home-tabla-pie {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--texto-secundario);
+}
+.home-tabla-pie .btn { padding: 4px 12px; }
+.home-badge {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.home-badge.ok { background: var(--success-bg); color: var(--success); }
+.home-badge.alerta { background: var(--warning-bg); color: var(--warning); }
+
+/* Barra del visor de hojas */
+.home-barra {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radio-m);
+  background: var(--fondo-superficie);
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra-card);
+}
+.home-presets,
+.home-rango {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.home-rango input[type="text"] {
+  padding: 9px 10px;
+  min-width: 240px;
+  border-radius: var(--radio-s);
+  border: 1px solid var(--borde-fuerte);
+  font-size: 14px;
+}
+
+@media (max-width: 1000px) {
+  .home-resumen { grid-template-columns: repeat(2, 1fr); }
+  .home-resumen-modulo { grid-template-columns: 1fr; }
+  .home-controles { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .home-resumen { grid-template-columns: 1fr; }
+  .home-nav { flex-wrap: wrap; }
+  .home-nav .btn { flex: 1 1 45%; }
+  .home-lienzo { height: 300px; }
+}
+
+/* Botón verde (mismo verde que "Importar Registros") */
+.btn.btn-verde {
+  background: var(--verde-oscuro);
+  color: var(--texto-claro);
+  text-decoration: none;
+}
+.btn.btn-verde:hover {
+  background: var(--verde-oscuro-hover);
+}
+.home-tabla td:last-child,
+.home-tabla th:last-child {
+  white-space: nowrap;
+}
+@media (max-width: 1000px) {
+  .home-filtro-fechas { grid-template-columns: 1fr 1fr; }
+}
+
+/* El atributo hidden debe ganarle a los display de .btn, etc. */
+#homePanel [hidden] { display: none !important; }
+
+/* Flecha hacia abajo en todos los selects del panel (igual que el resto de formularios) */
+#homePanel select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a4a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+
+/* ===========================
+   COLOR (acento por módulo: --acento)
+=========================== */
+.home-kpi {
+  border-left-color: var(--acento, var(--azul));
+  background: linear-gradient(135deg, var(--azul-muy-claro) 0%, #ffffff 100%);
+}
+.home-kpi-general {
+  background: linear-gradient(135deg, var(--verde-claro) 0%, #ffffff 100%);
+}
+.home-kpi-titulo {
+  color: var(--acento, var(--azul-oscuro));
+}
+
+.home-modulo-cab {
+  border-bottom: 4px solid var(--acento, var(--azul-oscuro));
+}
+.home-modulo-cab h3 {
+  padding: 4px 16px;
+  border-left: 8px solid var(--acento, var(--azul-oscuro));
+  background: var(--azul-muy-claro);
+  color: var(--azul-oscuro);
+}
+#homeCatalogos .home-modulo-cab { --acento: var(--verde-oscuro); }
+
+.home-resumen-modulo {
+  border-left-color: var(--acento, var(--azul));
+  border-top: 4px solid var(--acento, var(--azul));
+}
+.home-res-titulo {
+  padding-bottom: 5px;
+  border-bottom: 2px solid var(--acento, var(--azul));
+  color: var(--azul-oscuro);
+}
+
+.home-filtrar-barra {
+  padding: 10px 14px;
+  background: var(--azul-claro);
+  border-left: 5px solid var(--acento, var(--azul));
+  border-radius: var(--radio-s);
+}
+.home-filtro-fechas {
+  border-top: 3px solid var(--azul);
+  background: var(--azul-muy-claro);
+}
+
+.home-card {
+  border-top: 4px solid var(--acento, var(--azul));
+}
+.home-card-titulo {
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--azul-claro);
+}
+.home-filtros {
+  padding: 10px 12px;
+  background: var(--azul-muy-claro);
+  border: 1px solid var(--azul-claro);
+  border-left: 4px solid var(--azul);
+}
+.home-series {
+  padding: 8px 12px;
+  background: var(--fondo-secundario);
+  border-left: 4px solid var(--verde);
+}
+
+.home-nav .btn {
+  border-radius: var(--radio-m);
+}
+.home-tabla tbody tr:nth-child(even) td {
+  background: var(--azul-muy-claro);
+}
+.home-tabla tbody tr:hover td {
+  background: var(--azul-claro);
+}
+
+/* Botón para quitar un filtro (rojo) */
+.home-filtro-quitar {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radio-s);
+  background: var(--danger);
+  color: var(--texto-claro);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transicion);
+}
+.home-filtro-quitar:hover {
+  background: var(--danger-hover);
+}
+
+/* Barra del botón Filtrar: texto del período centrado en vertical */
+.home-filtrar-barra {
+  align-items: center;
+}
+.home-filtrar-barra .btn {
+  margin: 0;
+}
+.home-filtrar-barra .home-rango-actual {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ===========================
+   CADA MÓDULO EN SU PROPIO RECUADRO (con banner de título)
+=========================== */
+.home-modulo {
+  margin-top: 52px;
+  padding: 0 18px 6px;
+  background: #f6f9fc;
+  border: 2px solid var(--azul-oscuro);
+  border-radius: var(--radio-l);
+  box-shadow: var(--sombra-card);
+  overflow: hidden;
+}
+.home-modulo-cab {
+  margin: 0 -18px 18px;
+  padding: 14px 18px;
+  background: var(--azul-oscuro);
+  border-bottom: none;
+}
+.home-modulo-cab h3 {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--texto-claro);
+  font-size: 24px;
+  letter-spacing: 0.02em;
+}
+/* Botones del banner: blancos (y el verde de Ver Registros/PDFs se mantiene) */
+.home-modulo-cab a.btn:not(.btn-verde) {
+  background: var(--fondo-superficie);
+  color: var(--azul-oscuro);
+}
+.home-modulo-cab a.btn:not(.btn-verde):hover {
+  background: var(--azul-claro);
+}
+/* Catálogos: banner verde */
+#homeCatalogos.home-modulo {
+  border-color: var(--verde-oscuro);
+}
+#homeCatalogos .home-modulo-cab {
+  background: var(--verde-oscuro);
+}
+
+/* Ver Registros / Ver PDFs: igual que Ver Panel (fondo blanco, texto azul oscuro) */
+.home-modulo-cab a.btn.btn-verde {
+  background: var(--fondo-superficie);
+  color: var(--azul-oscuro);
+}
+.home-modulo-cab a.btn.btn-verde:hover {
+  background: var(--azul-claro);
+}
+
+/* Tabla de Catálogos: encabezado y bordes en el verde oscuro de su sección */
+#homeCatalogos .home-card {
+  border: 1px solid var(--verde-oscuro);
+  border-top: 4px solid var(--verde-oscuro);
+}
+#homeCatalogos .home-tabla-scroll {
+  border: 1px solid var(--verde-oscuro);
+}
+#homeCatalogos .home-tabla thead th {
+  background: var(--verde-oscuro);
+  color: var(--texto-claro);
+}
+#homeCatalogos .home-tabla tbody tr:nth-child(even) td {
+  background: var(--fondo-secundario);
+}
+#homeCatalogos .home-tabla tbody tr:hover td {
+  background: var(--verde-claro);
+}
+
+/* Tarjeta General: borde izquierdo, título y número grande en verde */
+.home-kpi.home-kpi-general {
+  border-left-color: var(--verde-oscuro);
+}
+.home-kpi-general .home-kpi-titulo,
+.home-kpi-general .home-kpi-valor {
+  color: var(--verde-oscuro);
+}

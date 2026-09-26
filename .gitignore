@@ -2,6 +2,10 @@
 /backups
 *.sql
 
+# ...excepto los archivos semilla de catálogos y relaciones (respaldo de datos maestros)
+!/modules/catalogs/seed/*.sql
+# (usuarios.sql también se sube: sus contraseñas van cifradas con bcrypt)
+
 
 # logs
 /logs
@@ -24,3 +28,6 @@ Thumbs.db
 
 # archivos de entorno
 .env
+
+# estado operativo local (panel de Inicio)
+/modules/shared/systemState.json

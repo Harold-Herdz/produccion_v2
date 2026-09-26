@@ -37,12 +37,10 @@ $rutaVista = BASE_URL . '/modules/catalogs/views/catalogs.php';
 ===================================================== */
 $clave = $_POST['cat'] ?? $_GET['cat'] ?? 'operarios';
 
-// Las relaciones máquina↔área / máquina↔referencia no son catálogos genéricos
-$esMatriz = in_array($clave, ['maquina_areas', 'maquina_referencias'], true);
+// (Las relaciones máquina↔área / máquina↔referencia se administran en relationsController.php)
+$cfg = obtenerConfigCatalogo($clave);
 
-$cfg = $esMatriz ? null : obtenerConfigCatalogo($clave);
-
-if (!$esMatriz && $cfg === null) {
+if ($cfg === null) {
     $clave = 'operarios';
     $cfg   = obtenerConfigCatalogo($clave);
 }
@@ -68,21 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Marcar / desmarcar un operario como supervisor
     if ($accion === 'toggle_supervisor' && $clave === 'operarios') {
         alternarSupervisorOperario($conexion, $_POST['id'] ?? 0);
-    }
-
-    // Matriz máquina↔área / máquina↔referencia (AJAX; responde JSON, sin recargar la página)
-    if (in_array($accion, ['toggle_maquina_area', 'toggle_maquina_referencia', 'toggle_maquina_esp'], true)) {
-        $idMaquina = $_POST['id_maquina'] ?? 0;
-        if ($accion === 'toggle_maquina_area') {
-            alternarMaquinaArea($conexion, $idMaquina, $_POST['id_area'] ?? 0);
-        } elseif ($accion === 'toggle_maquina_referencia') {
-            alternarMaquinaReferencia($conexion, $idMaquina, $_POST['id_referencia'] ?? 0);
-        } else {
-            alternarUsaReferenciasEsp($conexion, $idMaquina);
-        }
-        header('Content-Type: application/json');
-        echo json_encode(['ok' => true]);
-        exit;
     }
 
     // Exportar / importar varios catálogos (AJAX; responde JSON, sin recargar la página)
@@ -131,4 +114,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    LISTAR REGISTROS (GET)
 ===================================================== */
 $busqueda  = trim($_GET['buscar'] ?? '');
-$registros = $esMatriz ? null : listarRegistros($conexion, $cfg, $busqueda);
+$registros = listarRegistros($conexion, $cfg, $busqueda);

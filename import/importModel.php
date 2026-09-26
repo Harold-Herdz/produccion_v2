@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__) . '/modules/shared/systemState.php';
 // Límite de memoria y tiempo de ejecución
 ini_set('memory_limit', '512M');
 set_time_limit(0);
@@ -171,6 +172,12 @@ function finalizarImportacion($conexion, $nombre, $insertados, $actualizados, $d
     if (!empty($ultimo_id_sheet)) {
         actualizarUltimoIdSheet($conexion, $nombre, $ultimo_id_sheet);
     }
+    // Para el panel de Inicio: cuándo se importó por última vez y qué resultó
+    estadoSistemaGuardar('importaciones', $nombre, [
+        'fecha' => date('Y-m-d H:i:s'), 'insertados' => $insertados, 'actualizados' => $actualizados,
+        'duplicados' => $duplicados, 'total' => $total,
+    ]);
+    estadoSistemaGuardar('pendientes', $nombre, ['ts' => 0]); // invalida la caché de pendientes
 
     echo "<script>done($insertados,$actualizados,$duplicados,$total);</script>\n";
     if (ob_get_level()) ob_flush();

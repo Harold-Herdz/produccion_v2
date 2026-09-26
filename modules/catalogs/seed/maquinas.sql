@@ -1,0 +1,26 @@
+-- Máquinas (MAQUINAS) -- generado por Catalogos > Exportar el 2026-09-25 17:31
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 01', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 02', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 03', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 04', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 05', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 06', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 07', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 08', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 09', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 10', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 11', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 12', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 13', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 14', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 15', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 16', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 17', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 18', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 19', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 20', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 21', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 22', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 23', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 24', 1);
+INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 25', 1);

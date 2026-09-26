@@ -34,9 +34,10 @@ function obtenerLogPorIdDia($conexion, $id_dia){
     return $stmt->get_result()->fetch_assoc();
 }
 
-// El día actualmente en proceso (debería haber a lo sumo uno)
+// El día actualmente en proceso: el de fecha más reciente (por fecha, no por orden de
+// creación: un día pasado que se abre después no debe pasar por "el actual")
 function obtenerDiaEnProceso($conexion){
-    $res = $conexion->query("SELECT * FROM rollo_sheet WHERE estado = 'en_proceso' ORDER BY id_log DESC LIMIT 1");
+    $res = $conexion->query("SELECT * FROM rollo_sheet WHERE estado = 'en_proceso' ORDER BY fecha DESC, id_log DESC LIMIT 1");
     return $res ? $res->fetch_assoc() : null;
 }
 
@@ -79,8 +80,27 @@ function cerrarDia($conexion, $id_dia, $total, $rutaPdf){
    CIERRE DE DÍA (lee REGISTROS del Sheet y arma PDF + fila de LOGS)
 ================================================= */
 // Filas de REGISTROS que corresponden a una fecha dada
-function filasDelDiaRollo($fechaObjetivo){
+// Devuelve null si el Sheet no se pudo leer (nunca un arreglo vacío por error: un PDF
+// "Sin registros" subido por una lectura fallida pisaría el PDF bueno del día).
+// $minimo: cuántas filas se esperan como mínimo (el contador local del día); si el CSV
+// de Google aún no muestra un registro recién escrito, se reintenta unos segundos.
+function filasDelDiaRollo($fechaObjetivo, $minimo = 0){
+    $delDia = null;
+    for($intento = 1; $intento <= 3; $intento++){
+        $delDia = leerFilasDelDiaRollo($fechaObjetivo);
+        if($delDia !== null && count($delDia) >= $minimo){
+            return $delDia;
+        }
+        if($intento < 3){ sleep(2); }
+    }
+    return $delDia; // null si nunca se pudo leer; si se leyó pero faltan filas, lo que haya
+}
+
+function leerFilasDelDiaRollo($fechaObjetivo){
     [$filas] = leerSheet(ROLLO_REGISTROS_CSV_URL, 'todo', null);
+    if($filas === null){
+        return null;
+    }
     $delDia = [];
     foreach($filas as $data){
         if(convertirFecha($data[1] ?? '') === $fechaObjetivo){
@@ -100,7 +120,10 @@ function filasDelDiaRollo($fechaObjetivo){
 
 // Verifica si la fila ya se guardó (evita falso error)
 function yaExisteRegistroRollo($fecha, $operario, $maquina, $referencia, $color, $pesoRollo, $pesoRetal){
-    $filas = filasDelDiaRollo($fecha);
+    $filas = leerFilasDelDiaRollo($fecha);
+    if($filas === null){
+        return false;
+    }
     $recientes = array_slice($filas, -5); // solo las últimas 5 filas del día
     foreach($recientes as $fila){
         if($fila['operario'] === $operario
@@ -117,8 +140,12 @@ function yaExisteRegistroRollo($fecha, $operario, $maquina, $referencia, $color,
 }
 
 // Arma el paquete de cierre (PDF + fila de LOGS) para un día ya presente en el Sheet
+// Devuelve null si no se pudo leer el Sheet (no se debe cerrar con datos vacíos).
 function prepararCierreRollo($logDia){
-    $filas = filasDelDiaRollo($logDia['fecha']);
+    $filas = filasDelDiaRollo($logDia['fecha'], (int) ($logDia['total_registros'] ?? 0));
+    if($filas === null){
+        return null;
+    }
     $pdfBytes = generarPdfDiaRollo($logDia['fecha'], $filas);
     $total = count($filas);
     return [
@@ -131,6 +158,46 @@ function prepararCierreRollo($logDia){
             'base64' => base64_encode($pdfBytes),
         ],
     ];
+}
+
+// Reintenta el cierre (PDF + fila de LOGS) de días que quedaron cerrados en local
+// sin que Google lo confirmara (cierre perdido por un error/timeout del Apps Script),
+// o que quedaron "en proceso" aunque ya hay un día más nuevo. El cierre es un upsert
+// en el Apps Script, así que repetirlo no duplica nada.
+// Cierra un día: genera el PDF desde el Sheet, lo manda junto con su fila de LOGS
+// (upsert por id_dia) y SOLO si Google confirma con la URL del PDF lo marca cerrado en
+// local. Si algo falla queda pendiente y reintentarCierresPendientes() lo retoma.
+function cerrarDiaConfirmado($conexion, $dia){
+    $cierre = prepararCierreRollo($dia);
+    if($cierre === null){
+        return false;
+    }
+    for($intento = 1; $intento <= 2; $intento++){
+        $resp = enviarAppScriptRollo(['cierre' => $cierre]);
+        if(!empty($resp['ok']) && !empty($resp['cierre_pdf_url'])){
+            cerrarDia($conexion, $dia['id_dia'], $cierre['total'], $resp['cierre_pdf_url']);
+            return true;
+        }
+    }
+    return false;
+}
+
+function reintentarCierresPendientes($conexion, $limite = 2){
+    $res = $conexion->query("
+        SELECT * FROM rollo_sheet
+        WHERE (estado = 'completado' AND (ruta_pdf IS NULL OR ruta_pdf = ''))
+           OR (estado = 'en_proceso' AND fecha < (SELECT MAX(fecha) FROM rollo_sheet WHERE estado = 'en_proceso'))
+        ORDER BY fecha
+        LIMIT " . (int) $limite
+    );
+    $pendientes = [];
+    while($res && ($dia = $res->fetch_assoc())){ $pendientes[] = $dia; }
+
+    $reintentados = 0;
+    foreach($pendientes as $dia){
+        if(cerrarDiaConfirmado($conexion, $dia)){ $reintentados++; }
+    }
+    return $reintentados;
 }
 
 /* =================================================

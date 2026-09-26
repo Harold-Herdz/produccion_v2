@@ -6,8 +6,8 @@ require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 require_once dirname(__DIR__) . '/models/registerModel.php';
-require_once __DIR__ . '/spreadsheetPdf.php';
-require_once __DIR__ . '/appscript.php';
+require_once __DIR__ . '/pdfSpreadsheet.php';
+require_once __DIR__ . '/appsScript.php';
 
 header('Content-Type: application/json');$entrada  = json_decode(file_get_contents('php://input'), true) ?: [];
 $codigo   = $entrada['codigo'] ?? '';
@@ -39,7 +39,7 @@ try {
     }
 
     if(!appScriptConfigurado()){
-        echo json_encode(['ok' => false, 'error' => 'Falta configurar el Web App de Apps Script (modules/sellado/spreadsheet/appscript.php).']);
+        echo json_encode(['ok' => false, 'error' => 'Falta configurar el Web App de Apps Script (modules/sellado/spreadsheet/appsScript.php).']);
         return;
     }
 

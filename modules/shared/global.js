@@ -10,3 +10,9 @@ function cerrarModal(idModal){
 function formatearNumero(numero){
     return Number(numero).toLocaleString();
 }
+// Llegada desde Panel General ("Ir a importar"): abre directamente el overlay de importar
+document.addEventListener("DOMContentLoaded", function () {
+    if (new URLSearchParams(location.search).has("importar") && document.getElementById("modalImportar")) {
+        abrirModal("modalImportar");
+    }
+});

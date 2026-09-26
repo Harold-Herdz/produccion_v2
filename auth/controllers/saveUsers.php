@@ -9,6 +9,8 @@ require_once dirname(__DIR__) . '/authMiddleware.php';
 require_once dirname(__DIR__, 2) . '/includes/conexion.php';
 // Importar config.php
 require_once dirname(__DIR__, 2) . '/includes/config.php';
+// Importar passwords.php (cifrado de contraseñas)
+require_once dirname(__DIR__) . '/shared/passwords.php';
 
 // Obtener y limpiar datos del formulario
 $usuario = trim($_POST['usuario'] ?? '');
@@ -27,7 +29,7 @@ if(
 
 // Sanear datos antes de insertar
 $usuario = mysqli_real_escape_string($conexion, $usuario);
-$contrasena = mysqli_real_escape_string($conexion, $contrasena);
+$contrasena = mysqli_real_escape_string($conexion, cifrarContrasena($contrasena));
 $rol = mysqli_real_escape_string($conexion, $rol);
 
 // Insertar nuevo usuario

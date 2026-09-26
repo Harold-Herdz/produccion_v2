@@ -585,13 +585,15 @@
 /* ===========================
    REGISTER ROLLOS
 =========================== */
-#containerRegisterRollo {
+#containerRegisterRollo,
+#containerRegisterPlana {
   margin-top: 100px;
   margin-bottom: 96px;
   color: var(--texto);
 }
-#containerRegisterRollo .card {
-  max-width: 520px;
+#containerRegisterRollo .card,
+#containerRegisterPlana .card {
+  max-width: 100%;
   margin: 0 auto;
   padding: 30px;
   background: var(--fondo-superficie);
@@ -599,7 +601,8 @@
   border-radius: var(--radio-l);
   box-shadow: var(--sombra-card);
 }
-#containerRegisterRollo .aviso {
+#containerRegisterRollo .aviso,
+#containerRegisterPlana .aviso {
   margin-bottom: 16px;
 }
 .campo-doble {
@@ -622,15 +625,18 @@
   opacity: 0.5;
   pointer-events: none;
 }
-#btnRegistrarRollo {
+#btnRegistrarRollo,
+#btnRegistrarPlana {
   flex: 1;
   font-size: 16px;
   background: var(--verde-oscuro);
 }
-#btnRegistrarRollo:hover {
+#btnRegistrarRollo:hover,
+#btnRegistrarPlana:hover {
   background: var(--verde);
 }
-#btnRegistrarRollo:disabled {
+#btnRegistrarRollo:disabled,
+#btnRegistrarPlana:disabled {
   opacity: 0.65;
   pointer-events: none;
 }

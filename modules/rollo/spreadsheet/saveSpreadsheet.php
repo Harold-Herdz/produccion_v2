@@ -12,6 +12,7 @@ require_once dirname(__DIR__) . '/models/registerModel.php';
 require_once __DIR__ . '/appsScript.php';
 
 header('Content-Type: application/json');
+set_time_limit(120); // registro + cierre(s) implican varias llamadas a Google
 
 $entrada = json_decode(file_get_contents('php://input'), true) ?: [];
 
@@ -88,15 +89,22 @@ try {
     $idDia = construirIdDia($fecha);
     $diaActual = obtenerDiaEnProceso($conexion);
 
-    // ¿Avanzó la fecha respecto al día que estaba en curso? Si es así, ese día se cierra.
-    $cierreAvance = null;
-    if($diaActual && $diaActual['id_dia'] !== $idDia && strtotime($fecha) > strtotime($diaActual['fecha'])){
-        $cierreAvance = prepararCierreRollo($diaActual);
+    // Reglas de cierre (se evalúan ANTES de registrar, con el estado actual):
+    //  - Fecha nueva (posterior al día en curso): el día en curso se cierra.
+    //  - Fecha pasada (anterior al día en curso, ya cerrada o nunca abierta): ese día se
+    //    vuelve a cerrar al final para que su PDF incluya el registro nuevo.
+    $diaACerrar = null;
+    $esDiaPasado = false;
+    if($diaActual && $diaActual['id_dia'] !== $idDia){
+        if(strtotime($fecha) > strtotime($diaActual['fecha'])){
+            $diaACerrar = $diaActual;
+        } elseif(strtotime($fecha) < strtotime($diaActual['fecha'])){
+            $esDiaPasado = true;
+        }
     }
-
-    // ¿El día que se está registrando ya estaba COMPLETADO? (Caso D: corrección retroactiva)
+    // Día ya COMPLETADO al que se le agrega un registro (aunque no haya un día en curso)
     $logObjetivoPrevio = obtenerLogPorIdDia($conexion, $idDia);
-    $esCorreccionRetroactiva = $logObjetivoPrevio && $logObjetivoPrevio['estado'] === 'completado';
+    $recerrarDia = $esDiaPasado || ($logObjetivoPrevio && $logObjetivoPrevio['estado'] === 'completado');
 
     // Fila a agregar en REGISTROS (columnas B..H)
     $fila = [$fecha, $nombreOperario, $nombreMaquina, $nombreReferencia, $nombreColor, $pesoRollo, $pesoRetal];
@@ -104,13 +112,13 @@ try {
     // Id único (reservado para futuro chequeo en Apps Script)
     $idRegistro = bin2hex(random_bytes(8));
 
-    $respuesta = enviarAppScriptRollo(['fila' => $fila, 'cierre' => $cierreAvance, 'id_registro' => $idRegistro]);
+    // 1) SOLO el registro. El cierre va aparte: así un fallo del cierre nunca se confunde
+    //    con que el registro se guardó, ni al revés.
+    $respuesta = enviarAppScriptRollo(['fila' => $fila, 'id_registro' => $idRegistro]);
 
     if(!$respuesta['ok']){
         // Respuesta no interpretable: confirma si ya se guardó
-        if(yaExisteRegistroRollo($fecha, $nombreOperario, $nombreMaquina, $nombreReferencia, $nombreColor, $pesoRollo, $pesoRetal)){
-            $respuesta = ['ok' => true, 'cierre_pdf_url' => null];
-        } else {
+        if(!yaExisteRegistroRollo($fecha, $nombreOperario, $nombreMaquina, $nombreReferencia, $nombreColor, $pesoRollo, $pesoRetal)){
             echo json_encode(['ok' => false, 'error' => $respuesta['error'] ?? 'No se pudo registrar en Google.']);
             return;
         }
@@ -121,24 +129,21 @@ try {
     // fantasma en_proceso con 0 registros reales)
     abrirDia($conexion, $idDia, $fecha);
     incrementarContadorDia($conexion, $idDia);
-    if($cierreAvance){
-        cerrarDia($conexion, $cierreAvance['id_dia'], $cierreAvance['total'], $respuesta['cierre_pdf_url'] ?? '');
+
+    // 2) Cierres. Un día solo queda cerrado en local cuando Google confirma el PDF; si no,
+    //    queda pendiente y se reintenta solo (aquí mismo en el próximo registro, o al abrir
+    //    el formulario).
+    $diaCerrado = false;
+    if($diaACerrar){
+        $diaCerrado = cerrarDiaConfirmado($conexion, $diaACerrar);
+    }
+    if($recerrarDia){
+        // El contador local ya incluye el registro nuevo: el PDF espera verlo en el Sheet
+        $diaCerrado = cerrarDiaConfirmado($conexion, obtenerLogPorIdDia($conexion, $idDia)) || $diaCerrado;
     }
 
-    $diaCerrado = (bool) $cierreAvance;
-
-    // Caso D: el día recién reabierto se vuelve a cerrar de inmediato con el dato nuevo incluido
-    if($esCorreccionRetroactiva){
-        $logActualizado = obtenerLogPorIdDia($conexion, $idDia);
-        $cierreRetro = prepararCierreRollo($logActualizado);
-        $respuestaRetro = enviarAppScriptRollo(['cierre' => $cierreRetro]);
-        if($respuestaRetro['ok']){
-            cerrarDia($conexion, $idDia, $cierreRetro['total'], $respuestaRetro['cierre_pdf_url'] ?? '');
-            $diaCerrado = true;
-        }
-        // Si falla el recierre, el registro ya quedó guardado en el Sheet; el día
-        // simplemente queda en_proceso local para reintentar el cierre más tarde.
-    }
+    // Auto-reparación de cierres anteriores que hayan quedado pendientes
+    try { reintentarCierresPendientes($conexion); } catch (Throwable $e) { /* no afecta el registro ya guardado */ }
 
     echo json_encode(['ok' => true, 'dia_cerrado' => $diaCerrado, 'aviso' => $avisoOperario]);
 

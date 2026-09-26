@@ -30,11 +30,11 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <div class="container">
 
         <!-- Título -->
-        <h2 class="titulo-vista">Administración de Catálogos</h2>
+        <h2 class="titulo-vista">Administrar Tablas Maestras</h2>
 
         <!-- Barra superior: selector de catálogo + búsqueda -->
         <form class="barra-superior" method="GET">
-            <!-- Selector del catálogo o relación a administrar -->
+            <!-- Selector del catálogo a administrar -->
             <div class="grupo-campo">
                 <label for="cat">Catálogo</label>
                 <select id="cat" name="cat" onchange="this.form.submit()">
@@ -43,16 +43,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <?= $datos['etiqueta'] ?>
                         </option>
                     <?php } ?>
-                    <option value="maquina_areas" <?= ($clave === 'maquina_areas') ? 'selected' : '' ?>>
-                        Relación: Máquinas × Áreas
-                    </option>
-                    <option value="maquina_referencias" <?= ($clave === 'maquina_referencias') ? 'selected' : '' ?>>
-                        Relación: Máquinas × Referencias
-                    </option>
                 </select>
             </div>
 
-            <?php if (!$esMatriz) { ?>
             <!-- Búsqueda por nombre -->
             <div class="grupo-campo">
                 <label for="buscar">Buscar</label>
@@ -66,10 +59,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <button type="submit" class="btn">Filtrar</button>
                 <a class="btn btn-secundario" href="?cat=<?= $clave ?>">Limpiar</a>
             </div>
-            <?php } ?>
         </form>
 
-        <?php if (!$esMatriz) { ?>
         <!-- Acción: crear nuevo registro -->
         <div class="acciones" id="accionesCatalogos">
             <a class="btn" onclick="abrirModal('modalCrear')">
@@ -82,7 +73,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 Importar
             </a>
         </div>
-        <?php } ?>
 
         <!-- Panel de exportar (reemplaza la tabla mientras está abierto) -->
         <div id="panelExportar" class="panel-catalogos" style="display:none;">
@@ -152,81 +142,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             </form>
         </div>
 
-        <?php if ($clave === 'maquina_areas') {
-            $matriz = obtenerMatrizMaquinaAreas($conexion);
-        ?>
-        <!-- Matriz: en qué área (módulo) se usa cada máquina -->
-        <div class="matriz-scroll" data-url="<?= BASE_URL ?>/modules/catalogs/controllers/catalogsController.php">
-            <table class="tabla tabla-matriz">
-                <thead>
-                    <tr>
-                        <th class="col-matriz-nombre">Máquina</th>
-                        <?php foreach ($matriz['areas'] as $area) { ?>
-                            <th><?= htmlspecialchars(ucfirst($area['nombre_area'])) ?></th>
-                        <?php } ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($matriz['maquinas'] as $maq) { ?>
-                    <tr>
-                        <td class="col-matriz-nombre"><?= htmlspecialchars($maq['nombre_maquina']) ?></td>
-                        <?php foreach ($matriz['areas'] as $area) { ?>
-                        <td class="col-matriz-check">
-                            <input type="checkbox" class="chk-matriz"
-                                data-accion="toggle_maquina_area"
-                                data-maquina="<?= $maq['id_maquina'] ?>"
-                                data-area="<?= $area['id_area'] ?>"
-                                <?= isset($matriz['relaciones'][$maq['id_maquina']][$area['id_area']]) ? 'checked' : '' ?>>
-                        </td>
-                        <?php } ?>
-                    </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
-        </div>
-
-        <?php } elseif ($clave === 'maquina_referencias') {
-            $matriz = obtenerMatrizMaquinaReferencias($conexion);
-        ?>
-        <!-- Matriz: qué referencias produce cada máquina ("Especiales" = usa Referencias Especiales completas) -->
-        <div class="matriz-scroll" data-url="<?= BASE_URL ?>/modules/catalogs/controllers/catalogsController.php">
-            <table class="tabla tabla-matriz">
-                <thead>
-                    <tr>
-                        <th class="col-matriz-nombre">Máquina</th>
-                        <th class="col-matriz-esp">Especiales</th>
-                        <?php foreach ($matriz['referencias'] as $ref) { ?>
-                            <th><?= htmlspecialchars($ref['nombre_referencia']) ?></th>
-                        <?php } ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($matriz['maquinas'] as $maq) { $esp = (bool) $maq['usa_referencias_esp']; ?>
-                    <tr class="<?= $esp ? 'fila-usa-esp' : '' ?>">
-                        <td class="col-matriz-nombre"><?= htmlspecialchars($maq['nombre_maquina']) ?></td>
-                        <td class="col-matriz-check col-matriz-esp">
-                            <input type="checkbox" class="chk-matriz"
-                                data-accion="toggle_maquina_esp"
-                                data-maquina="<?= $maq['id_maquina'] ?>"
-                                <?= $esp ? 'checked' : '' ?>>
-                        </td>
-                        <?php foreach ($matriz['referencias'] as $ref) { ?>
-                        <td class="col-matriz-check">
-                            <input type="checkbox" class="chk-matriz"
-                                data-accion="toggle_maquina_referencia"
-                                data-maquina="<?= $maq['id_maquina'] ?>"
-                                data-referencia="<?= $ref['id_referencia'] ?>"
-                                <?= isset($matriz['relaciones'][$maq['id_maquina']][$ref['id_referencia']]) ? 'checked' : '' ?>
-                                <?= $esp ? 'disabled' : '' ?>>
-                        </td>
-                        <?php } ?>
-                    </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
-        </div>
-
-        <?php } else { ?>
         <!-- Tabla del catálogo -->
         <div id="containerHistorial">
             <table class="tabla">
@@ -305,7 +220,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </tbody>
             </table>
         </div>
-        <?php } ?>
 
     </div>
 
@@ -326,7 +240,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </div>
     </div>
 
-    <?php if (!$esMatriz) { ?>
     <!-- Modal de Crear -->
     <div class="overlay" id="modalCrear">
         <div class="modal">
@@ -367,7 +280,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
         </div>
     </div>
-    <?php } ?>
 
     <script src="<?= BASE_URL ?>/modules/catalogs/scripts/catalogs.js"></script>
 

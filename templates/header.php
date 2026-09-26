@@ -18,6 +18,8 @@ require_once dirname(__DIR__) . '/includes/config.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/notificaciones.css">
     <?php } ?>
 
+    <script src="<?= BASE_URL ?>/assets/js/mantenerScroll.js"></script>
+
 </head>
 
 <body>
@@ -77,10 +79,16 @@ require_once dirname(__DIR__) . '/includes/config.php';
         <div class="side-menu-content">
             <?php if($_SESSION['rol'] == 'admin'){ ?>
 
+            <!-- Inicio: panel general -->
+            <div class="side-menu-module">
+                <a class="side-menu-inicio" href="<?= BASE_URL ?>/index.php">Inicio</a>
+            </div>
+
             <!-- Módulo Catálogos -->
             <div class="side-menu-module">
                 <span class="side-menu-module-name">Catálogos</span>
-                <a href="<?= BASE_URL ?>/modules/catalogs/views/catalogs.php">Administrar</a>
+                <a href="<?= BASE_URL ?>/modules/catalogs/views/catalogs.php">Maestros</a>
+                <a href="<?= BASE_URL ?>/modules/catalogs/views/relations.php">Relaciones</a>
             </div>
             <?php } ?>
 

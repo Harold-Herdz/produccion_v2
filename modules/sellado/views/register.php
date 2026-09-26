@@ -89,8 +89,8 @@ if(!function_exists('celdasEntradaPlanilla')){
 <?php if(!$planilla): ?>
 
 <!-- Sin turno abierto: formulario para iniciar uno nuevo -->
-<div class="container" id="containerRegister">
-    <h2 class="titulo-vista">Planilla de Producción · Sellado</h2>
+<div class="container container-formulario" id="containerRegister">
+    <h2 class="titulo-vista">Registro de Producción · Sellado</h2>
 
     <div class="card">
         <div class="aviso-toast" id="avisoInicio" hidden>
@@ -135,7 +135,7 @@ if(!function_exists('celdasEntradaPlanilla')){
 </div>
 
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
-<script src="<?= BASE_URL ?>/modules/shared/avisoToast.js"></script>
+<script src="<?= BASE_URL ?>/modules/shared/alertToast.js"></script>
 <?php $regError = $_GET['reg_error'] ?? ''; if($regError !== ''): ?>
 <script>
     crearAvisoToast("avisoInicio", "avisoInicioTexto", "avisoInicioBarra")
@@ -145,9 +145,9 @@ if(!function_exists('celdasEntradaPlanilla')){
 <?php include dirname(__DIR__, 3) . '/templates/footer.php'; return; endif; ?>
 
 <!-- Contenedor de Register -->
-<div class="container" id="containerRegister">
+<div class="container container-planilla" id="containerRegister">
 
-    <h2 class="titulo-vista">Planilla de Producción · Sellado</h2>
+    <h2 class="titulo-vista">Registro de Producción · Sellado</h2>
 
     <!-- Encabezado del turno -->
     <div class="card encabezado-turno">

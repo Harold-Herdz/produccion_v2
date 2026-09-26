@@ -175,6 +175,8 @@ function obtenerConfigCatalogo($clave)
 /* =====================================================
    EXPORTAR / IMPORTAR (archivos semilla)
 ===================================================== */
+require_once dirname(__DIR__, 2) . '/shared/systemState.php';
+require_once dirname(__DIR__, 3) . '/auth/shared/passwords.php';
 define('CATALOGOS_SEED_DIR', dirname(__DIR__) . '/seed');
 
 // Ruta del archivo semilla del catálogo
@@ -183,30 +185,58 @@ function rutaSeedCatalogo($cfg)
     return CATALOGOS_SEED_DIR . '/' . strtolower($cfg['tabla']) . '.sql';
 }
 
-// Vuelca todos los registros al archivo semilla
-function exportarCatalogo($conexion, $cfg)
+// Líneas INSERT que representan el contenido actual del catálogo (sin el comentario de cabecera)
+function lineasExportCatalogo($conexion, $cfg)
 {
     $tabla     = $cfg['tabla'];
     $colNombre = $cfg['nombre'];
 
-    $res = mysqli_query($conexion, "SELECT {$colNombre} AS nombre, estado FROM {$tabla} ORDER BY {$colNombre} ASC");
-    $lineas = ["-- {$cfg['etiqueta']} ({$tabla}) -- generado por Catalogos > Exportar el " . date('Y-m-d H:i')];
-    $total = 0;
+    // Operarios: también se guarda si es supervisor
+    $conSupervisor = ($tabla === 'OPERARIOS');
+    $colExtra = $conSupervisor ? ', es_supervisor' : '';
+
+    $res = mysqli_query($conexion, "SELECT {$colNombre} AS nombre, estado{$colExtra} FROM {$tabla} ORDER BY {$colNombre} ASC");
+    $lineas = [];
     if ($res) {
         while ($fila = mysqli_fetch_assoc($res)) {
             $valor  = str_replace("'", "''", $fila['nombre']);
             $estado = (int) $fila['estado'];
-            $lineas[] = "INSERT INTO {$tabla} ({$colNombre}, estado) VALUES ('{$valor}', {$estado});";
-            $total++;
+            if ($conSupervisor) {
+                $sup = (int) $fila['es_supervisor'];
+                $lineas[] = "INSERT INTO {$tabla} ({$colNombre}, estado, es_supervisor) VALUES ('{$valor}', {$estado}, {$sup});";
+            } else {
+                $lineas[] = "INSERT INTO {$tabla} ({$colNombre}, estado) VALUES ('{$valor}', {$estado});";
+            }
         }
     }
+    return $lineas;
+}
+
+// Vuelca todos los registros al archivo semilla
+function exportarCatalogo($conexion, $cfg)
+{
+    $filas  = lineasExportCatalogo($conexion, $cfg);
+    $lineas = array_merge(["-- {$cfg['etiqueta']} ({$cfg['tabla']}) -- generado por Catalogos > Exportar el " . date('Y-m-d H:i')], $filas);
 
     if (!is_dir(CATALOGOS_SEED_DIR)) {
         mkdir(CATALOGOS_SEED_DIR, 0777, true);
     }
     file_put_contents(rutaSeedCatalogo($cfg), implode("\n", $lineas) . "\n");
+    estadoSistemaGuardar('catalogos', strtolower($cfg['tabla']), ['exportado' => date('Y-m-d H:i:s')]);
 
-    return $total;
+    return count($filas);
+}
+
+// ¿El archivo semilla ya refleja el contenido actual? (false = hay cambios sin exportar)
+function catalogoAlDia($conexion, $cfg)
+{
+    $ruta = rutaSeedCatalogo($cfg);
+    if (!is_file($ruta)) {
+        return false;
+    }
+    $guardadas = file($ruta, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    array_shift($guardadas); // cabecera con la fecha
+    return $guardadas === lineasExportCatalogo($conexion, $cfg);
 }
 
 // Agrega desde el archivo semilla lo que falte
@@ -226,11 +256,13 @@ function importarCatalogo($conexion, $cfg)
 
     $lineas = file($ruta, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lineas as $linea) {
-        if (!preg_match("/VALUES\s*\('((?:[^']|'')*)'\s*,\s*(\d)\)/i", $linea, $m)) {
+        // Tercer valor opcional (es_supervisor, solo en Operarios)
+        if (!preg_match("/VALUES\s*\('((?:[^']|'')*)'\s*,\s*(\d)(?:\s*,\s*(\d))?\)/i", $linea, $m)) {
             continue; // línea no reconocida
         }
         $valor  = trim(str_replace("''", "'", $m[1]));
         $estado = (int) $m[2];
+        $supervisor = ($tabla === 'OPERARIOS') ? (int) ($m[3] ?? 0) : 0;
         if ($valor === '') {
             continue;
         }
@@ -238,13 +270,23 @@ function importarCatalogo($conexion, $cfg)
 
         $res = mysqli_query($conexion, "SELECT {$colId} FROM {$tabla} WHERE {$colNombre} = '{$valorEsc}' LIMIT 1");
         if ($res && mysqli_num_rows($res) > 0) {
+            // Ya existe: si el archivo lo marca como supervisor, se conserva esa marca (nunca se quita)
+            if ($supervisor === 1) {
+                mysqli_query($conexion, "UPDATE {$tabla} SET es_supervisor = 1 WHERE {$colNombre} = '{$valorEsc}'");
+            }
             $existentes++;
             continue;
         }
 
-        mysqli_query($conexion, "INSERT INTO {$tabla} ({$colNombre}, estado) VALUES ('{$valorEsc}', {$estado})");
+        if ($tabla === 'OPERARIOS') {
+            mysqli_query($conexion, "INSERT INTO {$tabla} ({$colNombre}, estado, es_supervisor) VALUES ('{$valorEsc}', {$estado}, {$supervisor})");
+        } else {
+            mysqli_query($conexion, "INSERT INTO {$tabla} ({$colNombre}, estado) VALUES ('{$valorEsc}', {$estado})");
+        }
         $agregados++;
     }
+
+    estadoSistemaGuardar('catalogos', strtolower($tabla), ['importado' => date('Y-m-d H:i:s'), 'agregados' => $agregados]);
 
     return ['agregados' => $agregados, 'existentes' => $existentes, 'error' => null];
 }
@@ -264,7 +306,9 @@ function exportarUsuarios($conexion)
     if ($res) {
         while ($fila = mysqli_fetch_assoc($res)) {
             $usuario = str_replace("'", "''", $fila['usuario']);
-            $pass    = str_replace("'", "''", $fila['contrasena']);
+            // Nunca se exporta texto plano: si aún es una contraseña antigua, se cifra al exportar
+            $guardada = contrasenaEsHash($fila['contrasena']) ? $fila['contrasena'] : cifrarContrasena($fila['contrasena']);
+            $pass    = str_replace("'", "''", $guardada);
             $rol     = str_replace("'", "''", $fila['rol']);
             $estado  = (int) $fila['estado'];
             $lineas[] = "INSERT INTO USUARIOS (usuario, contrasena, rol, estado) VALUES ('{$usuario}', '{$pass}', '{$rol}', {$estado});";
@@ -311,7 +355,8 @@ function importarUsuarios($conexion)
             continue;
         }
 
-        $passEsc = mysqli_real_escape_string($conexion, $pass);
+        // Si el archivo trae una contraseña en texto plano (archivo antiguo), se cifra al importar
+        $passEsc = mysqli_real_escape_string($conexion, contrasenaEsHash($pass) ? $pass : cifrarContrasena($pass));
         $rolEsc  = mysqli_real_escape_string($conexion, $rol);
         mysqli_query($conexion, "INSERT INTO USUARIOS (usuario, contrasena, rol, estado) VALUES ('{$usuarioEsc}', '{$passEsc}', '{$rolEsc}', {$estado})");
         $agregados++;
@@ -415,73 +460,4 @@ function alternarSupervisorOperario($conexion, $idOperario)
             WHERE id_operario = $idOperario";
 
     return mysqli_query($conexion, $sql);
-}
-
-/* =====================================================
-   MATRIZ MÁQUINA ↔ ÁREA / REFERENCIA
-===================================================== */
-// Máquinas activas en orden por número real (no por id)
-function maquinasOrdenadas($conexion)
-{
-    return mysqli_fetch_all(mysqli_query($conexion, "
-        SELECT id_maquina, nombre_maquina, usa_referencias_esp
-        FROM MAQUINAS
-        WHERE estado = 1
-        ORDER BY CAST(REGEXP_SUBSTR(nombre_maquina, '[0-9]+') AS UNSIGNED)
-    "), MYSQLI_ASSOC);
-}
-
-// Máquinas x Áreas: qué máquinas están habilitadas en cada módulo
-function obtenerMatrizMaquinaAreas($conexion)
-{
-    $areas = mysqli_fetch_all(mysqli_query($conexion, "SELECT id_area, nombre_area FROM AREAS ORDER BY id_area"), MYSQLI_ASSOC);
-    $relaciones = [];
-    $res = mysqli_query($conexion, "SELECT id_maquina, id_area FROM MAQUINA_AREAS");
-    while ($r = mysqli_fetch_assoc($res)) {
-        $relaciones[$r['id_maquina']][$r['id_area']] = true;
-    }
-    return ['maquinas' => maquinasOrdenadas($conexion), 'areas' => $areas, 'relaciones' => $relaciones];
-}
-
-// Alterna si una máquina pertenece a un área
-function alternarMaquinaArea($conexion, $idMaquina, $idArea)
-{
-    $idMaquina = (int) $idMaquina;
-    $idArea    = (int) $idArea;
-    $existe = mysqli_query($conexion, "SELECT 1 FROM MAQUINA_AREAS WHERE id_maquina = $idMaquina AND id_area = $idArea");
-    if ($existe && mysqli_num_rows($existe) > 0) {
-        return mysqli_query($conexion, "DELETE FROM MAQUINA_AREAS WHERE id_maquina = $idMaquina AND id_area = $idArea");
-    }
-    return mysqli_query($conexion, "INSERT INTO MAQUINA_AREAS (id_maquina, id_area) VALUES ($idMaquina, $idArea)");
-}
-
-// Máquinas x Referencias: qué referencias normales produce cada máquina
-function obtenerMatrizMaquinaReferencias($conexion)
-{
-    $referencias = mysqli_fetch_all(mysqli_query($conexion, "SELECT id_referencia, nombre_referencia FROM REFERENCIAS WHERE estado = 1 ORDER BY id_referencia"), MYSQLI_ASSOC);
-    $relaciones = [];
-    $res = mysqli_query($conexion, "SELECT id_maquina, id_referencia FROM MAQUINA_REFERENCIAS");
-    while ($r = mysqli_fetch_assoc($res)) {
-        $relaciones[$r['id_maquina']][$r['id_referencia']] = true;
-    }
-    return ['maquinas' => maquinasOrdenadas($conexion), 'referencias' => $referencias, 'relaciones' => $relaciones];
-}
-
-// Alterna si una máquina produce una referencia
-function alternarMaquinaReferencia($conexion, $idMaquina, $idReferencia)
-{
-    $idMaquina    = (int) $idMaquina;
-    $idReferencia = (int) $idReferencia;
-    $existe = mysqli_query($conexion, "SELECT 1 FROM MAQUINA_REFERENCIAS WHERE id_maquina = $idMaquina AND id_referencia = $idReferencia");
-    if ($existe && mysqli_num_rows($existe) > 0) {
-        return mysqli_query($conexion, "DELETE FROM MAQUINA_REFERENCIAS WHERE id_maquina = $idMaquina AND id_referencia = $idReferencia");
-    }
-    return mysqli_query($conexion, "INSERT INTO MAQUINA_REFERENCIAS (id_maquina, id_referencia) VALUES ($idMaquina, $idReferencia)");
-}
-
-// Alterna si una máquina usa el catálogo completo de Referencias Especiales ("Bolsa Basura")
-function alternarUsaReferenciasEsp($conexion, $idMaquina)
-{
-    $idMaquina = (int) $idMaquina;
-    return mysqli_query($conexion, "UPDATE MAQUINAS SET usa_referencias_esp = IF(usa_referencias_esp = 1, 0, 1) WHERE id_maquina = $idMaquina");
 }

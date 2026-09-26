@@ -114,6 +114,7 @@ if(mes1 && mes2){
         const valorMes1 = mes1.value;
         const valorMes2 = mes2.value;
 
+        if (window.guardarScrollPagina) guardarScrollPagina();
         window.location.href =
             "?mes1=" + valorMes1 +
             "&mes2=" + valorMes2;

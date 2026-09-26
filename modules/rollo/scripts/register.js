@@ -3,14 +3,17 @@
 const formRollo = document.getElementById("formRegistroRollo");
 
 if (formRollo) {
-    const aviso          = document.getElementById("avisoRollo");
+    // Al abrir el formulario: completa en segundo plano cualquier cierre de día pendiente
+    fetch("../spreadsheet/closeSpreadsheet.php").catch(() => {});
+
+    const aviso         = document.getElementById("avisoRollo");
     const btnRegistrar  = document.getElementById("btnRegistrarRollo");
     const btnVolver      = document.getElementById("btnVolverRollo");
     const campoFecha     = document.getElementById("fechaRollo");
     let enviando = false;        // evita doble clic / doble registro
 
     /* =========================================
-       AVISO (toast compartido: ver modules/shared/avisoToast.js)
+       AVISO (toast compartido: ver modules/shared/alertToast.js)
     ========================================= */
     const avisoToast = crearAvisoToast("avisoRollo", "avisoRolloTexto", "avisoRolloBarra");
     function mostrarAviso(texto, tipo, autoOcultar) { avisoToast.mostrar(texto, tipo, autoOcultar); }

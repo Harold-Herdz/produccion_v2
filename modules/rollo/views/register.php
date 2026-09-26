@@ -40,8 +40,8 @@ if(!function_exists('campoConOtroRollo')){
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
 
 <!-- Contenedor de Register Rollos -->
-<div class="container" id="containerRegisterRollo">
-    <h2 class="titulo-vista">Registro de Producción · Rollos</h2>
+<div class="container container-formulario" id="containerRegisterRollo">
+    <h2 class="titulo-vista">Registro de Pesos · Rollos</h2>
 
     <div class="card">
         <div class="aviso-toast" id="avisoRollo" hidden>
@@ -98,7 +98,7 @@ if(!function_exists('campoConOtroRollo')){
 </div>
 
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
-<script src="<?= BASE_URL ?>/modules/shared/avisoToast.js"></script>
+<script src="<?= BASE_URL ?>/modules/shared/alertToast.js"></script>
 <script>const mapaReferenciasMaquina = <?= json_encode($mapaReferenciasMaquina, JSON_HEX_TAG) ?>;</script>
 <script src="<?= BASE_URL ?>/modules/rollo/scripts/register.js"></script>
 

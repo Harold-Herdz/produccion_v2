@@ -313,6 +313,18 @@
 .tabla-matriz thead .col-matriz-esp {
   background: var(--verde-oscuro);
 }
+/* Columnas de igual ancho (Máquina × Área): la primera fija, el resto se reparte parejo */
+.tabla-matriz-igual {
+  table-layout: fixed;
+  width: 100%;
+}
+.tabla-matriz-igual .col-matriz-nombre {
+  width: 140px;
+}
+.tabla-matriz-igual .col-matriz-check,
+.tabla-matriz-igual .col-matriz-esp {
+  width: auto;
+}
 .tabla-matriz input[type="checkbox"] {
   width: 18px;
   height: 18px;

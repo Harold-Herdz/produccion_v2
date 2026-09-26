@@ -9,6 +9,8 @@ require_once dirname(__DIR__) . '/authMiddleware.php';
 require_once dirname(__DIR__, 2) . '/includes/conexion.php';
 // Importar config.php
 require_once dirname(__DIR__, 2) . '/includes/config.php';
+// Importar passwords.php (cifrado de contraseñas)
+require_once dirname(__DIR__) . '/shared/passwords.php';
 
 // Obtener ID y datos del formulario
 $id = (int)($_POST['id_usuario'] ?? 0);
@@ -33,13 +35,13 @@ if(empty($contrasena)){
 
 }else{
     // Actualizar incluyendo nueva contraseña
-    $contrasena = mysqli_real_escape_string($conexion, $contrasena);
+    $contrasena = mysqli_real_escape_string($conexion, cifrarContrasena($contrasena));
     $sql = "UPDATE USUARIOS
             SET
                 usuario = '$usuario',
                 contrasena = '$contrasena',
                 rol = '$rol',
-                estado = 'estado'
+                estado = $estado
             WHERE id_usuario = $id
             ";
 }
