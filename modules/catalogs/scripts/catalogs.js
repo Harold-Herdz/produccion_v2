@@ -12,14 +12,6 @@ function cerrarModal(idModal) {
     document.getElementById(idModal).style.display = "none";
 }
 
-// Confirmar cambio de estado
-function confirmarEstado(estadoActual) {
-    var mensaje = (estadoActual === 1)
-        ? "¿Deseas inhabilitar este registro?"
-        : "¿Deseas activar este registro?";
-    return confirm(mensaje);
-}
-
 // Cerrar modal al hacer clic fuera
 window.addEventListener("click", function (evento) {
     if (evento.target.classList.contains("overlay")) {

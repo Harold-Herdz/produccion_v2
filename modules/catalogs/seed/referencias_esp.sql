@@ -1,4 +1,4 @@
--- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-09-26 18:58
+-- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-09-28 17:21
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('1,5K ESP', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x1,5', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x100', 1);

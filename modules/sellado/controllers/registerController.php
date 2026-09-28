@@ -5,6 +5,7 @@ require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 require_once dirname(__DIR__) . '/models/registerModel.php';
+require_once dirname(__DIR__) . '/spreadsheet/appsScript.php';
 
 $hoy      = date('Y-m-d');
 $bloques  = bloquesTurno();
@@ -36,6 +37,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
     $existente = obtenerPlanillaPorCodigo($conexion, $codigo);
 
     if($existente && $existente['estado'] === 'finalizada'){
+        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} ya fue finalizado."));
+        exit;
+    }
+    // La BD local puede haberse reiniciado y no recordarlo: Google es la fuente
+    // final, así que también se verifica ahí antes de abrir una planilla nueva.
+    if(!$existente && appScriptConfigurado() && turnoYaEnLogs($codigo)){
         header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} ya fue finalizado."));
         exit;
     }

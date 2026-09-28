@@ -334,7 +334,7 @@ if (planilla) {
             const data = await res.json();
 
             if (!data.ok) {
-                alert(data.error || "No se pudo finalizar el turno.");
+                await mostrarAviso(data.error || "No se pudo finalizar el turno.", { tipo: "error" });
                 restaurarBoton();
                 return;
             }
@@ -360,7 +360,7 @@ if (planilla) {
             // Turno ya finalizado
 
         } catch (e) {
-            alert("Error de conexión al finalizar. Intenta de nuevo.");
+            await mostrarAviso("Error de conexión al finalizar. Intenta de nuevo.", { tipo: "error" });
             restaurarBoton();
         }
     });
@@ -368,11 +368,18 @@ if (planilla) {
     /* =========================================
        PROTECCIONES
     ========================================= */
-    // Sin aviso tras cancelar
+    // Cancelar turno: confirmación propia antes de enviar el formulario
     const formCancelar = document.getElementById("formCancelarTurno");
     if (formCancelar) {
-        formCancelar.addEventListener("submit", e => {
-            if (!e.defaultPrevented) finalizando = true;
+        formCancelar.addEventListener("submit", async e => {
+            e.preventDefault();
+            const ok = await mostrarConfirmacion(
+                "¿Cancelar el turno? Se perderán los datos no finalizados de esta planilla.",
+                { peligro: true, textoSi: "Cancelar turno" }
+            );
+            if (!ok) return;
+            finalizando = true;
+            formCancelar.submit();
         });
     }
 

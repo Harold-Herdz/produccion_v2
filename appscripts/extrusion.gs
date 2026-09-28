@@ -17,9 +17,6 @@ function doPost(e) {
     if (body.token !== TOKEN) {
       return json({ ok: false, error: 'Token inválido' });
     }
-    // TEMPORAL: carga histórica (borrar con historicoLogs)
-    if (body.accion === 'historico_logs') return json(historicoLogs(body.logs));
-    if (body.accion === 'historico_pdf')  return json({ ok: true, pdf_url: guardarPdf(body.pdf) });
     if (body.accion !== 'finalizar') {
       return json({ ok: false, error: 'Acción no válida' });
     }
@@ -181,54 +178,6 @@ function guardarPdf(pdf) {
 function obtenerOCrear(padre, nombre) {
   const it = padre.getFoldersByName(nombre);
   return it.hasNext() ? it.next() : padre.createFolder(nombre);
-}
-
-// ------------------------------------------------
-// TEMPORAL: CARGA HISTORICA (borrar despues)
-// ------------------------------------------------
-function historicoLogs(items) {
-  const ss   = SpreadsheetApp.getActiveSpreadsheet();
-  const logs = obtenerOCrearHojaLogs(ss);
-  const cols = columnasLogs(logs);
-
-  const ultima = logs.getLastRow();
-  const datos  = ultima > 1 ? logs.getRange(2, 1, ultima - 1, cols.total).getValues() : [];
-  const indice = {};
-  datos.forEach(function (f, i) {
-    indice[String(f[cols.id - 1]).trim() + '|' + String(f[cols.maquina - 1]).trim()] = i;
-  });
-
-  const nuevas = [];
-  items.forEach(function (l) {
-    const clave = String(l.id_dia).trim() + '|' + String(l.maquina).trim();
-    let fila;
-    if (clave in indice) {
-      fila = datos[indice[clave]];
-    } else {
-      fila = new Array(cols.total).fill('');
-      fila[cols.id - 1] = l.id_dia;
-      fila[cols.maquina - 1] = l.maquina;
-      nuevas.push(fila);
-    }
-    fila[cols.fecha - 1]     = isoADate(l.fecha);
-    fila[cols.inicio - 1]    = isoADateHora(l.inicio);
-    fila[cols.fin - 1]       = isoADateHora(l.fin);
-    fila[cols.registros - 1] = l.registros;
-    if (cols.turnos > 0) fila[cols.turnos - 1] = l.turnos;
-    if (cols.estado > 0) fila[cols.estado - 1] = 'COMPLETADO';
-  });
-
-  if (datos.length > 0) logs.getRange(2, 1, datos.length, cols.total).setValues(datos);
-  if (nuevas.length > 0) logs.getRange(datos.length + 2, 1, nuevas.length, cols.total).setValues(nuevas);
-
-  const total = datos.length + nuevas.length;
-  if (total > 0) {
-    logs.getRange(2, cols.fecha, total, 1).setNumberFormat('dd/mm/yyyy');
-    logs.getRange(2, cols.inicio, total, 1).setNumberFormat('dd/mm/yyyy hh:mm:ss');
-    logs.getRange(2, cols.fin, total, 1).setNumberFormat('dd/mm/yyyy hh:mm:ss');
-  }
-  SpreadsheetApp.flush();
-  return { ok: true, actualizadas: datos.length, nuevas: nuevas.length };
 }
 
 // ------------------------------------------------

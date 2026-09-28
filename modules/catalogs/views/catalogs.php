@@ -63,9 +63,11 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
         <!-- Acción: crear nuevo registro -->
         <div class="acciones" id="accionesCatalogos">
+            <?php if ($cfg['permite_crear'] ?? true) { ?>
             <a class="btn" onclick="abrirModal('modalCrear')">
                 + Crear <?= $cfg['etiqueta'] ?>
             </a>
+            <?php } ?>
             <a class="btn btn-secundario" onclick="mostrarPanelCatalogos('exportar')">
                 Exportar
             </a>
@@ -198,7 +200,8 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <!-- Botón de acción: alternar estado -->
                             <td>
                                 <form method="POST"
-                                    onsubmit="return confirmarEstado(<?= $fila['estado'] ? 1 : 0 ?>);">
+                                    data-confirmar="<?= $fila['estado'] ? '¿Deseas inhabilitar este registro?' : '¿Deseas activar este registro?' ?>"
+                                    <?= $fila['estado'] ? 'data-peligro="1"' : '' ?>>
                                     <input type="hidden" name="cat" value="<?= $clave ?>">
                                     <input type="hidden" name="accion" value="estado">
                                     <input type="hidden" name="id" value="<?= $fila[$cfg['id']] ?>">

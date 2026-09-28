@@ -40,11 +40,14 @@ function catalogosDisponibles()
 
         // Referencias de producto
         'referencias' => [
-            'etiqueta' => 'Referencias',
-            'tabla'    => 'REFERENCIAS',
-            'id'       => 'id_referencia',
-            'nombre'   => 'nombre_referencia',
-            'campos'   => [
+            'etiqueta'      => 'Referencias',
+            'tabla'         => 'REFERENCIAS',
+            'id'            => 'id_referencia',
+            'nombre'        => 'nombre_referencia',
+            // Catálogo fijo (solo las que terminan en K): las referencias nuevas
+            // siempre se crean en "Referencias Especiales", nunca aquí.
+            'permite_crear' => false,
+            'campos'        => [
                 'nombre_referencia' => [
                     'etiqueta' => 'Nombre de la referencia',
                     'tipo'     => 'text',

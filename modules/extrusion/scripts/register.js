@@ -385,7 +385,7 @@ if (listaPesos) {
     listaPesos.addEventListener("change", alCambiar);
     [selReferencia, selColor, selLamina].forEach(s => s.addEventListener("change", alCambiar));
 
-    listaPesos.addEventListener("click", e => {
+    listaPesos.addEventListener("click", async e => {
         if (!e.target.classList.contains("ext-quitar")) return;
 
         // Quitar un cambio: sus pesos pasan al tramo anterior
@@ -400,10 +400,13 @@ if (listaPesos) {
                 if (el.querySelector(".f-peso").value !== "") conPesos = true;
             }
             if (previos + siguientes > MAX) {
-                alert("No se puede quitar: el tramo anterior pasaría de " + MAX + " pesos.");
+                await mostrarAviso("No se puede quitar: el tramo anterior pasaría de " + MAX + " pesos.", { tipo: "error" });
                 return;
             }
-            if (conPesos && !confirm("Los pesos de este cambio pasarán al tramo anterior. ¿Quitar el cambio?")) return;
+            if (conPesos) {
+                const ok = await mostrarConfirmacion("Los pesos de este cambio pasarán al tramo anterior. ¿Quitar el cambio?", { peligro: true, textoSi: "Quitar" });
+                if (!ok) return;
+            }
             bloque.remove();
             actualizar();
             marcarCambio();
@@ -444,7 +447,7 @@ if (listaPesos) {
 
     btnFinalizar.addEventListener("click", async () => {
         if (!(await guardar())) {
-            alert("No se pudo guardar el turno. Revisa la conexión e intenta de nuevo.");
+            await mostrarAviso("No se pudo guardar el turno. Revisa la conexión e intenta de nuevo.", { tipo: "error" });
             return;
         }
         abrirModal("modalFinalizar");
@@ -472,7 +475,7 @@ if (listaPesos) {
             const data = await res.json();
             if (!data.ok) {
                 cerrarModal("modalFinalizar");
-                alert(data.error || "No se pudo finalizar el turno.");
+                await mostrarAviso(data.error || "No se pudo finalizar el turno.", { tipo: "error" });
                 restaurarBoton();
                 return;
             }
@@ -493,7 +496,7 @@ if (listaPesos) {
 
         } catch (e) {
             cerrarModal("modalFinalizar");
-            alert("Error de conexión al finalizar. Intenta de nuevo.");
+            await mostrarAviso("Error de conexión al finalizar. Intenta de nuevo.", { tipo: "error" });
             restaurarBoton();
         }
     });
@@ -501,11 +504,18 @@ if (listaPesos) {
     /* =========================================
        PROTECCIONES
     ========================================= */
-    // Sin aviso tras cancelar
+    // Cancelar turno: confirmación propia antes de enviar el formulario
     const formCancelar = document.getElementById("formCancelarTurno");
     if (formCancelar) {
-        formCancelar.addEventListener("submit", e => {
-            if (!e.defaultPrevented) finalizando = true;
+        formCancelar.addEventListener("submit", async e => {
+            e.preventDefault();
+            const ok = await mostrarConfirmacion(
+                "¿Cancelar el turno? Se perderán los datos no finalizados de esta planilla.",
+                { peligro: true, textoSi: "Cancelar turno" }
+            );
+            if (!ok) return;
+            finalizando = true;
+            formCancelar.submit();
         });
     }
 

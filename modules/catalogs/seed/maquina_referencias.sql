@@ -1,4 +1,4 @@
--- Máquina x Referencia (MAQUINA_REFERENCIAS) y Especiales -- generado por Relaciones > Exportar el 2026-09-25 17:40
+-- Máquina x Referencia (MAQUINA_REFERENCIAS) y Especiales -- generado por Relaciones > Exportar el 2026-09-28 19:40
 INSERT INTO MAQUINA_REFERENCIAS (maquina, referencia) VALUES ('Máquina 01', '10K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, referencia) VALUES ('Máquina 01', '15K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, referencia) VALUES ('Máquina 01', '20K');

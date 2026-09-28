@@ -74,7 +74,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                                 <?php if($_SESSION['rol'] == 'admin'){ ?>
                                     <a class="btn btn-eliminar"
                                     href="../controllers/historyController.php?id=<?php echo $fila['id']; ?>"
-                                    onclick="return confirm('¿Deseas eliminar este registro?');">
+                                    data-confirmar="¿Deseas eliminar este registro?">
                                         Eliminar
                                     </a>
                                 <?php } ?>

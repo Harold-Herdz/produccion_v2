@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $accion = $_POST['accion'] ?? '';
 
-    // Crear registro
-    if ($accion === 'crear') {
+    // Crear registro (algunos catálogos, como Referencias, no lo permiten)
+    if ($accion === 'crear' && ($cfg['permite_crear'] ?? true)) {
         crearRegistro($conexion, $cfg, $_POST);
     }
 

@@ -57,7 +57,7 @@ function generarPdfPlanilla($conexion, $planilla, $nota = '', $maquinasFijas = n
                 $porMaquina[$num] = [
                     'operario'            => $f['nombre_operario'] ?? '',
                     'operario_verificado' => isset($f['operario_verificado']) ? (bool) $f['operario_verificado'] : true,
-                    'jornada'             => $f['jornada'] ?? '',
+                    'jornada'             => ($f['jornada_texto'] ?? '') !== '' ? $f['jornada_texto'] : ($f['jornada'] ?? ''),
                     'entradas'            => [],
                 ];
             }

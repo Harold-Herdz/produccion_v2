@@ -14,11 +14,13 @@ require_once dirname(__DIR__) . '/includes/config.php';
     <!-- Ícono y estilos -->
     <link rel="icon" type="image/png" href="<?= BASE_URL ?>/assets/images/logo.png">    
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/main.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/dialog.css">
     <?php if($_SESSION['rol'] == 'admin'){ ?>
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/notifications.css">
     <?php } ?>
 
     <script src="<?= BASE_URL ?>/assets/js/keepScroll.js"></script>
+    <script src="<?= BASE_URL ?>/assets/js/dialog.js"></script>
 
 </head>
 

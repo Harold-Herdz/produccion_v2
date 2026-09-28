@@ -5,6 +5,7 @@ require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 require_once dirname(__DIR__) . '/models/registerModel.php';
+require_once dirname(__DIR__) . '/spreadsheet/appsScript.php';
 
 $hoy = date('Y-m-d');
 $rutaRegister = BASE_URL . '/modules/extrusion/views/register.php';
@@ -34,6 +35,14 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
     $codigo = construirCodigoExtrusion($fecha, $turno['nombre_turno']);
     $existente = buscarPlanillaExtrusion($conexion, $codigo, $idMaquina);
     if($existente && $existente['estado'] === 'finalizada'){
+        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} de {$maquina['nombre_maquina']} ya fue finalizado."));
+        exit;
+    }
+    // La BD local puede haberse reiniciado y no recordarlo: Google es la fuente
+    // final, así que también se verifica ahí antes de abrir una planilla nueva.
+    if(!$existente && appScriptConfiguradoExtrusion()
+        && turnoYaEnRegistrosExtrusion($fecha, $maquina['nombre_maquina'], $turno['nombre_turno'])
+    ){
         header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} de {$maquina['nombre_maquina']} ya fue finalizado."));
         exit;
     }

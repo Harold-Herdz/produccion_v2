@@ -10,7 +10,7 @@ require_once dirname(__DIR__) . '/models/registerModel.php';
 require_once __DIR__ . '/appsScript.php';
 
 header('Content-Type: application/json');
-set_time_limit(120); // varias llamadas a Google
+set_time_limit(240); // varias llamadas a Google, cada una con reintentos internos
 
 $entrada = json_decode(file_get_contents('php://input'), true) ?: [];
 
@@ -134,8 +134,8 @@ try {
         $diaCerrado = cerrarDiaConfirmado($conexion, obtenerLogPorIdDia($conexion, $idDia)) || $diaCerrado;
     }
 
-    // Reparar cierres pendientes
-    try { reintentarCierresPendientes($conexion); } catch (Throwable $e) { /* no afecta lo guardado */ }
+    // Reparar cierres pendientes (mejor esfuerzo, limitado para no arriesgar el tiempo de espera)
+    try { reintentarCierresPendientes($conexion, 1); } catch (Throwable $e) { /* no afecta lo guardado */ }
 
     echo json_encode(['ok' => true, 'dia_cerrado' => $diaCerrado, 'aviso' => $avisoOperario]);
 

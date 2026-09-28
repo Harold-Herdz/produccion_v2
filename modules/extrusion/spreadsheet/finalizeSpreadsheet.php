@@ -10,7 +10,7 @@ require_once __DIR__ . '/pdfSpreadsheet.php';
 require_once __DIR__ . '/appsScript.php';
 
 header('Content-Type: application/json');
-set_time_limit(120);
+set_time_limit(240); // envío con reintentos internos a Apps Script (hasta ~182s)
 
 $entrada = json_decode(file_get_contents('php://input'), true) ?: [];
 $id = (int) ($entrada['id'] ?? 0);
@@ -87,8 +87,19 @@ try {
         ],
     ]);
 
-    $yaExportado = (!$respuesta['ok'] && ($respuesta['error'] ?? '') === 'yaExportado');
-    if(!$respuesta['ok'] && !$yaExportado){
+    // 'yaExportado' aquí solo puede venir de ESTE mismo clic (enviarAppScriptExtrusion
+    // ya reintenta y confirma internamente): no es un turno finalizado antes, es
+    // este mismo envío que sí se guardó pero cuya respuesta llegó ambigua. Se
+    // confirma leyendo REGISTROS y, si está, se trata como éxito normal (no
+    // como "ya estaba exportado", que confundiría al usuario).
+    $confirmado = !empty($respuesta['ok']) || ($respuesta['error'] ?? '') === 'yaExportado';
+    if(!$confirmado
+        && turnoYaEnRegistrosExtrusion($planilla['fecha_planilla'], $planilla['nombre_maquina'], $planilla['nombre_turno'], $planilla['nombre_operador'])
+    ){
+        $confirmado = true;
+    }
+
+    if(!$confirmado){
         echo json_encode(['ok' => false, 'error' => $respuesta['error'] ?? 'No se pudo enviar el turno a Google.']);
         return;
     }
@@ -96,7 +107,7 @@ try {
     $detalleFinal = json_encode(['rollos' => $rollos], JSON_UNESCAPED_UNICODE);
     cerrarPlanillaExtrusion($conexion, $id, count($rollos), $respuesta['pdf_url'] ?? '', $detalleFinal);
 
-    echo json_encode(['ok' => true, 'yaHecho' => $yaExportado, 'total' => count($rollos), 'pdf_url' => $respuesta['pdf_url'] ?? null]);
+    echo json_encode(['ok' => true, 'yaHecho' => false, 'total' => count($rollos), 'pdf_url' => $respuesta['pdf_url'] ?? null]);
 
 } catch (Throwable $e) {
     echo json_encode(['ok' => false, 'error' => 'Ocurrió un error al finalizar el turno. Intenta de nuevo.']);

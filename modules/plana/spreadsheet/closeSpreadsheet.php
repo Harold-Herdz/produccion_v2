@@ -10,7 +10,7 @@ require_once dirname(__DIR__) . '/models/registerModel.php';
 require_once __DIR__ . '/appsScript.php';
 
 header('Content-Type: application/json');
-set_time_limit(120);
+set_time_limit(400); // hasta 2 cierres, cada uno con reintentos internos
 
 // Sin espera; omitir si ocupado
 $tomado = $conexion->query("SELECT GET_LOCK('plana_registrar', 0) AS ok")->fetch_assoc();

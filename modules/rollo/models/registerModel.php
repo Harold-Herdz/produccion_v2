@@ -163,12 +163,11 @@ function cerrarDiaConfirmado($conexion, $dia){
     if($cierre === null){
         return false;
     }
-    for($intento = 1; $intento <= 2; $intento++){
-        $resp = enviarAppScriptRollo(['cierre' => $cierre]);
-        if(!empty($resp['ok']) && !empty($resp['cierre_pdf_url'])){
-            cerrarDia($conexion, $dia['id_dia'], $cierre['total'], $resp['cierre_pdf_url']);
-            return true;
-        }
+    // enviarAppScriptRollo ya reintenta sola ante fallas de red/formato
+    $resp = enviarAppScriptRollo(['cierre' => $cierre]);
+    if(!empty($resp['ok']) && !empty($resp['cierre_pdf_url'])){
+        cerrarDia($conexion, $dia['id_dia'], $cierre['total'], $resp['cierre_pdf_url']);
+        return true;
     }
     return false;
 }

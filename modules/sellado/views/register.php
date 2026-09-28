@@ -241,17 +241,18 @@ if(!function_exists('celdasEntradaPlanilla')){
                                 <label class="op-sub">Nombre
                                     <?= campoCatalogoConOtro($operarios, 'id_operario', 'nombre_operario', $datos['id_operario'] ?? '', 'f-operario', 'Operario', $datos['txt_operario'] ?? '') ?>
                                 </label>
-                                <!-- Jornada: Otro reemplaza select -->
+                                <!-- Jornada: Otro reemplaza select; el registro igual queda en 8/12 Horas -->
+                                <?php $jornadaTxt = $datos['jornada_texto'] ?? ''; ?>
                                 <label class="op-sub">Jornada
                                     <span class="campo-otro-wrap">
-                                        <select class="f-jornada tiene-otro">
+                                        <select class="f-jornada tiene-otro" <?= $jornadaTxt !== '' ? 'hidden' : '' ?>>
                                             <option value=""></option>
-                                            <option value="otro">Otro</option>
+                                            <option value="otro" <?= $jornadaTxt !== '' ? 'selected' : '' ?>>Otro</option>
                                             <option value="8 Horas"  <?= (($datos['jornada'] ?? '') === '8 Horas')  ? 'selected' : '' ?>>8 Horas</option>
                                             <option value="12 Horas" <?= (($datos['jornada'] ?? '') === '12 Horas') ? 'selected' : '' ?>>12 Horas</option>
                                         </select>
-                                        <input type="text" class="f-jornada campo-libre" hidden autocomplete="off" placeholder="Escribe...">
-                                        <button type="button" class="btn-volver-lista" hidden title="Volver a la lista">&#8634;</button>
+                                        <input type="text" class="f-jornada campo-libre" <?= $jornadaTxt === '' ? 'hidden' : '' ?> autocomplete="off" placeholder="Escribe..." value="<?= htmlspecialchars($jornadaTxt) ?>">
+                                        <button type="button" class="btn-volver-lista" <?= $jornadaTxt === '' ? 'hidden' : '' ?> title="Volver a la lista">&#8634;</button>
                                     </span>
                                 </label>
                             </div>
@@ -285,8 +286,7 @@ if(!function_exists('celdasEntradaPlanilla')){
     <!-- Acciones -->
     <div class="acciones-planilla">
         <!-- Cancelar turno -->
-        <form method="POST" id="formCancelarTurno" class="form-cancelar"
-              onsubmit="return confirm('¿Cancelar el turno? Se perderán los datos no finalizados de esta planilla.');">
+        <form method="POST" id="formCancelarTurno" class="form-cancelar">
             <input type="hidden" name="accion" value="cancelar">
             <input type="hidden" name="codigo" value="<?= htmlspecialchars($planilla['codigo']) ?>">
             <button type="submit" class="btn btn-cancelar-turno">Cancelar</button>

@@ -291,8 +291,8 @@ function guardarPlanilla($conexion, $planilla, $maquinas, $final = false){
     $sql = "INSERT INTO produccion_sellado
                 (id_sheet, fecha_sellado, id_operario, id_maquina, id_referencia, id_referencia_esp, id_color, id_turno, id_jornada,
                  paquetes_x70, paquetes_x90, paquetes_x98,
-                 peso_hora1, peso_hora2, peso_hora3, peso_hora4, peso_hora5, obs_sellado)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                 peso_hora1, peso_hora2, peso_hora3, peso_hora4, peso_hora5, obs_sellado, jornada_texto)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             ON DUPLICATE KEY UPDATE
                 id_operario       = VALUES(id_operario),
                 id_maquina        = VALUES(id_maquina),
@@ -301,6 +301,7 @@ function guardarPlanilla($conexion, $planilla, $maquinas, $final = false){
                 id_color          = VALUES(id_color),
                 id_turno          = VALUES(id_turno),
                 id_jornada        = VALUES(id_jornada),
+                jornada_texto     = VALUES(jornada_texto),
                 paquetes_x70      = VALUES(paquetes_x70),
                 paquetes_x90      = VALUES(paquetes_x90),
                 paquetes_x98      = VALUES(paquetes_x98),
@@ -351,11 +352,15 @@ function guardarPlanilla($conexion, $planilla, $maquinas, $final = false){
             if($avisoOp){ $avisos[] = $avisoOp; }
         }
 
-        // Jornada: 8 o 12 Horas
+        // Jornada: 8 o 12 Horas (el registro siempre queda en una de las 2)
         $idJornada = resolverIdJornada($conexion, $m['jornada'] ?? '');
         if($idJornada === null){
             $avisos[] = "No se encontró la jornada «" . normalizarJornada($m['jornada'] ?? '') . "» en el catálogo JORNADAS.";
         }
+        // Si se escribió "Otro" con un texto distinto a los 2 valores, se conserva solo para el PDF
+        $jornadaCruda = trim((string) ($m['jornada'] ?? ''));
+        $jornadaTexto = (in_array($jornadaCruda, ['8 Horas', '12 Horas'], true) || $jornadaCruda === '')
+            ? null : mb_substr($jornadaCruda, 0, 40);
 
         // Entradas de la máquina (máx. 6)
         $entradas = $m['entradas'] ?? [];
@@ -416,9 +421,9 @@ function guardarPlanilla($conexion, $planilla, $maquinas, $final = false){
             $obs = trim($ent['obs'] ?? '');
 
             $stmt->bind_param(
-                'ssiiiiiiiiiiddddds',
+                'ssiiiiiiiiiiddddsss',
                 $idSheet, $fecha, $idOperario, $idMaquina, $idReferencia, $idReferenciaEsp, $idColor, $idTurno, $idJornada,
-                $x70, $x90, $x98, $p1, $p2, $p3, $p4, $p5, $obs
+                $x70, $x90, $x98, $p1, $p2, $p3, $p4, $p5, $obs, $jornadaTexto
             );
             $stmt->execute();
             $guardados++;
@@ -482,7 +487,7 @@ function obtenerPlanillaEstructurada($conexion, $planilla){
                CAST(REGEXP_SUBSTR(m.nombre_maquina, '[0-9]+') AS UNSIGNED) AS numero_maquina,
                s.paquetes_x70, s.paquetes_x90, s.paquetes_x98,
                s.peso_hora1, s.peso_hora2, s.peso_hora3, s.peso_hora4, s.peso_hora5,
-               s.obs_sellado, j.nombre_jornada AS jornada
+               s.obs_sellado, s.jornada_texto, j.nombre_jornada AS jornada
         FROM produccion_sellado s
         LEFT JOIN maquinas m ON s.id_maquina = m.id_maquina
         LEFT JOIN jornadas j ON s.id_jornada = j.id_jornada
@@ -500,6 +505,7 @@ function obtenerPlanillaEstructurada($conexion, $planilla){
                 'id_operario'  => $fila['id_operario'],
                 'txt_operario' => $txt['op'][$num] ?? '',
                 'jornada'      => $fila['jornada'],
+                'jornada_texto' => $fila['jornada_texto'] ?? '',
                 'entradas'     => [],
             ];
         }
@@ -536,7 +542,7 @@ function obtenerEntradasPlanillaPdf($conexion, $codigo){
                COALESCE(r.nombre_referencia, re.nombre_referencia_esp) AS nombre_referencia, c.nombre_color,
                s.paquetes_x70, s.paquetes_x90, s.paquetes_x98, s.paquetes_total,
                s.peso_hora1, s.peso_hora2, s.peso_hora3, s.peso_hora4, s.peso_hora5,
-               s.obs_sellado
+               s.obs_sellado, s.jornada_texto
         FROM produccion_sellado s
         LEFT JOIN maquinas m         ON s.id_maquina        = m.id_maquina
         LEFT JOIN operarios o        ON s.id_operario       = o.id_operario

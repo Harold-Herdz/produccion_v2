@@ -202,8 +202,7 @@ if(!function_exists('opcionesCatalogoExtrusion')){
 
     <!-- Acciones -->
     <div class="acciones-planilla">
-        <form method="POST" id="formCancelarTurno" class="form-cancelar"
-              onsubmit="return confirm('¿Cancelar el turno? Se perderán los datos no finalizados de esta planilla.');">
+        <form method="POST" id="formCancelarTurno" class="form-cancelar">
             <input type="hidden" name="accion" value="cancelar">
             <input type="hidden" name="id" value="<?= (int) $planilla['id_planilla'] ?>">
             <button type="submit" class="btn btn-cancelar-turno">Cancelar</button>

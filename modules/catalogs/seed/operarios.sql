@@ -1,8 +1,8 @@
--- Operarios (OPERARIOS) -- generado por Catalogos > Exportar el 2026-09-26 18:58
-INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Adriana', 1, 0);
+-- Operarios (OPERARIOS) -- generado por Catalogos > Exportar el 2026-09-28 19:40
+INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Adriana', 0, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Alejandra', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Alejandro', 1, 0);
-INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Andrés', 1, 0);
+INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Andrés', 0, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Angie N', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Angie R', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Anthony', 1, 0);
@@ -10,22 +10,22 @@ INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Aponte',
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Arianyerli', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Bibiana', 1, 1);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Brayan', 1, 0);
-INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Briyit', 1, 0);
+INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Briyit', 0, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Camilo', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Cristian', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Danna', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Daza', 1, 0);
-INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Isabel', 1, 0);
+INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Isabel', 0, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Jhon', 1, 0);
-INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Jhon G', 1, 0);
-INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Juan David', 1, 0);
+INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Jhon G', 0, 0);
+INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Juan David', 0, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Julieth', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Julio', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Karen', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Leidy', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Liadis', 1, 1);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Liliana', 1, 0);
-INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Liliana T', 1, 0);
+INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Liliana T', 0, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Lorenzo', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Maibelis', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Manuel', 1, 0);

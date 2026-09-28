@@ -9,7 +9,9 @@ require_once dirname(__DIR__) . '/models/registerModel.php';
 require_once __DIR__ . '/pdfSpreadsheet.php';
 require_once __DIR__ . '/appsScript.php';
 
-header('Content-Type: application/json');$entrada  = json_decode(file_get_contents('php://input'), true) ?: [];
+header('Content-Type: application/json');
+set_time_limit(240); // envío con reintentos internos a Apps Script (hasta ~182s)
+$entrada  = json_decode(file_get_contents('php://input'), true) ?: [];
 $codigo   = $entrada['codigo'] ?? '';
 $maquinas = $entrada['maquinas'] ?? [];
 // Nota solo al PDF
@@ -78,9 +80,17 @@ try {
         ],
     ]);
 
-    $yaExportado = (!$respuesta['ok'] && ($respuesta['error'] ?? '') === 'yaExportado');
+    // 'yaExportado' aquí solo puede venir de ESTE mismo clic (enviarAppScript ya
+    // reintenta y confirma internamente): no es un turno finalizado antes, es
+    // este mismo envío que sí se guardó pero cuya respuesta llegó ambigua. Se
+    // confirma leyendo LOGS y, si está, se trata como éxito normal (no como
+    // "ya estaba exportado", que confundiría al usuario).
+    $confirmado = !empty($respuesta['ok']) || ($respuesta['error'] ?? '') === 'yaExportado';
+    if(!$confirmado && turnoYaEnLogs($codigo)){
+        $confirmado = true;
+    }
 
-    if(!$respuesta['ok'] && !$yaExportado){
+    if(!$confirmado){
         // Falló envío: conservar borrador
         echo json_encode(['ok' => false, 'error' => $respuesta['error'] ?? 'No se pudo enviar el turno a Google.']);
         return;
@@ -92,7 +102,7 @@ try {
 
     echo json_encode([
         'ok'      => true,
-        'yaHecho' => $yaExportado,
+        'yaHecho' => false,
         'total'   => $total,
         'avisos'  => $resultado['avisos'],
         'pdf_url' => $respuesta['pdf_url'] ?? null,

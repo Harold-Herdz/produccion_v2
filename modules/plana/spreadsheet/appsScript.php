@@ -14,10 +14,8 @@ function appScriptConfiguradoPlana(){
         && strlen(PLANA_APPSCRIPT_TOKEN) >= 6;
 }
 
-// POST al Web App
-function enviarAppScriptPlana($payload){
-    $payload['token'] = PLANA_APPSCRIPT_TOKEN;
-
+// Un intento de POST al Web App
+function enviarAppScriptPlanaUnaVez($payload){
     $ctx = stream_context_create([
         'http' => [
             'method'          => 'POST',
@@ -39,4 +37,27 @@ function enviarAppScriptPlana($payload){
         return ['ok' => false, 'error' => 'Respuesta inesperada del Apps Script.'];
     }
     return $data;
+}
+
+// POST al Web App con reintentos: Google a veces responde con algo que no es
+// JSON aunque el dato sí haya quedado guardado. Reintentar evita mostrar un
+// error cuando en realidad funcionó.
+function enviarAppScriptPlana($payload){
+    $payload['token'] = PLANA_APPSCRIPT_TOKEN;
+    $fila = $payload['fila'] ?? null; // solo en registros individuales, no en cierres
+
+    $resp = null;
+    for($intento = 1; $intento <= 2; $intento++){
+        $resp = enviarAppScriptPlanaUnaVez($payload);
+        if(!empty($resp['ok'])){
+            return $resp;
+        }
+        // Antes de reintentar: si la respuesta fue ambigua pero la fila ya
+        // quedó guardada, no tiene sentido enviarla de nuevo (duplicaría).
+        if($intento < 2 && $fila && function_exists('yaExisteRegistroPlana') && yaExisteRegistroPlana(...$fila)){
+            return ['ok' => true];
+        }
+        if($intento < 2){ sleep(2); }
+    }
+    return $resp;
 }
