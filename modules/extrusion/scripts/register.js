@@ -9,9 +9,8 @@ if (listaPesos) {
     const btnAgregar    = document.getElementById("btnAgregarPeso");
     const btnFinalizar  = document.getElementById("btnFinalizar");
     const indicador     = document.getElementById("indicadorGuardado");
-    const zonaAvisos    = document.getElementById("zonaAvisos");
     const MAX           = planillaExtrusion.maxPesos;
-    const MIN_INICIAL   = 3;
+    const MIN_INICIAL   = 1;
 
     // Selects por tipo de cambio
     const selectPorTipo = { referencia: selReferencia, color: selColor, lamina: selLamina };
@@ -29,104 +28,8 @@ if (listaPesos) {
         indicador.className = "indicador-guardado " + estado;
         indicador.querySelector(".texto").textContent = texto;
     }
-    function mostrarAviso(texto) {
-        zonaAvisos.innerHTML = "";
-        const p = document.createElement("p");
-        p.className = "aviso aviso-info";
-        p.textContent = texto;
-        zonaAvisos.appendChild(p);
-        setTimeout(() => { zonaAvisos.innerHTML = ""; }, 5000);
-    }
-
-    /* =========================================
-       SELECT CON BUSCADOR
-    ========================================= */
-    const sinTildes = t => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-
-    // Reemplaza el select por un campo con lista filtrable (el select queda oculto)
-    function hacerBuscable(select) {
-        const wrap = document.createElement("div");
-        wrap.className = "ext-buscable";
-        const input = document.createElement("input");
-        input.type = "text";
-        input.className = "ext-buscable-input";
-        input.autocomplete = "off";
-        input.placeholder = "Buscar…";
-        const lista = document.createElement("div");
-        lista.className = "ext-buscable-lista";
-        lista.hidden = true;
-
-        if (select.parentNode) select.parentNode.replaceChild(wrap, select);
-        wrap.append(select, input, lista);
-        select.style.display = "none";
-
-        const textoActual = () => {
-            const op = select.options[select.selectedIndex];
-            return op && op.value !== "" ? op.textContent : "";
-        };
-        const refrescar = () => { input.value = textoActual(); };
-        select._refrescar = refrescar;
-
-        function pintar(filtro) {
-            lista.innerHTML = "";
-            const t = sinTildes(filtro || "");
-            let visibles = 0;
-            [...select.children].forEach(hijo => {
-                const opciones = hijo.tagName === "OPTGROUP" ? [...hijo.children] : [hijo];
-                const coinciden = opciones.filter(o => o.value !== "" && (!t || sinTildes(o.textContent).includes(t)));
-                if (!coinciden.length) return;
-                if (hijo.tagName === "OPTGROUP") {
-                    const titulo = document.createElement("div");
-                    titulo.className = "ext-buscable-grupo";
-                    titulo.textContent = hijo.label;
-                    lista.appendChild(titulo);
-                }
-                coinciden.forEach(o => {
-                    const item = document.createElement("div");
-                    item.className = "ext-buscable-op" + (o.value === select.value ? " activa" : "");
-                    item.textContent = o.textContent;
-                    item.dataset.valor = o.value;
-                    lista.appendChild(item);
-                    visibles++;
-                });
-            });
-            if (!visibles) {
-                const vacio = document.createElement("div");
-                vacio.className = "ext-buscable-vacio";
-                vacio.textContent = "Sin resultados";
-                lista.appendChild(vacio);
-            }
-        }
-        const abrir = () => { pintar(""); lista.hidden = false; input.select(); };
-        const cerrar = () => { lista.hidden = true; refrescar(); };
-        function elegir(valor) {
-            select.value = valor;
-            select.dispatchEvent(new Event("change", { bubbles: true }));
-            cerrar();
-            input.blur();
-        }
-
-        input.addEventListener("focus", abrir);
-        input.addEventListener("input", () => { lista.hidden = false; pintar(input.value); });
-        input.addEventListener("keydown", e => {
-            if (e.key === "Escape") { cerrar(); input.blur(); }
-            if (e.key === "Enter") {
-                e.preventDefault();
-                const primera = lista.querySelector(".ext-buscable-op");
-                if (primera) elegir(primera.dataset.valor);
-            }
-        });
-        // mousedown evita que el blur cierre la lista antes del clic
-        lista.addEventListener("mousedown", e => {
-            e.preventDefault();
-            const item = e.target.closest(".ext-buscable-op");
-            if (item) elegir(item.dataset.valor);
-        });
-        input.addEventListener("blur", cerrar);
-
-        refrescar();
-        return wrap;
-    }
+    // Select buscador compartido
+    const hacerBuscable = select => window.hacerSelectBuscable(select);
 
     /* =========================================
        CAMPO "OTRO" (texto libre; se crea en catálogo solo al finalizar)
@@ -153,7 +56,7 @@ if (listaPesos) {
         select._libre = libre;
 
         const entrar = texto => {
-            contenedor.hidden = true;
+            contenedor.style.display = "none";
             libre.hidden = false;
             volver.hidden = false;
             libre.value = texto || "";
@@ -166,7 +69,7 @@ if (listaPesos) {
             libre.value = "";
             libre.hidden = true;
             volver.hidden = true;
-            contenedor.hidden = false;
+            contenedor.style.display = "";
             select.value = "";
             if (select._refrescar) select._refrescar();
             select.dispatchEvent(new Event("change", { bubbles: true }));
@@ -224,10 +127,17 @@ if (listaPesos) {
         bloque.dataset.tipo = tipo;
         const etq = document.createElement("label");
         etq.textContent = etiquetaTipo[tipo] + ":";
+        // Resetea el clon ya envuelto
         const select = selectPorTipo[tipo].cloneNode(true);
         select.removeAttribute("id");
+        select.removeAttribute("data-sel-buscador");
+        select.style.display = "";
         select.className = "f-cambio";
-        const campoSelect = agregarOtro(select, tipo === "referencia" ? hacerBuscable(select) : select);
+        // Copia decisión de buscador
+        const wrapOriginal = selectPorTipo[tipo]._selBuscadorWrap;
+        const inputOriginal = wrapOriginal && wrapOriginal.querySelector(".sel-buscador-input");
+        if (inputOriginal) select.dataset.selBuscar = inputOriginal.readOnly ? "no" : "si";
+        const campoSelect = agregarOtro(select, hacerBuscable(select));
         fijarCampo(select, valor);
         const quitar = document.createElement("button");
         quitar.type = "button";
@@ -329,14 +239,45 @@ if (listaPesos) {
                 (seg.pesos || []).forEach(p => listaPesos.appendChild(crearFilaPeso(p)));
             });
         }
-        // Mínimo 3 filas al inicio
+        // Mínimo 1 fila al inicio
         let cantidad = listaPesos.querySelectorAll(".ext-fila-peso").length;
         while (cantidad < MIN_INICIAL && listaPesos.querySelectorAll(".ext-bloque-cambio").length === 0) {
             listaPesos.appendChild(crearFilaPeso(""));
             cantidad++;
         }
         if (listaPesos.children.length === 0) listaPesos.appendChild(crearFilaPeso(""));
+        bloquearConfirmados();
         actualizar();
+    }
+
+    // Turno reabierto: bloquea lo que ya se envió a Google
+    function bloquearConfirmados() {
+        const n = planillaExtrusion.rollosConfirmados;
+        if (!n || n <= 0) return;
+        let contados = 0;
+        [...listaPesos.children].forEach(el => {
+            if (el.classList.contains("ext-fila-peso")) {
+                if (contados < n) {
+                    el.querySelector(".f-peso").readOnly = true;
+                    el.classList.add("ext-fila-bloqueada");
+                    el.querySelector(".ext-quitar").style.display = "none";
+                }
+                contados++;
+            } else if (el.classList.contains("ext-bloque-cambio") && contados < n) {
+                el.classList.add("ext-fila-bloqueada");
+                el.querySelector(".ext-quitar-bloque").style.display = "none";
+                const select = el.querySelector("select");
+                if (select) {
+                    select.disabled = true;
+                    const wrap = select._selBuscadorWrap;
+                    const input = wrap && wrap.querySelector(".sel-buscador-input");
+                    if (input) input.disabled = true;
+                    const limpiar = wrap && wrap.querySelector(".sel-buscador-limpiar");
+                    if (limpiar) limpiar.style.display = "none";
+                    if (select._libre) select._libre.readOnly = true;
+                }
+            }
+        });
     }
 
     /* =========================================
@@ -427,15 +368,15 @@ if (listaPesos) {
         marcarCambio();
     });
 
-    // Bloque de cambio + peso
+    // Bloque de cambio (sin peso automático: se agrega con "+ Agregar")
     document.querySelectorAll("[data-cambio]").forEach(btn => {
         btn.addEventListener("click", () => {
             const bloque = crearBloqueCambio(btn.dataset.cambio, "");
             listaPesos.appendChild(bloque);
-            const fila = crearFilaPeso("");
-            listaPesos.appendChild(fila);
             actualizar();
-            bloque.querySelector("select").focus();
+            const select = bloque.querySelector("select");
+            const foco = (select._selBuscadorWrap || select).querySelector(".sel-buscador-input");
+            (foco || select).focus();
             marcarCambio();
         });
     });
@@ -531,8 +472,8 @@ if (listaPesos) {
     setInterval(() => { if (sinGuardar && !guardando) guardar(); }, 60000);
 
     agregarOtro(selReferencia, hacerBuscable(selReferencia));
-    agregarOtro(selColor, selColor);
-    agregarOtro(selLamina, selLamina);
+    agregarOtro(selColor, hacerBuscable(selColor));
+    agregarOtro(selLamina, hacerBuscable(selLamina));
     // Lo que se escribe en las casillas "Otro" del encabezado también se autoguarda
     document.getElementById("tablaSeleccion").addEventListener("input", () => { resumir(); marcarCambio(); });
     restaurar();

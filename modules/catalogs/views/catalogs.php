@@ -46,18 +46,11 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 </select>
             </div>
 
-            <!-- Búsqueda por nombre -->
-            <div class="grupo-campo">
+            <!-- Búsqueda por nombre (filtra la tabla al escribir) -->
+            <div class="grupo-campo grupo-buscar">
                 <label for="buscar">Buscar</label>
-                <input type="text" id="buscar" name="buscar" autocomplete="off"
-                    placeholder="Buscar por nombre..."
-                    value="<?= htmlspecialchars($busqueda) ?>">
-            </div>
-
-            <!-- Botones de filtro -->
-            <div class="grupo-campo grupo-botones">
-                <button type="submit" class="btn">Filtrar</button>
-                <a class="btn btn-secundario" href="?cat=<?= $clave ?>">Limpiar</a>
+                <input type="text" id="buscar" autocomplete="off"
+                    placeholder="Buscar por nombre...">
             </div>
         </form>
 
@@ -163,7 +156,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <tbody>
                     <?php if ($registros && mysqli_num_rows($registros) > 0) { ?>
                         <?php while ($fila = mysqli_fetch_assoc($registros)) { ?>
-                        <tr>
+                        <tr data-nombre="<?= htmlspecialchars(mb_strtolower($fila[$cfg['nombre']])) ?>">
                             <!-- ID -->
                             <td><?= $fila[$cfg['id']] ?></td>
 

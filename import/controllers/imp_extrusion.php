@@ -101,14 +101,13 @@ foreach ($filas as $data) {
     // IDs de catálogos (o crear)
     $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
     $id_operador   = $operadores[$operador]    ?? autoCrear($conexion, $operadores,  "OPERADORES",  "nombre_operador",   $operador);
-    // Referencia normal o especial (el Sheet trae solo el nombre)
+    // Referencia normal o especial (el Sheet trae solo el nombre). Solo las
+    // «…K» viven en REFERENCIAS; cualquier otra (ya exista o no) va a
+    // REFERENCIAS_ESP, nunca se crea una nueva en REFERENCIAS.
     $id_referencia = $referencias[$referencia] ?? null;
     $id_referencia_esp = null;
     if ($id_referencia === null) {
-        $id_referencia_esp = $referenciasEsp[$referencia] ?? null;
-        if ($id_referencia_esp === null) {
-            $id_referencia = autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
-        }
+        $id_referencia_esp = $referenciasEsp[$referencia] ?? autoCrear($conexion, $referenciasEsp, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia);
     }
     $id_referencia_sql     = ($id_referencia === null) ? "NULL" : "'{$id_referencia}'";
     $id_referencia_esp_sql = ($id_referencia_esp === null) ? "NULL" : "'{$id_referencia_esp}'";

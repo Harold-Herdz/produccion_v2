@@ -15,6 +15,12 @@ if (planilla) {
     const tplEntrada     = document.getElementById("tplEntrada");
     const MAX_ENTRADAS   = 6;
 
+    // Sin placeholder "Buscar…" aquí
+    function sinPlaceholderBuscador(raiz) {
+        raiz.querySelectorAll("select").forEach(s => { s.dataset.placeholder = ""; });
+    }
+    sinPlaceholderBuscador(planilla);
+
     let sinGuardar   = false;   // hay cambios pendientes
     let guardando    = false;   // guardado en curso
     let finalizando  = false;   // finalización en curso
@@ -218,13 +224,14 @@ if (planilla) {
             const libre   = wrap.querySelector(".campo-libre");
             const volver  = wrap.querySelector(".btn-volver-lista");
             const esOperario = e.target.classList.contains("f-operario");
+            const caja = e.target._selBuscadorWrap || e.target;
             if (e.target.value === "otro") {
                 if (esOperario) {
                     // Operario: espacio reservado
                     libre.classList.add("activo");
                 } else {
                     // Reemplaza el select por Otro
-                    e.target.hidden = true;
+                    caja.style.display = "none";
                     libre.hidden = false;
                     volver.hidden = false;
                 }
@@ -236,7 +243,7 @@ if (planilla) {
                     libre.hidden = true;
                 }
                 libre.value = "";
-                e.target.hidden = false;
+                caja.style.display = "";
                 if (volver) volver.hidden = true;
             }
         }
@@ -259,8 +266,9 @@ if (planilla) {
             const libre  = wrap.querySelector(".campo-libre");
             libre.hidden = true;
             libre.value = "";
-            select.hidden = false;
+            (select._selBuscadorWrap || select).style.display = "";
             select.selectedIndex = 0;
+            if (select._refrescar) select._refrescar();
             e.target.hidden = true;
             marcarCambio();
         }
@@ -275,6 +283,8 @@ if (planilla) {
             const tr = tplEntrada.content.firstElementChild.cloneNode(true);
             poblarReferenciasFila(tr, Number(tb.dataset.idMaquina));
             tb.querySelector(".fila-add").before(tr);
+            sinPlaceholderBuscador(tr);
+            if (window.inicializarSelectsBuscables) window.inicializarSelectsBuscables(tr);
             recalcularRowspan(tb);
             if (tb.querySelectorAll(".fila-entrada").length >= MAX_ENTRADAS) tb.classList.add("tope");
             marcarCambio();
@@ -289,7 +299,10 @@ if (planilla) {
             if (filas.length <= 1) {
                 // Única entrada: solo se limpia
                 fila.querySelectorAll("input").forEach(i => i.value = "");
-                fila.querySelectorAll("select").forEach(s => s.selectedIndex = 0);
+                fila.querySelectorAll("select").forEach(s => {
+                    s.selectedIndex = 0;
+                    if (s._refrescar) s._refrescar();
+                });
             } else {
                 // Mover celdas a la siguiente
                 if (fila === filas[0]) {

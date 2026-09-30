@@ -48,6 +48,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                         <th>Operador</th>
                         <th>Referencia</th>
                         <th>Color</th>
+                        <th>Lámina P</th>
                         <th>Rollos</th>
                         <th>Peso Total (kg)</th>
                         <th>Acciones</th>
@@ -65,6 +66,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <td><?php echo $fila['nombre_operador']; ?></td>
                             <td><?php echo $fila['nombre_referencia']; ?></td>
                             <td><?php echo $fila['nombre_color']; ?></td>
+                            <td><?php echo $fila['nombre_lamina_p'] ?? ''; ?></td>
                             <td><?php echo $fila['rollos']; ?></td>
                             <td><?php echo $fila['peso_total']; ?></td>
                              <!-- Editar / eliminar -->

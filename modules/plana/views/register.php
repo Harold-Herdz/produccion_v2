@@ -38,7 +38,7 @@ if(!function_exists('campoConOtroPlana')){
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
 
 <!-- Contenedor de Register Máquina Plana -->
-<div class="container container-formulario" id="containerRegisterPlana">
+<div class="container container-formulario" id="containerRegisterPlana" data-sel-zona="formulario">
     <h2 class="titulo-vista">Registro de Pesos · Máquina Plana</h2>
 
     <div class="card">

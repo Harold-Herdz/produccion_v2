@@ -7,7 +7,7 @@
  * =====================================================
  *  Administra las relaciones entre catálogos:
  *    - Máquina × Área
- *    - Máquina × Referencia (y "Especiales")
+ *    - Referencia × Máquina (por área, y "Especiales")
  * Cambios por AJAX (JSON)
  */
 
@@ -32,12 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
     if ($accion === 'toggle_maquina_referencia') {
-        alternarMaquinaReferencia($conexion, $_POST['id_maquina'] ?? 0, $_POST['id_referencia'] ?? 0);
+        alternarMaquinaReferencia($conexion, $_POST['id_maquina'] ?? 0, $_POST['id_area'] ?? 0, $_POST['id_referencia'] ?? 0);
         echo json_encode(['ok' => true]);
         exit;
     }
     if ($accion === 'toggle_maquina_esp') {
-        alternarUsaReferenciasEsp($conexion, $_POST['id_maquina'] ?? 0);
+        alternarUsaReferenciasEsp($conexion, $_POST['id_maquina'] ?? 0, $_POST['id_area'] ?? 0);
         echo json_encode(['ok' => true]);
         exit;
     }
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $t = exportarRelaciones($conexion);
         echo json_encode(['tipo' => 'exportar', 'resultados' => [
             ['etiqueta' => 'Máquinas × Áreas',       'detalle' => "{$t['areas']} exportadas", 'error' => false],
-            ['etiqueta' => 'Máquinas × Referencias', 'detalle' => "{$t['referencias']} exportadas, {$t['especiales']} máquinas con Especiales", 'error' => false],
+            ['etiqueta' => 'Referencias × Máquinas', 'detalle' => "{$t['referencias']} exportadas", 'error' => false],
         ]]);
         exit;
     }
@@ -68,4 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* =====================================================
    RELACIÓN ACTIVA (GET): areas | referencias
 ===================================================== */
-$rel = ($_GET['rel'] ?? 'areas') === 'referencias' ? 'referencias' : 'areas';
+$rel   = ($_GET['rel'] ?? 'areas') === 'referencias' ? 'referencias' : 'areas';
+// Peletizado no maneja referencias: no aparece en este selector
+$areas = array_values(array_filter(areasOrdenadas($conexion), fn($a) => $a['nombre_area'] !== 'peletizado'));
+$idArea = (int) ($_GET['area'] ?? 0);
+if ($idArea && !array_filter($areas, fn($a) => (int) $a['id_area'] === $idArea)) {
+    $idArea = 0;
+}

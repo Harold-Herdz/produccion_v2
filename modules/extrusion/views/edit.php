@@ -26,7 +26,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <div class="card">
 
             <!-- Formulario de edición -->
-            <form action="<?= BASE_URL ?>/modules/extrusion/controllers/editController.php" method="POST">
+            <form action="<?= BASE_URL ?>/modules/extrusion/controllers/historyController.php" method="POST">
             <!-- ID del registro a actualizar -->
             <input type="hidden" name="id" value="<?php echo $fila['id']; ?>">
 
@@ -73,16 +73,28 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <?php endwhile; ?>
             </select>
 
-            <!-- Referencia -->
+            <!-- Referencia (catálogo K o especial) -->
             <label>Referencia</label>
-                <select name="id_referencia" required>
+                <select name="referencia_valor" required>
+                <option value=""></option>
+                <optgroup label="Referencias">
                 <?php while($r = mysqli_fetch_assoc($referencias)): ?>
-                    <option 
-                        value="<?php echo $r['id_referencia']; ?>" 
-                        <?php if($fila['id_referencia'] == $r['id_referencia']) echo 'selected'; ?>>
-                        <?php echo $r['nombre_referencia']; ?>
+                    <option
+                        value="r:<?php echo $r['id_referencia']; ?>"
+                        <?php if($fila['id_referencia'] !== null && $fila['id_referencia'] == $r['id_referencia']) echo 'selected'; ?>>
+                        <?php echo htmlspecialchars($r['nombre_referencia']); ?>
                     </option>
                 <?php endwhile; ?>
+                </optgroup>
+                <optgroup label="Referencias especiales">
+                <?php while($r = mysqli_fetch_assoc($referenciasEsp)): ?>
+                    <option
+                        value="e:<?php echo $r['id_referencia_esp']; ?>"
+                        <?php if($fila['id_referencia_esp'] !== null && $fila['id_referencia_esp'] == $r['id_referencia_esp']) echo 'selected'; ?>>
+                        <?php echo htmlspecialchars($r['nombre_referencia_esp']); ?>
+                    </option>
+                <?php endwhile; ?>
+                </optgroup>
             </select>
 
             <!-- Color -->
@@ -97,14 +109,15 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <?php endwhile; ?>
             </select>
 
-            <!-- Lamina P -->
+            <!-- Lamina P (opcional) -->
             <label>Lamina P</label>
-            <select name="id_lamina_p" required>
+            <select name="id_lamina_p">
+                <option value=""></option>
                 <?php while($l = mysqli_fetch_assoc($laminas)): ?>
                     <option
                         value="<?php echo $l['id_lamina_p']; ?>"
-                        <?php if($fila['id_lamina_p'] == $l['id_lamina_p']) echo 'selected'; ?>>
-                        <?php echo $l['nombre_lamina_p']; ?>
+                        <?php if($fila['id_lamina_p'] !== null && $fila['id_lamina_p'] == $l['id_lamina_p']) echo 'selected'; ?>>
+                        <?php echo htmlspecialchars($l['nombre_lamina_p']); ?>
                     </option>
                 <?php endwhile; ?>
             </select>
@@ -123,8 +136,11 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 name="peso_total" 
                 value="<?php echo $fila['peso_total']; ?>">
 
-            <!-- Botón de Actualizar -->
-            <button type="submit" class="btn" id="btnActualizar">Actualizar</button>
+            <!-- Botones -->
+            <div class="acciones-editar">
+                <button type="submit" class="btn" id="btnActualizar">Actualizar</button>
+                <a class="btn btn-secundario" href="history.php">Cancelar</a>
+            </div>
             </form>
 
         </div>
@@ -134,7 +150,7 @@ include dirname(__DIR__, 3) . '/templates/header.php';
     <!-- Botones de navegación -->
 </div>
 
-<?php 
+<?php
 // Importar footer.php
 include dirname(__DIR__, 3) . '/templates/footer.php';
 ?>

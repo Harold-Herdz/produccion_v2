@@ -23,8 +23,8 @@ $semana_actual = date('W', strtotime('this week'));
 $mes_actual = date('n');
 $mes_anterior = date('n', strtotime('-1 month'));
 // Meses a comparar
-$mes1 = $_GET['mes1'] ?? $mes_anterior;
-$mes2 = $_GET['mes2'] ?? $mes_actual;
+$mes1 = (int) ($_GET['mes1'] ?? $mes_anterior) ?: $mes_anterior;
+$mes2 = (int) ($_GET['mes2'] ?? $mes_actual) ?: $mes_actual;
 
 // Total histórico de producción
 $total = obtenerTotalHistoricoSellado($conexion);

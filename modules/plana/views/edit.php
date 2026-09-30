@@ -98,8 +98,11 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 name="peso_total"
                 value="<?php echo $fila['peso_total']; ?>">
 
-            <!-- Botón de Actualizar -->
-            <button type="submit" class="btn" id="btnActualizar">Actualizar</button>
+            <!-- Botones -->
+            <div class="acciones-editar">
+                <button type="submit" class="btn" id="btnActualizar">Actualizar</button>
+                <a class="btn btn-secundario" href="history.php">Cancelar</a>
+            </div>
             </form>
 
         </div>

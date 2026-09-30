@@ -69,9 +69,9 @@ document.getElementById("modalResultadoCatalogos").addEventListener("click", e =
 /* =====================================================
    MATRIZ MÁQUINA × ÁREA / REFERENCIA (guardado de un clic)
    ===================================================== */
-// Casillas de datos de la fila
+// Casillas de datos de la fila (incluye Especiales: "Todas" es literal)
 function casillasFila(fila) {
-    return Array.from(fila.querySelectorAll(".chk-matriz")).filter(c => c.dataset.accion !== "toggle_maquina_esp");
+    return Array.from(fila.querySelectorAll(".chk-matriz"));
 }
 
 // "Todas" si todas marcadas
@@ -99,10 +99,11 @@ document.addEventListener("change", e => {
     if (!scroll) return;
     const fila = chk.closest("tr");
 
-    // Marcar/desmarcar fila completa
+    // Marcar/desmarcar fila completa (incluye Especiales: selecciona todo)
     if (chk.classList.contains("chk-todas")) {
-        casillasFila(fila).filter(c => !c.disabled && c.checked !== chk.checked).forEach(c => {
+        casillasFila(fila).filter(c => c.checked !== chk.checked).forEach(c => {
             c.checked = chk.checked;
+            if (c.dataset.accion === "toggle_maquina_esp") fila.classList.toggle("fila-usa-esp", c.checked);
             enviarCasilla(scroll, c).catch(() => {
                 c.checked = !c.checked;
                 sincronizarTodas(fila);
@@ -114,19 +115,13 @@ document.addEventListener("change", e => {
     if (!chk.classList.contains("chk-matriz")) return;
 
     const esEsp = chk.dataset.accion === "toggle_maquina_esp";
-    const alternarFila = marcado => {
-        fila.classList.toggle("fila-usa-esp", marcado);
-        casillasFila(fila).forEach(ref => { ref.disabled = marcado; });
-        const todas = fila.querySelector(".chk-todas");
-        if (todas) todas.disabled = marcado;
-    };
-    if (esEsp) alternarFila(chk.checked);
-    else sincronizarTodas(fila);
+    if (esEsp) fila.classList.toggle("fila-usa-esp", chk.checked);
+    sincronizarTodas(fila);
 
     enviarCasilla(scroll, chk).catch(() => {
         chk.checked = !chk.checked;
-        if (esEsp) alternarFila(chk.checked);
-        else sincronizarTodas(fila);
+        if (esEsp) fila.classList.toggle("fila-usa-esp", chk.checked);
+        sincronizarTodas(fila);
     });
 });
 

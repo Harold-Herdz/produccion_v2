@@ -22,6 +22,8 @@ $operadores = obtenerOperadoresExtrusion($conexion);
 
 $referencias = obtenerReferenciasExtrusion($conexion);
 
+$referenciasEsp = obtenerReferenciasEspExtrusion($conexion);
+
 $colores = obtenerColoresExtrusion($conexion);
 
 $laminas = obtenerLaminaPExtrusion($conexion);

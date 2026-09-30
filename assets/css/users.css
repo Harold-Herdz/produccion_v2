@@ -40,6 +40,10 @@
 .modal select {
   padding: 10px 32px 10px 14px;
 }
+.modal .sel-buscador {
+  width: 100%;
+  margin: 5px auto 15px auto;
+}
 .modal input:hover,
 .modal select:hover,
 .modal textarea:hover {

@@ -1,4 +1,4 @@
--- Lámina P (LAMINA_P) -- generado por Catalogos > Exportar el 2026-09-28 17:21
+-- Lámina P (LAMINA_P) -- generado por Catalogos > Exportar el 2026-09-30 15:28
 INSERT INTO LAMINA_P (nombre_lamina_p, estado) VALUES ('Alvaro Gomez', 1);
 INSERT INTO LAMINA_P (nombre_lamina_p, estado) VALUES ('Carmona', 1);
 INSERT INTO LAMINA_P (nombre_lamina_p, estado) VALUES ('Caucacia', 1);

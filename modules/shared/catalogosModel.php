@@ -1,28 +1,31 @@
 <?php
 // Catálogos compartidos y resolver Otro
 
-// Referencias por máquina
-// Referencias de una máquina
-function obtenerReferenciasPorMaquina($conexion, $idMaquina){
+// Referencias de una máquina, según el área
+function obtenerReferenciasPorMaquina($conexion, $idMaquina, $idArea){
     $stmt = $conexion->prepare("
         SELECT r.id_referencia AS id, r.nombre_referencia AS nombre
         FROM referencias r
         JOIN maquina_referencias mr ON mr.id_referencia = r.id_referencia
-        WHERE mr.id_maquina = ? AND r.estado = 1
-        ORDER BY r.id_referencia
+        WHERE mr.id_maquina = ? AND mr.id_area = ? AND r.estado = 1
+        ORDER BY CAST(REPLACE(REPLACE(r.nombre_referencia, ',', '.'), 'K', '') AS DECIMAL(10,2))
     ");
-    $stmt->bind_param('i', $idMaquina);
+    $stmt->bind_param('ii', $idMaquina, $idArea);
     $stmt->execute();
     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
-// Referencias especiales
+// Referencias especiales: primero las "K ESP" en orden numérico, luego el resto
 function obtenerReferenciasEspOrdenadas($conexion){
     $res = $conexion->query("
         SELECT id_referencia_esp AS id, nombre_referencia_esp AS nombre
         FROM referencias_esp
         WHERE estado = 1
-        ORDER BY nombre_referencia_esp
+        ORDER BY
+            CASE WHEN nombre_referencia_esp REGEXP '^[0-9]+(,[0-9]+)?K ESP$' THEN 0 ELSE 1 END,
+            CASE WHEN nombre_referencia_esp REGEXP '^[0-9]+(,[0-9]+)?K ESP$'
+                 THEN CAST(REPLACE(REPLACE(nombre_referencia_esp, ',', '.'), 'K ESP', '') AS DECIMAL(10,2)) END,
+            nombre_referencia_esp
     ");
     return $res->fetch_all(MYSQLI_ASSOC);
 }
@@ -30,7 +33,7 @@ function obtenerReferenciasEspOrdenadas($conexion){
 // Máquinas de un área
 function obtenerMaquinasConReferencias($conexion, $nombreArea){
     $stmt = $conexion->prepare("
-        SELECT m.id_maquina, m.nombre_maquina, m.usa_referencias_esp,
+        SELECT m.id_maquina, m.nombre_maquina, ma.id_area, ma.usa_referencias_esp,
                CAST(REGEXP_SUBSTR(m.nombre_maquina, '[0-9]+') AS UNSIGNED) AS numero_maquina
         FROM maquinas m
         JOIN maquina_areas ma ON ma.id_maquina = m.id_maquina
@@ -46,7 +49,7 @@ function obtenerMaquinasConReferencias($conexion, $nombreArea){
     $mapaJs = [];
     foreach($maquinas as &$m){
         $esp = (bool) $m['usa_referencias_esp'];
-        $m['referencias'] = $esp ? $referenciasEsp : obtenerReferenciasPorMaquina($conexion, $m['id_maquina']);
+        $m['referencias'] = $esp ? $referenciasEsp : obtenerReferenciasPorMaquina($conexion, $m['id_maquina'], (int) $m['id_area']);
         $mapaJs[$m['id_maquina']] = ['esp' => $esp, 'opciones' => $m['referencias']];
     }
     unset($m);

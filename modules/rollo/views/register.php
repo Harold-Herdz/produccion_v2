@@ -39,7 +39,7 @@ if(!function_exists('campoConOtroRollo')){
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
 
 <!-- Contenedor de Register Rollos -->
-<div class="container container-formulario" id="containerRegisterRollo">
+<div class="container container-formulario" id="containerRegisterRollo" data-sel-zona="formulario">
     <h2 class="titulo-vista">Registro de Pesos · Rollos</h2>
 
     <div class="card">

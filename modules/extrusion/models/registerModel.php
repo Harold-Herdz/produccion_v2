@@ -45,6 +45,34 @@ function maquinasExtrusion($conexion){
     return obtenerMaquinasConReferencias($conexion, 'extrusion')['maquinas'];
 }
 
+// Referencias de una máquina de Extrusión: normales asignadas + especiales si
+// la máquina las usa (ambas a la vez, no una u otra)
+function referenciasDeMaquinaExtrusion($conexion, $idMaquina){
+    $idMaquina = (int) $idMaquina;
+    $normales = $conexion->query("
+        SELECT r.id_referencia AS id, r.nombre_referencia AS nombre
+        FROM referencias r
+        JOIN maquina_referencias mr ON mr.id_referencia = r.id_referencia
+        JOIN areas a ON a.id_area = mr.id_area
+        WHERE mr.id_maquina = {$idMaquina} AND a.nombre_area = 'extrusion' AND r.estado = 1
+        ORDER BY CAST(REPLACE(REPLACE(r.nombre_referencia, ',', '.'), 'K', '') AS DECIMAL(10,2))
+    ")->fetch_all(MYSQLI_ASSOC);
+
+    $fm = $conexion->query("
+        SELECT ma.usa_referencias_esp
+        FROM maquina_areas ma
+        JOIN areas a ON a.id_area = ma.id_area
+        WHERE ma.id_maquina = {$idMaquina} AND a.nombre_area = 'extrusion'
+        LIMIT 1
+    ")->fetch_assoc();
+    $usaEsp = (bool) ($fm['usa_referencias_esp'] ?? false);
+
+    return [
+        'normales'   => $normales,
+        'especiales' => $usaEsp ? obtenerReferenciasEspOrdenadas($conexion) : [],
+    ];
+}
+
 // Turnos permitidos
 function turnosCatalogoExtrusion($conexion){
     $res = $conexion->query("
@@ -135,6 +163,23 @@ function crearPlanillaExtrusion($conexion, $fecha, $idTurno, $nombreTurno, $idMa
     return obtenerPlanillaExtrusion($conexion, $conexion->insert_id);
 }
 
+// Crea localmente una planilla "reabierta" a partir de lo que ya hay en
+// Google, para cuando la BD local no tiene ningún registro de ese turno
+// (por ejemplo, tras un reset) pero Google sí lo tiene finalizado.
+function crearPlanillaDesdeGoogleExtrusion($conexion, $fecha, $idTurno, $nombreTurno, $idMaquina, $idOperador, array $rollosGoogle){
+    $codigo = construirCodigoExtrusion($fecha, $nombreTurno);
+    $total  = count($rollosGoogle);
+    $filas  = json_encode(['rollos' => $rollosGoogle], JSON_UNESCAPED_UNICODE);
+    $stmt = $conexion->prepare("
+        INSERT INTO extrusion_sheet
+            (codigo, fecha_planilla, id_maquina, id_turno, id_operador, estado, total_registros, filas, rollos_confirmados)
+        VALUES (?, ?, ?, ?, ?, 'abierta', ?, ?, ?)
+    ");
+    $stmt->bind_param('ssiiiisi', $codigo, $fecha, $idMaquina, $idTurno, $idOperador, $total, $filas, $total);
+    $stmt->execute();
+    return obtenerPlanillaExtrusion($conexion, $conexion->insert_id);
+}
+
 function cancelarPlanillaExtrusion($conexion, $id){
     $stmt = $conexion->prepare("DELETE FROM extrusion_sheet WHERE id_planilla = ? AND estado = 'abierta'");
     $stmt->bind_param('i', $id);
@@ -148,11 +193,69 @@ function guardarBorradorExtrusion($conexion, $id, $json){
     $stmt->execute();
 }
 
-// Cerrar planilla con detalle
+// Cerrar planilla con detalle (limpia rollos_confirmados: ya quedó todo enviado)
 function cerrarPlanillaExtrusion($conexion, $id, $total, $rutaPdf, $jsonFinal){
-    $stmt = $conexion->prepare("UPDATE extrusion_sheet SET estado = 'finalizada', total_registros = ?, ruta_pdf = ?, filas = ?, finalizado_en = NOW() WHERE id_planilla = ?");
+    $stmt = $conexion->prepare("UPDATE extrusion_sheet SET estado = 'finalizada', total_registros = ?, ruta_pdf = ?, filas = ?, finalizado_en = NOW(), rollos_confirmados = NULL WHERE id_planilla = ?");
     $stmt->bind_param('issi', $total, $rutaPdf, $jsonFinal, $id);
     $stmt->execute();
+}
+
+// Reabrir una planilla ya finalizada, para agregar más rollos al mismo turno.
+// Guarda cuántos rollos ya se habían enviado, para no volver a mandarlos.
+function reabrirPlanillaExtrusion($conexion, $id){
+    $stmt = $conexion->prepare("
+        UPDATE extrusion_sheet
+        SET estado = 'abierta', rollos_confirmados = total_registros, finalizado_en = NULL
+        WHERE id_planilla = ? AND estado = 'finalizada'
+    ");
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    return $stmt->affected_rows > 0;
+}
+
+// Un turno finalizado guarda "filas" como {rollos:[{referencia,color,lamina,peso}]}
+// (nombres ya resueltos), no como el borrador de segmentos que edita el formulario.
+// Al reabrir hay que reconstruir esos segmentos para poder seguir editando.
+function segmentosDesdeRollosExtrusion(array $rollosGuardados, array $referencias, array $referenciasEsp, array $colores, array $laminas){
+    $refPorNombre = [];
+    foreach($referencias as $r){ $refPorNombre[$r['nombre']] = 'r:' . $r['id']; }
+    foreach($referenciasEsp as $r){ $refPorNombre[$r['nombre']] = 'e:' . $r['id']; }
+    $colorPorNombre = [];
+    foreach($colores as $c){ $colorPorNombre[$c['nombre_color']] = (string) $c['id_color']; }
+    $laminaPorNombre = [];
+    foreach($laminas as $l){ $laminaPorNombre[$l['nombre']] = (string) $l['id']; }
+
+    $valorRef    = fn($n) => $refPorNombre[$n] ?? ($n !== '' ? 'x:' . $n : '');
+    $valorColor  = fn($n) => $colorPorNombre[$n] ?? ($n !== '' ? 'x:' . $n : '');
+    $valorLamina = fn($n) => $laminaPorNombre[$n] ?? ($n !== '' ? 'x:' . $n : '');
+
+    $segmentos = [];
+    foreach($rollosGuardados as $r){
+        $ref    = $valorRef((string) ($r['referencia'] ?? ''));
+        $color  = $valorColor((string) ($r['color'] ?? ''));
+        $lamina = $valorLamina((string) ($r['lamina'] ?? ''));
+        $i = count($segmentos) - 1;
+
+        if($i < 0){
+            $segmentos[] = ['cambio' => null, 'ref' => $ref, 'color' => $color, 'lamina' => $lamina, 'pesos' => []];
+            $i = 0;
+        } else {
+            if($ref !== $segmentos[$i]['ref']){
+                $segmentos[] = ['cambio' => 'referencia', 'ref' => $ref, 'color' => $segmentos[$i]['color'], 'lamina' => $segmentos[$i]['lamina'], 'pesos' => []];
+                $i++;
+            }
+            if($color !== $segmentos[$i]['color']){
+                $segmentos[] = ['cambio' => 'color', 'ref' => $segmentos[$i]['ref'], 'color' => $color, 'lamina' => $segmentos[$i]['lamina'], 'pesos' => []];
+                $i++;
+            }
+            if($lamina !== $segmentos[$i]['lamina']){
+                $segmentos[] = ['cambio' => 'lamina', 'ref' => $segmentos[$i]['ref'], 'color' => $segmentos[$i]['color'], 'lamina' => $lamina, 'pesos' => []];
+                $i++;
+            }
+        }
+        $segmentos[$i]['pesos'][] = (string) ($r['peso'] ?? '');
+    }
+    return $segmentos;
 }
 
 /* =================================================

@@ -364,8 +364,21 @@ function listarRegistros($conexion, $cfg, $busqueda = '')
         $sql .= " WHERE $nombre LIKE '%$busqueda%'";
     }
 
-    // Orden por ID
-    $sql .= " ORDER BY $id ASC";
+    // Referencias: orden numérico (1,5K, 2K, 3K... 50K), no por ID
+    if (strtoupper($tabla) === 'REFERENCIAS') {
+        $sql .= " ORDER BY CAST(REPLACE(REPLACE($nombre, ',', '.'), 'K', '') AS DECIMAL(10,2)) ASC";
+    } elseif (strtoupper($tabla) === 'REFERENCIAS_ESP') {
+        // Primero las "K ESP" en orden numérico, luego el resto como ya estaban
+        $esKesp = "$nombre REGEXP '^[0-9]+(,[0-9]+)?K ESP$'";
+        $sql .= "
+            ORDER BY
+                CASE WHEN $esKesp THEN 0 ELSE 1 END,
+                CASE WHEN $esKesp THEN CAST(REPLACE(REPLACE($nombre, ',', '.'), 'K ESP', '') AS DECIMAL(10,2)) END,
+                $id ASC
+        ";
+    } else {
+        $sql .= " ORDER BY $id ASC";
+    }
 
     return mysqli_query($conexion, $sql);
 }

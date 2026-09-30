@@ -43,17 +43,18 @@ if (formPlana) {
     // Referencia/Color: reemplaza el select
     formPlana.addEventListener("change", e => {
         if (!e.target.classList.contains("tiene-otro")) return;
-        const libre = e.target.nextElementSibling;
+        const libre = selSiguiente(e.target);
+        const caja = e.target._selBuscadorWrap || e.target;
         const esOperario = e.target.id === "operarioPlana";
         if (e.target.value === "otro") {
-            if (!esOperario) e.target.hidden = true;
+            if (!esOperario) caja.style.display = "none";
             libre.hidden = false;
             libre.value = "";
             libre.focus();
         } else {
             libre.hidden = true;
             libre.value = "";
-            e.target.hidden = false;
+            caja.style.display = "";
         }
     });
 
@@ -70,26 +71,28 @@ if (formPlana) {
         if (!e.target.classList.contains("campo-libre")) return;
         e.target.value = capitalizar(e.target.value);
         if (e.target.id !== "operarioPlanaTexto" && e.target.value === "") {
-            const select = e.target.previousElementSibling;
+            const select = selDesenvolver(e.target.previousElementSibling);
             e.target.hidden = true;
-            select.hidden = false;
+            (select._selBuscadorWrap || select).style.display = "";
             select.selectedIndex = 0;
+            if (select._refrescar) select._refrescar();
         }
     }, true); // blur no burbujea
 
     // Valor del select u Otro
     function valorConOtro(idSelect) {
         const select = document.getElementById(idSelect);
-        return select.value === "otro" ? capitalizar(select.nextElementSibling.value) : select.value;
+        return select.value === "otro" ? capitalizar(selSiguiente(select).value) : select.value;
     }
 
     // Restaurar select tras Otro
     function restaurarCampoConOtro(idSelect) {
         const select = document.getElementById(idSelect);
-        const libre = select.nextElementSibling;
+        const libre = selSiguiente(select);
         libre.hidden = true;
         libre.value = "";
         select.selectedIndex = 0;
+        if (select._refrescar) select._refrescar();
     }
 
     const selectMaquina = document.getElementById("maquinaPlana");
@@ -98,6 +101,7 @@ if (formPlana) {
     function limpiarFormulario() {
         restaurarCampoConOtro("operarioPlana");
         selectMaquina.selectedIndex = 0;
+        if (selectMaquina._refrescar) selectMaquina._refrescar();
         restaurarCampoConOtro("referenciaPlana");
         ["pesoRolloPlana", "pesoRetalPlana", "bultosPlana", "pesoTotalPlana"].forEach(id => { document.getElementById(id).value = ""; });
         document.getElementById("operarioPlana").focus();

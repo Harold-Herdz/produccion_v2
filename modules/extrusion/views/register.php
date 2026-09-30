@@ -24,7 +24,7 @@ if(!function_exists('opcionesCatalogoExtrusion')){
 <?php if(!$planilla): ?>
 
 <!-- Formulario de inicio de turno -->
-<div class="container container-formulario" id="containerRegister">
+<div class="container container-formulario" id="containerRegister" data-sel-zona="formulario">
     <h2 class="titulo-vista">Registro de Producción · Extrusión</h2>
 
     <div class="card">
@@ -67,6 +67,21 @@ if(!function_exists('opcionesCatalogoExtrusion')){
 
             <button type="submit" class="btn" id="btnIniciar">Iniciar planilla</button>
         </form>
+
+        <?php $reabrirId = (int) ($_GET['reabrir_id'] ?? 0); if($reabrirId > 0): ?>
+        <form id="formReabrir" method="POST" action="<?= BASE_URL ?>/modules/extrusion/views/register.php" hidden>
+            <input type="hidden" name="accion" value="reabrir">
+            <input type="hidden" name="id" value="<?= $reabrirId ?>">
+        </form>
+        <?php elseif(($_GET['reabrir_google'] ?? '') === '1'): ?>
+        <form id="formReabrir" method="POST" action="<?= BASE_URL ?>/modules/extrusion/views/register.php" hidden>
+            <input type="hidden" name="accion" value="reabrir_google">
+            <input type="hidden" name="fecha" value="<?= htmlspecialchars($_GET['fecha'] ?? '') ?>">
+            <input type="hidden" name="id_maquina" value="<?= (int) ($_GET['id_maquina'] ?? 0) ?>">
+            <input type="hidden" name="id_turno" value="<?= (int) ($_GET['id_turno'] ?? 0) ?>">
+            <input type="hidden" name="id_operador" value="<?= (int) ($_GET['id_operador'] ?? 0) ?>">
+        </form>
+        <?php endif; ?>
     </div>
 
     <?php if(!empty($abiertas)): ?>
@@ -88,14 +103,19 @@ if(!function_exists('opcionesCatalogoExtrusion')){
 <script src="<?= BASE_URL ?>/modules/shared/alertToast.js"></script>
 <?php $regError = $_GET['reg_error'] ?? ''; if($regError !== ''): ?>
 <script>
+<?php if($reabrirId > 0 || ($_GET['reabrir_google'] ?? '') === '1'): ?>
+    mostrarConfirmacion(<?= json_encode($regError . ' ¿Deseas reabrirlo?') ?>, { titulo: "Turno finalizado", textoSi: "Reabrir", textoNo: "Cancelar" })
+        .then(function (ok) { if (ok) document.getElementById("formReabrir").submit(); });
+<?php else: ?>
     crearAvisoToast("avisoInicio", "avisoInicioTexto", "avisoInicioBarra")
         .mostrar(<?= json_encode($regError) ?>, "error", true);
+<?php endif; ?>
 </script>
 <?php endif; ?>
 <?php include dirname(__DIR__, 3) . '/templates/footer.php'; return; endif; ?>
 
 <!-- Planilla del turno -->
-<div class="container container-extrusion" id="containerRegister">
+<div class="container container-extrusion" id="containerRegister" data-sel-zona="formulario">
 
     <h2 class="titulo-vista">Registro de Producción · Extrusión</h2>
 
@@ -129,6 +149,12 @@ if(!function_exists('opcionesCatalogoExtrusion')){
 
     <!-- Zona de avisos -->
     <div id="zonaAvisos"></div>
+
+    <?php if($planilla['rollos_confirmados'] !== null): ?>
+    <div class="aviso-reabierto">
+        Turno reabierto: los primeros <?= (int) $planilla['rollos_confirmados'] ?> rollos ya se enviaron y están bloqueados. Solo se pueden agregar rollos nuevos.
+    </div>
+    <?php endif; ?>
 
     <!-- Referencia, color y lámina P -->
     <table class="ext-tabla" id="tablaSeleccion">
@@ -179,7 +205,7 @@ if(!function_exists('opcionesCatalogoExtrusion')){
                         <!-- Resumen en vivo del turno -->
                         <aside class="ext-resumen">
                             <div class="ext-resumen-titulo">Resumen del turno</div>
-                            <div class="ext-resumen-linea"><span>Rollos pesados</span><strong id="resRollos">0</strong></div>
+                            <div class="ext-resumen-linea"><span>Rollos</span><strong id="resRollos">0</strong></div>
                             <div class="ext-resumen-linea"><span>Peso total</span><strong id="resPeso">0,00</strong></div>
                             <div class="ext-resumen-linea"><span>Promedio</span><strong id="resPromedio">0,00</strong></div>
                             <div class="ext-resumen-sub">Combinación actual</div>
@@ -240,7 +266,12 @@ if(!function_exists('opcionesCatalogoExtrusion')){
 
 <!-- Scripts -->
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
-<script>const planillaExtrusion = <?= json_encode(['id' => (int) $planilla['id_planilla'], 'borrador' => $borrador, 'maxPesos' => 10], JSON_HEX_TAG) ?>;</script>
+<script>const planillaExtrusion = <?= json_encode([
+    'id' => (int) $planilla['id_planilla'],
+    'borrador' => $borrador,
+    'maxPesos' => 10,
+    'rollosConfirmados' => $planilla['rollos_confirmados'] !== null ? (int) $planilla['rollos_confirmados'] : null,
+], JSON_HEX_TAG) ?>;</script>
 <script src="<?= BASE_URL ?>/modules/extrusion/scripts/register.js"></script>
 
 <?php include dirname(__DIR__, 3) . '/templates/footer.php'; ?>

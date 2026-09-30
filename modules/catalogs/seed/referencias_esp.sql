@@ -1,4 +1,4 @@
--- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-09-28 17:21
+-- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-09-30 15:28
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('1,5K ESP', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x1,5', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x100', 1);
@@ -7,6 +7,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('15K ESP', 1
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('16x20', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('16x24', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('18+4+4', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('18+4+4x1', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('18x24', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('18x40', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('19x25', 1);
@@ -81,6 +82,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('70x104', 1)
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('70x90', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('72x3,7', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x1,10', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x1,2', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('88x1,18', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('88x1,2', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('90x1,10', 1);

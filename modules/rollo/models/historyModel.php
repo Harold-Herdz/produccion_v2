@@ -22,7 +22,7 @@ function obtenerMaquinas($conexion){
 }
 function obtenerReferencias($conexion){
     return mysqli_query($conexion,
-        "SELECT * FROM REFERENCIAS"
+        "SELECT * FROM REFERENCIAS ORDER BY CAST(REPLACE(REPLACE(nombre_referencia, ',', '.'), 'K', '') AS DECIMAL(10,2))"
     );
 }
 function obtenerColores($conexion){

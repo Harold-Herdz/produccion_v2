@@ -1,12 +1,14 @@
 <?php
 /** @var mysqli $conexion */
 /** @var string $rel Relación activa: areas | referencias */
+/** @var array  $areas */
+/** @var int    $idArea */
 
 // Restringir acceso solo a administradores
 $soloAdmin = true;
 require_once dirname(__DIR__, 3) . '/auth/authMiddleware.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
-// Prepara $rel y atiende POST
+// Prepara $rel, $areas, $idArea y atiende POST
 include dirname(__DIR__) . '/controllers/relationsController.php';
 
 $urlControlador = BASE_URL . '/modules/catalogs/controllers/relationsController.php';
@@ -26,12 +28,27 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <label for="rel">Relación</label>
                 <select id="rel" name="rel" onchange="this.form.submit()">
                     <option value="areas" <?= $rel === 'areas' ? 'selected' : '' ?>>Máquinas × Áreas</option>
-                    <option value="referencias" <?= $rel === 'referencias' ? 'selected' : '' ?>>Máquinas × Referencias</option>
+                    <option value="referencias" <?= $rel === 'referencias' ? 'selected' : '' ?>>Referencias × Máquinas</option>
                 </select>
             </div>
 
-            <!-- Búsqueda por máquina -->
+            <?php if ($rel === 'referencias') { ?>
+            <!-- Área a administrar -->
             <div class="grupo-campo">
+                <label for="area">Área</label>
+                <select id="area" name="area" onchange="this.form.submit()">
+                    <option value="">Selecciona...</option>
+                    <?php foreach ($areas as $area) { ?>
+                        <option value="<?= $area['id_area'] ?>" <?= $idArea === (int) $area['id_area'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars(ucfirst($area['nombre_area'])) ?>
+                        </option>
+                    <?php } ?>
+                </select>
+            </div>
+            <?php } ?>
+
+            <!-- Búsqueda por máquina -->
+            <div class="grupo-campo grupo-buscar">
                 <label for="buscarMaquina">Buscar</label>
                 <input type="text" id="buscarMaquina" autocomplete="off" placeholder="Buscar máquina...">
             </div>
@@ -52,19 +69,16 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <thead>
                     <tr>
                         <th class="col-matriz-nombre">Máquina</th>
-                        <th>Todas</th>
                         <?php foreach ($matriz['areas'] as $area) { ?>
                             <th><?= htmlspecialchars(ucfirst($area['nombre_area'])) ?></th>
                         <?php } ?>
+                        <th>Todas</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($matriz['maquinas'] as $maq) { ?>
                     <tr data-maquina-nombre="<?= htmlspecialchars(mb_strtolower($maq['nombre_maquina'])) ?>">
                         <td class="col-matriz-nombre"><?= htmlspecialchars($maq['nombre_maquina']) ?></td>
-                        <td class="col-matriz-check">
-                            <input type="checkbox" class="chk-todas" title="Marcar todas">
-                        </td>
                         <?php foreach ($matriz['areas'] as $area) { ?>
                         <td class="col-matriz-check">
                             <input type="checkbox" class="chk-matriz"
@@ -74,29 +88,39 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                                 <?= isset($matriz['relaciones'][$maq['id_maquina']][$area['id_area']]) ? 'checked' : '' ?>>
                         </td>
                         <?php } ?>
+                        <td class="col-matriz-check">
+                            <input type="checkbox" class="chk-todas" title="Marcar todas">
+                        </td>
                     </tr>
                     <?php } ?>
                 </tbody>
             </table>
         </div>
 
+        <?php } elseif (!$idArea) { ?>
+        <!-- Sin área seleccionada -->
+        <p class="texto-panel">Selecciona un área arriba para ver sus máquinas y referencias.</p>
+
         <?php } else {
-            $matriz = obtenerMatrizMaquinaReferencias($conexion);
+            $matriz = obtenerMatrizMaquinaReferencias($conexion, $idArea);
         ?>
-        <!-- Matriz máquina × referencia -->
+        <!-- Matriz referencia × máquina (del área elegida) -->
         <div class="matriz-scroll" data-url="<?= $urlControlador ?>">
             <table class="tabla tabla-matriz tabla-matriz-igual">
                 <thead>
                     <tr>
                         <th class="col-matriz-nombre">Máquina</th>
                         <th class="col-matriz-esp">Especiales</th>
-                        <th>Todas</th>
                         <?php foreach ($matriz['referencias'] as $ref) { ?>
                             <th><?= htmlspecialchars($ref['nombre_referencia']) ?></th>
                         <?php } ?>
+                        <th>Todas</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php if (!$matriz['maquinas']) { ?>
+                        <tr><td colspan="<?= count($matriz['referencias']) + 3 ?>">Esta área no tiene máquinas asignadas (ve a Máquinas × Áreas).</td></tr>
+                    <?php } ?>
                     <?php foreach ($matriz['maquinas'] as $maq) { $esp = (bool) $maq['usa_referencias_esp']; ?>
                     <tr class="<?= $esp ? 'fila-usa-esp' : '' ?>" data-maquina-nombre="<?= htmlspecialchars(mb_strtolower($maq['nombre_maquina'])) ?>">
                         <td class="col-matriz-nombre"><?= htmlspecialchars($maq['nombre_maquina']) ?></td>
@@ -104,21 +128,22 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <input type="checkbox" class="chk-matriz"
                                 data-accion="toggle_maquina_esp"
                                 data-maquina="<?= $maq['id_maquina'] ?>"
+                                data-area="<?= $idArea ?>"
                                 <?= $esp ? 'checked' : '' ?>>
-                        </td>
-                        <td class="col-matriz-check">
-                            <input type="checkbox" class="chk-todas" title="Marcar todas" <?= $esp ? 'disabled' : '' ?>>
                         </td>
                         <?php foreach ($matriz['referencias'] as $ref) { ?>
                         <td class="col-matriz-check">
                             <input type="checkbox" class="chk-matriz"
                                 data-accion="toggle_maquina_referencia"
                                 data-maquina="<?= $maq['id_maquina'] ?>"
+                                data-area="<?= $idArea ?>"
                                 data-referencia="<?= $ref['id_referencia'] ?>"
-                                <?= isset($matriz['relaciones'][$maq['id_maquina']][$ref['id_referencia']]) ? 'checked' : '' ?>
-                                <?= $esp ? 'disabled' : '' ?>>
+                                <?= isset($matriz['relaciones'][$maq['id_maquina']][$ref['id_referencia']]) ? 'checked' : '' ?>>
                         </td>
                         <?php } ?>
+                        <td class="col-matriz-check">
+                            <input type="checkbox" class="chk-todas" title="Marcar todas">
+                        </td>
                     </tr>
                     <?php } ?>
                 </tbody>

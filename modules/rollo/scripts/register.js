@@ -43,17 +43,18 @@ if (formRollo) {
     // Referencia/Color: reemplaza el select
     formRollo.addEventListener("change", e => {
         if (!e.target.classList.contains("tiene-otro")) return;
-        const libre = e.target.nextElementSibling;
+        const libre = selSiguiente(e.target);
+        const caja = e.target._selBuscadorWrap || e.target;
         const esOperario = e.target.id === "operarioRollo";
         if (e.target.value === "otro") {
-            if (!esOperario) e.target.hidden = true;
+            if (!esOperario) caja.style.display = "none";
             libre.hidden = false;
             libre.value = "";
             libre.focus();
         } else {
             libre.hidden = true;
             libre.value = "";
-            e.target.hidden = false;
+            caja.style.display = "";
         }
     });
 
@@ -70,26 +71,28 @@ if (formRollo) {
         if (!e.target.classList.contains("campo-libre")) return;
         e.target.value = capitalizar(e.target.value);
         if (e.target.id !== "operarioRolloTexto" && e.target.value === "") {
-            const select = e.target.previousElementSibling;
+            const select = selDesenvolver(e.target.previousElementSibling);
             e.target.hidden = true;
-            select.hidden = false;
+            (select._selBuscadorWrap || select).style.display = "";
             select.selectedIndex = 0;
+            if (select._refrescar) select._refrescar();
         }
     }, true); // blur no burbujea
 
     // Valor del select u Otro
     function valorConOtro(idSelect) {
         const select = document.getElementById(idSelect);
-        return select.value === "otro" ? capitalizar(select.nextElementSibling.value) : select.value;
+        return select.value === "otro" ? capitalizar(selSiguiente(select).value) : select.value;
     }
 
     // Restaurar select tras Otro
     function restaurarCampoConOtro(idSelect) {
         const select = document.getElementById(idSelect);
-        const libre = select.nextElementSibling;
+        const libre = selSiguiente(select);
         libre.hidden = true;
         libre.value = "";
         select.selectedIndex = 0;
+        if (select._refrescar) select._refrescar();
     }
 
     /* =========================================
@@ -109,6 +112,7 @@ if (formRollo) {
             option.textContent = op.nombre;
             selectReferencia.appendChild(option);
         });
+        if (selectReferencia._refrescar) selectReferencia._refrescar();
     }
 
     selectMaquina.addEventListener("change", () => poblarReferenciasRollo(Number(selectMaquina.value)));
@@ -117,6 +121,7 @@ if (formRollo) {
     function limpiarFormulario() {
         restaurarCampoConOtro("operarioRollo");
         selectMaquina.selectedIndex = 0;
+        if (selectMaquina._refrescar) selectMaquina._refrescar();
         poblarReferenciasRollo(null);
         restaurarCampoConOtro("colorRollo");
         document.getElementById("pesoRolloInput").value = "";

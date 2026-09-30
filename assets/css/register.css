@@ -34,7 +34,8 @@
 }
 /* Refuerza especificidad */
 .form-inicio.form-inicio input,
-.form-inicio.form-inicio select {
+.form-inicio.form-inicio select,
+.form-inicio.form-inicio .sel-buscador-input {
   width: 100%;
   padding: 12px 14px;
   border-radius: var(--radio-m);
@@ -43,6 +44,13 @@
   color: var(--texto);
   font-size: 14px;
   margin: 0;
+}
+.form-inicio.form-inicio .sel-buscador-input {
+  padding-right: 38px;
+}
+.form-inicio .sel-buscador {
+  display: block;
+  width: 100%;
 }
 /* Flecha del select */
 .form-inicio select {
@@ -242,19 +250,19 @@
   width: 80px;
 }
 .c-op {
-  width: 134px;
+  width: 120px;
 }
 .c-ref {
-  width: 108px;
+  width: 110px;
 }
 .c-color {
-  width: 86px;
+  width: 124px;
 }
 .c-x {
   width: 54px;
 }
 .c-p {
-  width: 60px;
+  width: 52px;
 }
 .c-obs {
   width: auto;
@@ -285,7 +293,8 @@
 
 /* Inputs estilo celda */
 .planilla input,
-.planilla select {
+.planilla select,
+.planilla .sel-buscador-input {
   display: block;
   box-sizing: border-box;
   width: 100%;
@@ -299,8 +308,12 @@
   font-size: 14px;
 }
 /* Borde fino en selects */
-.planilla select {
+.planilla select,
+.planilla .sel-buscador-input {
   border: 1px solid var(--borde-fuerte);
+}
+.planilla .sel-buscador {
+  display: block;
 }
 /* hidden gana a display */
 .planilla [hidden] {
@@ -311,7 +324,8 @@
   outline-offset: -2px;
   background-color: var(--azul-claro);
 }
-.planilla select:focus {
+.planilla select:focus,
+.planilla .sel-buscador-input:focus {
   outline: none;
   border-color: var(--azul-oscuro);
   background-color: var(--azul-claro);
@@ -326,7 +340,8 @@
   height: 100%;
 }
 .campo-otro-wrap select,
-.campo-otro-wrap input {
+.campo-otro-wrap input,
+.campo-otro-wrap .sel-buscador {
   flex: 1;
   min-width: 0;
 }
@@ -336,7 +351,8 @@
 }
 /* Altura fija en modo apilado */
 .campo-otro-apilado select,
-.campo-otro-apilado input {
+.campo-otro-apilado input,
+.campo-otro-apilado .sel-buscador {
   flex: 0 0 auto;
 }
 /* Espacio reservado (visibility) */
@@ -367,7 +383,8 @@
 }
 
 /* Flecha del select */
-.planilla select {
+.planilla select,
+.planilla .sel-buscador-input {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -376,6 +393,15 @@
   background-repeat: no-repeat;
   background-position: right 4px center;
   background-size: 10px;
+}
+.planilla .sel-buscador.tiene-valor .sel-buscador-input {
+  padding-right: 30px;
+}
+.planilla .sel-buscador-limpiar {
+  right: 14px;
+  width: 16px;
+  height: 16px;
+  font-size: 13px;
 }
 
 /* Sin flechas de número */
@@ -426,7 +452,8 @@
   color: var(--texto-tenue);
 }
 .op-sub select,
-.op-sub input {
+.op-sub input,
+.op-sub .sel-buscador-input {
   height: 26px;
 }
 
@@ -733,6 +760,10 @@
 .ext-tabla td select {
   width: 100%;
 }
+.ext-tabla td .sel-buscador {
+  display: block;
+  width: 100%;
+}
 .ext-tabla-cuerpo .ext-col-pesos {
   width: 65%;
   background: var(--azul-muy-claro);
@@ -830,6 +861,23 @@
   font-weight: 700;
   font-size: 14px;
   color: var(--azul-oscuro);
+}
+.ext-fila-bloqueada {
+  opacity: 0.55;
+}
+.ext-fila-bloqueada input {
+  cursor: not-allowed;
+  background: var(--fondo-secundario);
+}
+.aviso-reabierto {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: var(--radio-s);
+  background: var(--azul-claro);
+  border-left: 4px solid var(--azul);
+  color: var(--azul-oscuro);
+  font-size: 14px;
+  font-weight: 600;
 }
 .btn-entrada-grande {
   margin-top: 6px;
@@ -934,79 +982,10 @@
   }
 }
 
-/* Select con buscador (referencias) */
-.ext-buscable {
-  position: relative;
-  z-index: 5;
-}
-.ext-buscable:focus-within {
-  z-index: 60;
-}
-.ext-tabla .ext-buscable-input,
-.ext-bloque-cambio .ext-buscable-input {
-  width: 100%;
-  padding: 8px 34px 8px 10px;
-  border: 1px solid var(--borde-fuerte);
-  border-radius: var(--radio-s);
-  background-color: var(--fondo-superficie);
-  font-size: 14px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a4a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 14px;
-}
-.ext-buscable-input:focus {
-  outline: none;
-  border-color: var(--azul);
-}
-.ext-bloque-cambio .ext-buscable {
+/* Ajuste de tamaño local */
+.ext-bloque-cambio .sel-buscador {
   flex: none;
   width: 130px;
-}
-.ext-buscable-lista {
-  position: absolute;
-  z-index: 40;
-  top: 100%;
-  left: 0;
-  min-width: 100%;
-  width: max-content;
-  max-width: 320px;
-  max-height: 260px;
-  overflow-y: auto;
-  margin-top: 2px;
-  background: var(--fondo-superficie);
-  border: 1px solid var(--borde-fuerte);
-  border-radius: var(--radio-s);
-  box-shadow: var(--sombra-modal);
-  font-size: 14px;
-  text-align: left;
-}
-.ext-buscable-lista[hidden] {
-  display: none;
-}
-.ext-buscable-grupo {
-  padding: 6px 10px;
-  background: var(--azul-claro);
-  color: var(--azul-oscuro);
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.ext-buscable-op {
-  padding: 7px 10px;
-  cursor: pointer;
-}
-.ext-buscable-op:hover {
-  background: var(--azul-muy-claro);
-}
-.ext-buscable-op.activa {
-  font-weight: 700;
-  color: var(--azul-oscuro);
-}
-.ext-buscable-vacio {
-  padding: 8px 10px;
-  color: var(--texto-tenue);
 }
 
 /* Campo "Otro" de Extrusión (texto libre) */
@@ -1017,7 +996,7 @@
   width: 100%;
 }
 .ext-otro > select,
-.ext-otro > .ext-buscable {
+.ext-otro > .sel-buscador {
   flex: 1;
   min-width: 0;
 }
@@ -1031,7 +1010,9 @@
   font-size: 14px;
 }
 .ext-libre[hidden],
-.ext-volver[hidden] { display: none; }
+.ext-volver[hidden] {
+  display: none;
+}
 .ext-volver {
   flex: 0 0 auto;
   width: 26px;
@@ -1044,7 +1025,9 @@
   font-size: 15px;
   cursor: pointer;
 }
-.ext-volver:hover { background: var(--azul-claro); }
+.ext-volver:hover {
+  background: var(--azul-claro);
+}
 .ext-bloque-cambio .ext-otro {
   flex: none;
   width: 190px;

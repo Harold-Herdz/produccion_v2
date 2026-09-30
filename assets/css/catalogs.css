@@ -31,6 +31,9 @@
   align-items: center;
   gap: 10px;
 }
+.grupo-buscar {
+  margin-left: auto;
+}
 .barra-superior input[type="text"] {
   background-color: var(--fondo-superficie);
   color: var(--texto);
@@ -334,9 +337,6 @@
 .tabla-matriz tbody tr:nth-child(even) td:not(.col-matriz-nombre) {
   background: var(--fondo-secundario);
 }
-.fila-usa-esp td:not(.col-matriz-nombre):not(.col-matriz-esp) {
-  opacity: 0.45;
-}
 
 /* ===========================
    RESPONSIVE
@@ -348,7 +348,8 @@
   }
   .grupo-campo,
   .barra-superior input[type="text"],
-  select {
+  select,
+  .sel-buscador {
     width: 100%;
     min-width: 0;
   }

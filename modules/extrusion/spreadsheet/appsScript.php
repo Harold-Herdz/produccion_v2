@@ -80,9 +80,9 @@ function turnoYaEnRegistrosExtrusion($fecha, $maquina, $turno, $operador = null)
     if(!$fh){
         return false;
     }
-    fgetcsv($fh); // encabezado
+    fgetcsv($fh, 0, ',', '"', '\\'); // encabezado
     $encontrado = false;
-    while(($fila = fgetcsv($fh)) !== false){
+    while(($fila = fgetcsv($fh, 0, ',', '"', '\\')) !== false){
         if(convertirFecha($fila[1] ?? '') === $fecha
             && trim((string) ($fila[2] ?? '')) === $maquina
             && trim((string) ($fila[3] ?? '')) === $turno
@@ -93,4 +93,33 @@ function turnoYaEnRegistrosExtrusion($fecha, $maquina, $turno, $operador = null)
     }
     fclose($fh);
     return $encontrado;
+}
+
+// Rollos ya guardados en Google para un turno (fecha+máquina+turno), en el
+// mismo formato que se guarda en "filas" al finalizar. Sirve para reabrir un
+// turno cuando la BD local no tiene ningún registro de él (p.ej. tras un reset).
+function rollosDesdeRegistrosExtrusion($fecha, $maquina, $turno){
+    require_once dirname(__DIR__, 3) . '/import/importModel.php';
+    $ctx = stream_context_create(['http' => ['timeout' => 20]]);
+    $fh = @fopen(EXTRUSION_REGISTROS_CSV_URL, 'r', false, $ctx);
+    if(!$fh){
+        return [];
+    }
+    fgetcsv($fh, 0, ',', '"', '\\'); // encabezado
+    $rollos = [];
+    while(($fila = fgetcsv($fh, 0, ',', '"', '\\')) !== false){
+        if(convertirFecha($fila[1] ?? '') === $fecha
+            && trim((string) ($fila[2] ?? '')) === $maquina
+            && trim((string) ($fila[3] ?? '')) === $turno
+        ){
+            $rollos[] = [
+                'referencia' => trim((string) ($fila[5] ?? '')),
+                'color'      => trim((string) ($fila[6] ?? '')),
+                'peso'       => (float) str_replace(',', '.', (string) ($fila[7] ?? '0')),
+                'lamina'     => trim((string) ($fila[8] ?? '')),
+            ];
+        }
+    }
+    fclose($fh);
+    return $rollos;
 }

@@ -85,7 +85,7 @@ if(!function_exists('celdasEntradaPlanilla')){
 <?php if(!$planilla): ?>
 
 <!-- Formulario de inicio de turno -->
-<div class="container container-formulario" id="containerRegister">
+<div class="container container-formulario" id="containerRegister" data-sel-zona="formulario">
     <h2 class="titulo-vista">Registro de Producción · Sellado</h2>
 
     <div class="card">
@@ -155,7 +155,7 @@ if(!function_exists('celdasEntradaPlanilla')){
 <?php include dirname(__DIR__, 3) . '/templates/footer.php'; return; endif; ?>
 
 <!-- Contenedor de Register -->
-<div class="container container-planilla" id="containerRegister">
+<div class="container container-planilla" id="containerRegister" data-sel-zona="formulario">
 
     <h2 class="titulo-vista">Registro de Producción · Sellado</h2>
 

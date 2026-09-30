@@ -59,12 +59,13 @@ if (ob_get_level()) ob_flush(); flush();
 echo "<script>document.getElementById('msg').textContent='Cargando catálogos…';</script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
-$maquinas    = cargarCatalogo($conexion, "MAQUINAS",    "nombre_maquina",    "id_maquina");
-$operarios   = cargarCatalogo($conexion, "OPERARIOS",   "nombre_operario",   "id_operario");
-$turnos      = cargarCatalogo($conexion, "TURNOS",      "nombre_turno",      "id_turno");
-$jornadas    = cargarCatalogo($conexion, "JORNADAS",    "nombre_jornada",    "id_jornada");
-$referencias = cargarCatalogo($conexion, "REFERENCIAS", "nombre_referencia", "id_referencia");
-$colores     = cargarCatalogo($conexion, "COLORES",     "nombre_color",      "id_color");
+$maquinas       = cargarCatalogo($conexion, "MAQUINAS",       "nombre_maquina",       "id_maquina");
+$operarios      = cargarCatalogo($conexion, "OPERARIOS",      "nombre_operario",      "id_operario");
+$turnos         = cargarCatalogo($conexion, "TURNOS",         "nombre_turno",         "id_turno");
+$jornadas       = cargarCatalogo($conexion, "JORNADAS",       "nombre_jornada",       "id_jornada");
+$referencias    = cargarCatalogo($conexion, "REFERENCIAS",    "nombre_referencia",    "id_referencia");
+$referenciasEsp = cargarCatalogo($conexion, "REFERENCIAS_ESP", "nombre_referencia_esp", "id_referencia_esp");
+$colores        = cargarCatalogo($conexion, "COLORES",        "nombre_color",         "id_color");
 
 // Contadores de resultado
 $contador     = 0;
@@ -95,8 +96,19 @@ foreach ($filas as $data) {
     // IDs de catálogos (o crear)
     $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
     $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
-    $id_referencia = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
     $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
+
+    // Referencia: solo las «…K» van al catálogo REFERENCIAS; cualquier otra
+    // (ya exista o no) va a REFERENCIAS_ESP, nunca se crea una nueva en REFERENCIAS.
+    if (isset($referencias[$referencia])) {
+        $id_referencia     = $referencias[$referencia];
+        $id_referencia_esp = null;
+    } else {
+        $id_referencia     = null;
+        $id_referencia_esp = $referenciasEsp[$referencia] ?? autoCrear($conexion, $referenciasEsp, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia);
+    }
+    $id_referencia_sql     = ($id_referencia === null) ? "NULL" : "'{$id_referencia}'";
+    $id_referencia_esp_sql = ($id_referencia_esp === null) ? "NULL" : "'{$id_referencia_esp}'";
 
     // Peso NULL
     $peso1 = is_null($peso_h1) ? "NULL" : $peso_h1;
@@ -131,20 +143,21 @@ foreach ($filas as $data) {
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_SELLADO
                     (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,id_jornada,
-                    id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
+                    id_referencia,id_referencia_esp,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_operario',$id_turno_sql,$id_jornada_sql,
-                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98',
+                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$paq_x70','$paq_x90','$paq_x98',
                     $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')
                 ON DUPLICATE KEY UPDATE
-                    fecha_sellado   = VALUES(fecha_sellado),
-                    id_maquina      = VALUES(id_maquina),
-                    id_operario     = VALUES(id_operario),
-                    id_turno        = VALUES(id_turno),
-                    id_jornada      = VALUES(id_jornada),
-                    id_referencia   = VALUES(id_referencia),
-                    id_color        = VALUES(id_color),
+                    fecha_sellado      = VALUES(fecha_sellado),
+                    id_maquina         = VALUES(id_maquina),
+                    id_operario        = VALUES(id_operario),
+                    id_turno           = VALUES(id_turno),
+                    id_jornada         = VALUES(id_jornada),
+                    id_referencia      = VALUES(id_referencia),
+                    id_referencia_esp  = VALUES(id_referencia_esp),
+                    id_color           = VALUES(id_color),
                     paquetes_x70    = VALUES(paquetes_x70),
                     paquetes_x90    = VALUES(paquetes_x90),
                     paquetes_x98    = VALUES(paquetes_x98),
@@ -158,11 +171,11 @@ foreach ($filas as $data) {
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_SELLADO
                     (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,id_jornada,
-                    id_referencia,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
+                    id_referencia,id_referencia_esp,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_operario',$id_turno_sql,$id_jornada_sql,
-                    '$id_referencia','$id_color','$paq_x70','$paq_x90','$paq_x98',
+                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$paq_x70','$paq_x90','$paq_x98',
                     $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')";
     }
     // Ejecutar inserción y actualizar progreso

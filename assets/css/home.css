@@ -179,6 +179,9 @@
   background: var(--fondo-superficie);
   font-size: 14px;
 }
+.home-filtro-fechas .home-campo .sel-buscador {
+  width: 100%;
+}
 
 /* ===========================
    TARJETAS DE GRÁFICO / TABLA
@@ -226,6 +229,10 @@
   background: var(--fondo-superficie);
   font-size: 14px;
 }
+.home-campo .sel-buscador,
+.home-controles .sel-buscador {
+  width: 100%;
+}
 
 .home-series {
   display: flex;
@@ -270,6 +277,10 @@
   border: 1px solid var(--borde-fuerte);
   background: var(--fondo-superficie);
   font-size: 14px;
+}
+.home-filtros-fila .sel-buscador {
+  min-width: 200px;
+  max-width: 280px;
 }
 .home-filtros-fila .btn { padding: 7px 16px; }
 .home-filtros-activos {

@@ -165,7 +165,7 @@
             const gen = el("div", "home-kpi home-kpi-general");
             gen.appendChild(el("div", "home-kpi-titulo", "General"));
             gen.appendChild(el("div", "home-kpi-valor", fmt(r.total_registros)));
-            gen.appendChild(el("div", "home-kpi-sub", "Registros totales (todos los módulos)"));
+            gen.appendChild(el("div", "home-kpi-sub", "Registros totales"));
             gen.appendChild(linea("Módulos", String(Object.keys(meta).length)));
             gen.appendChild(linea("Notificaciones por revisar", String(r.notificaciones), r.notificaciones ? "alerta" : ""));
             const cat = linea("Catálogos por exportar", "…");
@@ -666,6 +666,7 @@
         cardT.appendChild(pie);
         sec.appendChild(cardT);
 
+        if (window.inicializarSelectsBuscables) window.inicializarSelectsBuscables(sec);
         return sec;
     }
 

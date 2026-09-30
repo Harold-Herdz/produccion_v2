@@ -28,6 +28,7 @@ LEFT JOIN MAQUINAS m ON e.id_maquina = m.id_maquina
 LEFT JOIN TURNOS t ON e.id_turno = t.id_turno
 LEFT JOIN OPERADORES o ON e.id_operador = o.id_operador
 LEFT JOIN REFERENCIAS r ON e.id_referencia = r.id_referencia
+LEFT JOIN REFERENCIAS_ESP re ON e.id_referencia_esp = re.id_referencia_esp
 LEFT JOIN COLORES c ON e.id_color = c.id_color
 LEFT JOIN LAMINA_P l ON e.id_lamina_p = l.id_lamina_p
 WHERE 1=1";
@@ -39,6 +40,7 @@ if(!empty($busqueda)){
         t.nombre_turno LIKE '%$busqueda%' OR
         o.nombre_operador LIKE '%$busqueda%' OR
         r.nombre_referencia LIKE '%$busqueda%' OR
+        re.nombre_referencia_esp LIKE '%$busqueda%' OR
         c.nombre_color LIKE '%$busqueda%' OR
         e.id LIKE '%$busqueda%' OR
         l.nombre_lamina_p LIKE '%$busqueda%' OR
@@ -64,7 +66,7 @@ $sql = "SELECT
             m.nombre_maquina,
             t.nombre_turno,
             o.nombre_operador,
-            r.nombre_referencia,
+            COALESCE(r.nombre_referencia, re.nombre_referencia_esp) AS nombre_referencia,
             c.nombre_color,
             l.nombre_lamina_p
         $sql_base
@@ -76,25 +78,33 @@ $resultado = mysqli_query($conexion,$sql);
 // ACTUALIZAR REGISTRO
 // ======================================================
 if($_SERVER['REQUEST_METHOD']=="POST"){
-    $id = $_POST['id'];
+    $id = (int) $_POST['id'];
+
+    // La referencia viaja como "r:ID" (catálogo K) o "e:ID" (especial)
+    $refValor = $_POST['referencia_valor'] ?? '';
+    $idReferencia = null;
+    $idReferenciaEsp = null;
+    if(strncmp($refValor, 'r:', 2) === 0){
+        $idReferencia = (int) substr($refValor, 2);
+    } elseif(strncmp($refValor, 'e:', 2) === 0){
+        $idReferenciaEsp = (int) substr($refValor, 2);
+    }
+
+    // Lámina P es opcional
+    $idLamina = $_POST['id_lamina_p'] ?? '';
+    $idLamina = ($idLamina === '') ? null : (int) $idLamina;
+
     $datos = [
         'fecha' => $_POST['fecha_extrusion'],
-
-        'id_maquina' => $_POST['id_maquina'],
-
-        'id_turno' => $_POST['id_turno'],
-
-        'id_operador' => $_POST['id_operador'],
-
-        'id_referencia' => $_POST['id_referencia'],
-
-        'id_color' => $_POST['id_color'],
-
-        'id_lamina_p' => $_POST['id_lamina_p'],
-
-        'rollos' => $_POST['rollos'],
-
-        'peso_total' => $_POST['peso_total']
+        'id_maquina' => (int) $_POST['id_maquina'],
+        'id_turno' => (int) $_POST['id_turno'],
+        'id_operador' => (int) $_POST['id_operador'],
+        'id_referencia' => $idReferencia,
+        'id_referencia_esp' => $idReferenciaEsp,
+        'id_color' => (int) $_POST['id_color'],
+        'id_lamina_p' => $idLamina,
+        'rollos' => (int) $_POST['rollos'],
+        'peso_total' => (float) $_POST['peso_total'],
     ];
     actualizarProduccion($conexion,$id,$datos);
     header("Location: ".BASE_URL."/modules/extrusion/views/history.php");
@@ -104,8 +114,8 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
 // ======================================================
 // ELIMINAR REGISTRO
 // ======================================================
-if(isset($_GET['eliminar'])){
-    $id = intval($_GET['eliminar']);
+if(isset($_GET['id'])){
+    $id = intval($_GET['id']);
     eliminarProduccion($conexion,$id);
     header("Location: ".BASE_URL."/modules/extrusion/views/history.php");
     exit;

@@ -84,6 +84,16 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
     // ID a actualizar
     $id = $_POST['id'];
 
+    // La referencia viaja como "r:ID" (catálogo K) o "e:ID" (especial)
+    $refValor = $_POST['referencia_valor'] ?? '';
+    $idReferencia = null;
+    $idReferenciaEsp = null;
+    if(strncmp($refValor, 'r:', 2) === 0){
+        $idReferencia = (int) substr($refValor, 2);
+    } elseif(strncmp($refValor, 'e:', 2) === 0){
+        $idReferenciaEsp = (int) substr($refValor, 2);
+    }
+
     // Recopilar datos del formulario
     $datos = [
         'fecha' => $_POST['fecha_sellado'],
@@ -92,7 +102,9 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
 
         'id_maquina' => $_POST['id_maquina'],
 
-        'id_referencia' => $_POST['id_referencia'],
+        'id_referencia' => $idReferencia,
+
+        'id_referencia_esp' => $idReferenciaEsp,
 
         'id_color' => $_POST['id_color'],
 

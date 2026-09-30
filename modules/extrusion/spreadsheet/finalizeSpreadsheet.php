@@ -66,9 +66,15 @@ try {
     $pdfBytes = generarPdfExtrusion($planilla['fecha_planilla'], $planilla['nombre_maquina'], array_values($turnosPdf));
     $ahora = date('Y-m-d H:i:s');
 
+    // Turno reabierto: los primeros N rollos ya se habían mandado a Google la
+    // vez anterior (el PDF y LOGS sí se actualizan completos; a REGISTROS solo
+    // se manda lo nuevo, para no duplicar lo que ya estaba).
+    $yaConfirmados = (int) ($planilla['rollos_confirmados'] ?? 0);
+    $rollosNuevos = ($yaConfirmados > 0) ? array_slice($rollos, $yaConfirmados) : $rollos;
+
     $respuesta = enviarAppScriptExtrusion([
         'accion'    => 'finalizar',
-        'registros' => filasRegistrosExtrusion($planilla, $rollos),
+        'registros' => filasRegistrosExtrusion($planilla, $rollosNuevos),
         'log'       => [
             'id_dia'       => idDiaExtrusion($planilla['fecha_planilla']),
             'fecha'        => $planilla['fecha_planilla'],

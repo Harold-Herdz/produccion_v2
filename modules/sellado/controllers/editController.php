@@ -16,6 +16,8 @@ $maquinas = obtenerMaquinas($conexion);
 
 $referencias = obtenerReferencias($conexion);
 
+$referenciasEsp = obtenerReferenciasEsp($conexion);
+
 $colores = obtenerColores($conexion);
 
 $turnos = obtenerTurnos($conexion);

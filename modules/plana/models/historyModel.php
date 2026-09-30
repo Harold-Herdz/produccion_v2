@@ -17,7 +17,14 @@ function obtenerOperariosPlana($conexion){
     return mysqli_query($conexion, "SELECT * FROM OPERARIOS");
 }
 function obtenerReferenciasPlana($conexion){
-    return mysqli_query($conexion, "SELECT * FROM REFERENCIAS_ESP");
+    return mysqli_query($conexion, "
+        SELECT * FROM REFERENCIAS_ESP
+        ORDER BY
+            CASE WHEN nombre_referencia_esp REGEXP '^[0-9]+(,[0-9]+)?K ESP$' THEN 0 ELSE 1 END,
+            CASE WHEN nombre_referencia_esp REGEXP '^[0-9]+(,[0-9]+)?K ESP$'
+                 THEN CAST(REPLACE(REPLACE(nombre_referencia_esp, ',', '.'), 'K ESP', '') AS DECIMAL(10,2)) END,
+            nombre_referencia_esp
+    ");
 }
 
 /* =================================================

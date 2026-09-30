@@ -91,3 +91,18 @@ if (formImportarCatalogos) {
         enviarFormularioCatalogos(formImportarCatalogos, "importar");
     });
 }
+
+/* =====================================================
+   BÚSQUEDA (filtra la tabla al escribir)
+   ===================================================== */
+const buscarCatalogos = document.getElementById("buscar");
+if (buscarCatalogos) {
+    buscarCatalogos.addEventListener("input", () => {
+        const texto = buscarCatalogos.value.trim().toLowerCase();
+        document.querySelectorAll("#containerHistorial tbody tr").forEach(fila => {
+            fila.hidden = texto !== "" && !(fila.dataset.nombre || "").includes(texto);
+        });
+    });
+    // Enter no recarga
+    buscarCatalogos.closest("form").addEventListener("submit", e => e.preventDefault());
+}

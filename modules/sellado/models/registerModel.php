@@ -314,9 +314,14 @@ function guardarPlanilla($conexion, $planilla, $maquinas, $final = false){
     $stmt = $conexion->prepare($sql);
     $maquinasEnviadas = []; // solo filas de máquinas enviadas
 
-    // Máquinas con Referencias Especiales
+    // Máquinas con Referencias Especiales (en el área de Sellado)
     $maquinasEsp = [];
-    $resEsp = $conexion->query("SELECT id_maquina, usa_referencias_esp FROM maquinas");
+    $resEsp = $conexion->query("
+        SELECT ma.id_maquina, ma.usa_referencias_esp
+        FROM maquina_areas ma
+        JOIN areas a ON a.id_area = ma.id_area
+        WHERE a.nombre_area = 'sellado'
+    ");
     while($fm = $resEsp->fetch_assoc()){
         $maquinasEsp[(int) $fm['id_maquina']] = (bool) $fm['usa_referencias_esp'];
     }

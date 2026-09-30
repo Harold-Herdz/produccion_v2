@@ -85,16 +85,28 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 <?php endwhile; ?>
             </select>
 
-            <!-- Referencia -->
+            <!-- Referencia (catálogo K o especial) -->
             <label>Referencia</label>
-            <select name="id_referencia">
+            <select name="referencia_valor">
+                <option value=""></option>
+                <optgroup label="Referencias">
                 <?php while($r = mysqli_fetch_assoc($referencias)): ?>
                     <option
-                        value="<?php echo $r['id_referencia']; ?>"
-                        <?php echo ($r['id_referencia'] == $fila['id_referencia']) ? 'selected' : ''; ?>>
-                        <?php echo $r['nombre_referencia']; ?>
+                        value="r:<?php echo $r['id_referencia']; ?>"
+                        <?php echo ($fila['id_referencia'] !== null && $r['id_referencia'] == $fila['id_referencia']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($r['nombre_referencia']); ?>
                     </option>
                 <?php endwhile; ?>
+                </optgroup>
+                <optgroup label="Referencias especiales">
+                <?php while($r = mysqli_fetch_assoc($referenciasEsp)): ?>
+                    <option
+                        value="e:<?php echo $r['id_referencia_esp']; ?>"
+                        <?php echo ($fila['id_referencia_esp'] !== null && $r['id_referencia_esp'] == $fila['id_referencia_esp']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($r['nombre_referencia_esp']); ?>
+                    </option>
+                <?php endwhile; ?>
+                </optgroup>
             </select>
 
             <!-- Color -->
@@ -189,14 +201,17 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <label>Observaciones</label>
             <textarea name="obs_sellado"><?php echo $fila['obs_sellado']; ?></textarea>
 
-            <!-- Botón de Actualizar -->
-            <button type="submit" class="btn" id="btnActualizar">Actualizar</button>
+            <!-- Botones -->
+            <div class="acciones-editar">
+                <button type="submit" class="btn" id="btnActualizar">Actualizar</button>
+                <a class="btn btn-secundario" href="history.php">Cancelar</a>
+            </div>
             </form>
 
         </div>
-    
+
     <br><br>
-    
+
     <!-- Botones de navegación -->
 </div>
 

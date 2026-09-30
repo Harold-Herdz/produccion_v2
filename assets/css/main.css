@@ -337,6 +337,21 @@ body {
   font-size: 15px;
   font-weight: 700;
 }
+.resumen-mes1 h3 .sel-buscador,
+.resumen-mes2 h3 .sel-buscador {
+  display: inline-block;
+  width: 150px;
+  max-width: 60%;
+  vertical-align: middle;
+}
+.resumen-mes1 h3 .sel-buscador-input,
+.resumen-mes2 h3 .sel-buscador-input {
+  width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  padding: 4px 28px 4px 8px;
+}
 .comparacion {
   border-radius: var(--radio-l);
   padding: 10px;
@@ -561,6 +576,10 @@ body {
   min-width: 100%;
   padding: 10px 32px 10px 14px;
 }
+.modal form .sel-buscador {
+  width: 100%;
+  margin: 5px auto 15px auto;
+}
 .modal form input:hover,
 .modal form select:hover,
 .modal form textarea:hover {
@@ -604,6 +623,19 @@ body {
 .label select {
   margin-left: 8px;
   height: 29px;
+  padding: 4px 30px 4px 10px;
+}
+.label .sel-buscador {
+  display: inline-block;
+  width: auto;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.label .sel-buscador-input {
+  width: auto;
+  min-width: 110px;
+  height: 29px;
+  box-sizing: border-box;
   padding: 4px 30px 4px 10px;
 }
 .label:hover {
@@ -715,6 +747,14 @@ canvas {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+}
+.header-grafico-meses .sel-buscador {
+  flex: 0 0 auto;
+  width: auto;
+}
+.header-grafico-meses .sel-buscador-input {
+  width: auto;
+  min-width: 90px;
 }
 .total-anio {
   font-weight: bold;
@@ -913,22 +953,31 @@ input::placeholder {
   margin-bottom: 96px;
 }
 #containerEditar .card label {
-  margin-left: 120px;
+  display: block;
+  margin: 14px 0 4px 0;
+  font-weight: 600;
 }
 #containerEditar .card input,
-.card select,
-.card textarea {
+#containerEditar .card select,
+#containerEditar .card textarea {
+  display: block;
   border: 1px solid var(--borde-fuerte);
   background-color: var(--fondo-superficie);
   color: var(--texto);
-  width: 80%;
+  width: 100%;
+  max-width: 480px;
   padding: 12px 14px;
-  margin: 5px auto 15px auto;
+  margin: 5px 0 15px 0;
   border-radius: var(--radio-m);
   transition: var(--transicion);
   font-size: 14px;
-  display: flex;
   text-align: left;
+}
+#containerEditar .card .sel-buscador {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  margin: 5px 0 15px 0;
 }
 #containerEditar .card input:hover {
   border-color: var(--azul);
@@ -938,10 +987,13 @@ input::placeholder {
   min-width: 900px;
   border-collapse: collapse;
 }
-#containerEditar .card #btnActualizar {
+#containerEditar .card .acciones-editar {
   display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+#containerEditar .card #btnActualizar {
   font-size: 16px;
-  justify-self: center;
 }
 
 /* =================================================
