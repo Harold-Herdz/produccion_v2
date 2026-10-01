@@ -194,7 +194,14 @@ function reintentarCierresPendientes($conexion, $limite = 2){
    CATÁLOGOS DEL FORMULARIO
 ================================================= */
 function obtenerOperariosActivosRollo($conexion){
-    return $conexion->query("SELECT id_operario, nombre_operario FROM operarios WHERE estado = 1 ORDER BY nombre_operario");
+    return $conexion->query("
+        SELECT o.id_operario, o.nombre_operario
+        FROM operarios o
+        JOIN operario_areas oa ON oa.id_operario = o.id_operario
+        JOIN areas a ON a.id_area = oa.id_area
+        WHERE o.estado = 1 AND a.nombre_area = 'rollo'
+        ORDER BY o.nombre_operario
+    ");
 }
 // Máquinas y colores: ver catalogosModel
 // obtenerColoresOrdenados() en shared/catalogosModel.php

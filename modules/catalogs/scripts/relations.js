@@ -36,8 +36,8 @@ function mostrarResultadoRelaciones(datos) {
     abrirModal("modalResultadoCatalogos");
 }
 
-// Exportar / importar (AJAX)
-function accionRelaciones(tipo) {
+// Exportar / importar (AJAX), con los tipos marcados en el overlay de selección
+function accionRelaciones(tipo, tipos) {
     const url = document.getElementById("accionesRelaciones").dataset.url;
     const overlayCarga = document.getElementById("overlayCargaCatalogos");
     document.getElementById("textoCargaCatalogos").textContent =
@@ -46,6 +46,7 @@ function accionRelaciones(tipo) {
 
     const datos = new URLSearchParams();
     datos.set("accion", tipo);
+    tipos.forEach(t => datos.append("tipos[]", t));
 
     fetch(url, { method: "POST", body: datos })
         .then(res => res.json())
@@ -56,6 +57,36 @@ function accionRelaciones(tipo) {
         }))
         .finally(() => { overlayCarga.style.display = "none"; });
 }
+
+// Overlays de selección (Exportar / Importar relaciones)
+document.querySelectorAll(".form-seleccion-relaciones").forEach(form => {
+    const idModal = form.closest(".overlay").id;
+    form.addEventListener("submit", e => {
+        e.preventDefault();
+        const tipos = Array.from(form.querySelectorAll('input[name="tipos[]"]:checked')).map(c => c.value);
+        if (!tipos.length) {
+            mostrarAviso("Selecciona al menos una relación.", { tipo: "error" });
+            return;
+        }
+        cerrarModal(idModal);
+        accionRelaciones(form.dataset.accion, tipos);
+    });
+});
+
+// Casilla "Todas" de una tabla de selección (Exportar/Importar)
+document.querySelectorAll(".modal-seleccion .chk-todas-seleccion").forEach(todas => {
+    const tabla = todas.closest("table");
+    const casillas = () => Array.from(tabla.querySelectorAll('tbody input[type="checkbox"]:not(.chk-todas-seleccion)'));
+    todas.addEventListener("change", () => {
+        casillas().forEach(c => { c.checked = todas.checked; });
+    });
+    tabla.addEventListener("change", e => {
+        if (e.target === todas) return;
+        if (e.target.matches('tbody input[type="checkbox"]')) {
+            todas.checked = casillas().every(c => c.checked);
+        }
+    });
+});
 
 // Recargar tras importar
 document.getElementById("modalResultadoCatalogos").addEventListener("click", e => {
@@ -85,7 +116,9 @@ function sincronizarTodas(fila) {
 function enviarCasilla(scroll, chk) {
     const datos = new URLSearchParams();
     datos.set("accion", chk.dataset.accion);
-    datos.set("id_maquina", chk.dataset.maquina);
+    if (chk.dataset.maquina) datos.set("id_maquina", chk.dataset.maquina);
+    if (chk.dataset.operario) datos.set("id_operario", chk.dataset.operario);
+    if (chk.dataset.color) datos.set("id_color", chk.dataset.color);
     if (chk.dataset.area) datos.set("id_area", chk.dataset.area);
     if (chk.dataset.referencia) datos.set("id_referencia", chk.dataset.referencia);
     return fetch(scroll.dataset.url, { method: "POST", body: datos });

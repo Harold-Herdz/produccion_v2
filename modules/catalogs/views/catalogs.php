@@ -61,80 +61,102 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                 + Crear <?= $cfg['etiqueta'] ?>
             </a>
             <?php } ?>
-            <a class="btn btn-secundario" onclick="mostrarPanelCatalogos('exportar')">
+            <a class="btn btn-secundario" onclick="abrirModal('modalExportarCatalogos')">
                 Exportar
             </a>
-            <a class="btn btn-secundario" onclick="mostrarPanelCatalogos('importar')">
+            <a class="btn btn-secundario" onclick="abrirModal('modalImportarCatalogos')">
                 Importar
             </a>
         </div>
 
-        <!-- Panel de exportar -->
-        <div id="panelExportar" class="panel-catalogos" style="display:none;">
-            <h3 class="subtitulo-panel">Exportar catálogos</h3>
-            <p class="texto-panel">Guardar el contenido actual de cada catálogo.</p>
-            <form id="formExportarCatalogos" data-url="<?= BASE_URL ?>/modules/catalogs/controllers/catalogsController.php">
-                <input type="hidden" name="cat" value="<?= $clave ?>">
-                <input type="hidden" name="accion" value="exportar">
-                <table class="tabla">
-                    <thead>
-                        <tr>
-                            <th>Catálogo</th>
-                            <th>Seleccionar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Usuarios</td>
-                            <td><input type="checkbox" name="catalogos[]" value="usuarios" checked></td>
-                        </tr>
-                        <?php foreach ($catalogos as $key => $datos) { ?>
-                        <tr>
-                            <td><?= htmlspecialchars($datos['etiqueta']) ?></td>
-                            <td><input type="checkbox" name="catalogos[]" value="<?= $key ?>" checked></td>
-                        </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-                <div class="acciones">
-                    <button class="btn" type="submit">Exportar</button>
-                    <a class="btn btn-secundario" onclick="ocultarPanelesCatalogos()">Cancelar</a>
+        <!-- Overlay: elegir qué exportar -->
+        <div class="overlay" id="modalExportarCatalogos">
+            <div class="modal modal-seleccion">
+                <div class="modal-header">
+                    <h2>Exportar catálogos</h2>
+                    <button type="button" class="btn-cerrar-modal" onclick="cerrarModal('modalExportarCatalogos')">X</button>
                 </div>
-            </form>
+                <p class="texto-panel">Guardar el contenido actual de cada catálogo.</p>
+                <form id="formExportarCatalogos" data-url="<?= BASE_URL ?>/modules/catalogs/controllers/catalogsController.php">
+                    <input type="hidden" name="cat" value="<?= $clave ?>">
+                    <input type="hidden" name="accion" value="exportar">
+                    <div class="tabla-scroll">
+                    <table class="tabla">
+                        <thead>
+                            <tr>
+                                <th>Catálogo</th>
+                                <th>Seleccionar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fila-todas">
+                                <td>Todas</td>
+                                <td><input type="checkbox" class="chk-todas-seleccion"></td>
+                            </tr>
+                            <tr>
+                                <td>Usuarios</td>
+                                <td><input type="checkbox" name="catalogos[]" value="usuarios"></td>
+                            </tr>
+                            <?php foreach ($catalogos as $key => $datos) { ?>
+                            <tr>
+                                <td><?= htmlspecialchars($datos['etiqueta']) ?></td>
+                                <td><input type="checkbox" name="catalogos[]" value="<?= $key ?>"></td>
+                            </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    <div class="acciones">
+                        <button class="btn" type="submit">Exportar</button>
+                        <button type="button" class="btn btn-secundario" onclick="cerrarModal('modalExportarCatalogos')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <!-- Panel de importar -->
-        <div id="panelImportar" class="panel-catalogos" style="display:none;">
-            <h3 class="subtitulo-panel">Importar catálogos</h3>
-            <p class="texto-panel">Agrega a cada catálogo su contenido guardado.</p>
-            <form id="formImportarCatalogos" data-url="<?= BASE_URL ?>/modules/catalogs/controllers/catalogsController.php">
-                <input type="hidden" name="cat" value="<?= $clave ?>">
-                <input type="hidden" name="accion" value="importar">
-                <table class="tabla">
-                    <thead>
-                        <tr>
-                            <th>Catálogo</th>
-                            <th>Seleccionar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Usuarios</td>
-                            <td><input type="checkbox" name="catalogos[]" value="usuarios" checked></td>
-                        </tr>
-                        <?php foreach ($catalogos as $key => $datos) { ?>
-                        <tr>
-                            <td><?= htmlspecialchars($datos['etiqueta']) ?></td>
-                            <td><input type="checkbox" name="catalogos[]" value="<?= $key ?>" checked></td>
-                        </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-                <div class="acciones">
-                    <button class="btn" type="submit">Importar</button>
-                    <a class="btn btn-secundario" onclick="ocultarPanelesCatalogos()">Cancelar</a>
+        <!-- Overlay: elegir qué importar -->
+        <div class="overlay" id="modalImportarCatalogos">
+            <div class="modal modal-seleccion">
+                <div class="modal-header">
+                    <h2>Importar catálogos</h2>
+                    <button type="button" class="btn-cerrar-modal" onclick="cerrarModal('modalImportarCatalogos')">X</button>
                 </div>
-            </form>
+                <p class="texto-panel">Agrega a cada catálogo su contenido guardado.</p>
+                <form id="formImportarCatalogos" data-url="<?= BASE_URL ?>/modules/catalogs/controllers/catalogsController.php">
+                    <input type="hidden" name="cat" value="<?= $clave ?>">
+                    <input type="hidden" name="accion" value="importar">
+                    <div class="tabla-scroll">
+                    <table class="tabla">
+                        <thead>
+                            <tr>
+                                <th>Catálogo</th>
+                                <th>Seleccionar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fila-todas">
+                                <td>Todas</td>
+                                <td><input type="checkbox" class="chk-todas-seleccion"></td>
+                            </tr>
+                            <tr>
+                                <td>Usuarios</td>
+                                <td><input type="checkbox" name="catalogos[]" value="usuarios"></td>
+                            </tr>
+                            <?php foreach ($catalogos as $key => $datos) { ?>
+                            <tr>
+                                <td><?= htmlspecialchars($datos['etiqueta']) ?></td>
+                                <td><input type="checkbox" name="catalogos[]" value="<?= $key ?>"></td>
+                            </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                    </div>
+                    <div class="acciones">
+                        <button class="btn" type="submit">Importar</button>
+                        <button type="button" class="btn btn-secundario" onclick="cerrarModal('modalImportarCatalogos')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <!-- Tabla del catálogo -->

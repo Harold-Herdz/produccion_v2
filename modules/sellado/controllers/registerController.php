@@ -89,6 +89,6 @@ $datosMaquina  = obtenerMaquinasConReferencias($conexion, 'sellado');
 $maquinas      = $datosMaquina['maquinas'];
 $mapaReferenciasMaquina = $datosMaquina['mapaJs'];
 $operarios   = mysqli_fetch_all(obtenerOperariosActivos($conexion), MYSQLI_ASSOC);
-$colores     = obtenerColoresOrdenados($conexion);
+$colores     = obtenerColoresDeArea($conexion, 'sellado');
 $datosMaquinas = obtenerPlanillaEstructurada($conexion, $planilla);
 $horarioTurno  = $bloques[$planilla['bloque']]['horario'] ?? '';

@@ -1,0 +1,209 @@
+// Instancias de gráficos
+window.chartProduccion = window.chartProduccion || null;
+window.chartOperarios  = window.chartOperarios  || null;
+window.chartMeses      = window.chartMeses      || null;
+
+// Las 6 categorías que se grafican por separado
+const CATEGORIAS_PELETIZADO = [
+    { clave: 'alta_retal', etiqueta: 'Alta retal', color: '#2f7ec2' },
+    { clave: 'baja',       etiqueta: 'Baja',        color: '#e0a020' },
+    { clave: 'refiltrado', etiqueta: 'Refiltrado',  color: '#a04ab8' },
+    { clave: 'soplado',    etiqueta: 'Soplado',     color: '#17a2b8' },
+    { clave: 'torta',      etiqueta: 'Torta',       color: '#8d6e63' },
+    { clave: 'limpieza',   etiqueta: 'Limpieza',    color: '#c0392b' },
+];
+function datasetsCategorias(categorias, tipoGrafico){
+    return CATEGORIAS_PELETIZADO.map(c => ({
+        label: c.etiqueta,
+        data: categorias[c.clave],
+        backgroundColor: tipoGrafico === 'bar' ? c.color : c.color + '33',
+        borderColor: c.color,
+        tension: 0.3,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        maxBarThickness: 40
+    }));
+}
+
+// Cargar gráficos según filtros
+function cargarDatos(tipo){
+    let mes    = document.getElementById("filtroMes").value;
+    let semana = document.getElementById("filtroSemana").value;
+
+    fetch("../ajax/productionByPeriod.php?tipo=" + tipo + "&mes=" + mes + "&semana=" + semana)
+    .then(res => res.json())
+    .then(data => {
+
+        // Gráfico de producción (las 6 categorías por separado)
+        if(chartProduccion) chartProduccion.destroy();
+        const tipo_grafico = (tipo === 'anio') ? 'bar' : 'line';
+        chartProduccion = new Chart(document.getElementById('graficoProduccion'), {
+            type: tipo_grafico,
+            data: {
+                labels: data.fechas,
+                datasets: datasetsCategorias(data.categorias, tipo_grafico)
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { labels: { color: '#4a4a4a' } },
+                    tooltip: {
+                        enabled: true,
+                        bodyFont:  { size: 12 },
+                        titleFont: { size: 13 },
+                        padding: 10,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
+                    },
+                    y: {
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
+                    }
+                }
+            }
+        });
+
+        // Ordenar operarios por producción
+        let combinado = data.operarios.map((operario, i) => ({
+            nombre: operario,
+            total:  data.totales_operarios[i]
+        }));
+        combinado.sort((a, b) => b.total - a.total);
+        let operariosOrdenados = combinado.map(o => o.nombre);
+        let totalesOrdenados   = combinado.map(o => o.total);
+
+        // Gráfico de operarios
+        if(chartOperarios) chartOperarios.destroy();
+        chartOperarios = new Chart(document.getElementById('graficoOperarios'), {
+            type: 'bar',
+            data: {
+                labels: operariosOrdenados,
+                datasets: [{
+                    label: 'Producción por operario',
+                    data: totalesOrdenados,
+                    maxBarThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { labels: { color: '#4a4a4a' } },
+                    tooltip: {
+                        enabled: true,
+                        bodyFont:  { size: 12 },
+                        titleFont: { size: 13 },
+                        padding: 10,
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
+                    },
+                    y: {
+                        ticks:  { color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
+                    }
+                }
+            }
+        });
+    });
+}
+
+// Recargar resúmenes por mes
+const mes1 = document.getElementById("mes1");
+const mes2 = document.getElementById("mes2");
+
+if(mes1 && mes2){
+
+    function actualizarComparacion(){
+
+        const valorMes1 = mes1.value;
+        const valorMes2 = mes2.value;
+
+        if (window.guardarScrollPagina) guardarScrollPagina();
+        window.location.href =
+            "?mes1=" + valorMes1 +
+            "&mes2=" + valorMes2;
+    }
+
+    mes1.addEventListener("change", actualizarComparacion);
+    mes2.addEventListener("change", actualizarComparacion);
+}
+
+// Aplicar filtros y recargar gráficos
+function actualizarFiltros(){
+    let semana = document.getElementById("filtroSemana").value;
+    if(semana == ""){
+        cargarDatos('mes');
+    } else {
+        cargarDatos('semana');
+    }
+}
+actualizarFiltros();
+
+// Gráfico mensual por año
+function cargarGraficoMeses(){
+    let anio = document.getElementById("filtroAnioMes").value;
+
+    fetch(`../ajax/productionByMonth.php?anio=${anio}`)
+    .then(res => res.json())
+    .then(data => {
+
+        if(chartMeses) chartMeses.destroy();
+
+        const nombresMeses = [
+            "Ene","Feb","Mar","Abr","May","Jun",
+            "Jul","Ago","Sep","Oct","Nov","Dic"
+        ];
+
+        // Total del año
+        fetch(`../ajax/productionByYear.php?anio=${anio}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("totalAnio").innerText =
+                "Total: " + Number(data.total).toLocaleString();
+        });
+
+        // Gráfico de barras por mes
+        chartMeses = new Chart(document.getElementById('graficoMeses'), {
+            type: 'bar',
+            data: {
+                labels: data.meses.map(m => nombresMeses[m-1]),
+                datasets: [{
+                    label: 'Producción mensual',
+                    data: data.totales
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend:  { labels: { font: { size: 12 }, color: '#4a4a4a' } },
+                    tooltip: { bodyFont: { size: 12 }, titleFont: { size: 12 } }
+                },
+                scales: {
+                    x: {
+                        ticks:  { font: { size: 13 }, color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
+                    },
+                    y: {
+                        ticks:  { font: { size: 13 }, color: '#4a4a4a' },
+                        border: { color: '#4a4a4a' }
+                    }
+                }
+            }
+        });
+    });
+}
+cargarGraficoMeses();

@@ -32,7 +32,7 @@
         input.className = "sel-buscador-input";
         input.autocomplete = "off";
         input.readOnly = !conBuscador;
-        if (conBuscador) input.placeholder = select.dataset.placeholder !== undefined ? select.dataset.placeholder : "Buscar…";
+        if (conBuscador) input.placeholder = select.dataset.placeholder !== undefined ? select.dataset.placeholder : "";
         input.disabled = select.disabled;
 
         // Solo se puede vaciar si el select ya tiene una opción vacía

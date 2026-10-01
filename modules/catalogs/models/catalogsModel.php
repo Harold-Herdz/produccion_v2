@@ -18,7 +18,7 @@ function catalogosDisponibles()
                     'tipo'     => 'text',
                 ],
                 'es_supervisor' => [
-                    'etiqueta' => 'Es supervisor',
+                    'etiqueta' => 'Marcar como supervisor',
                     'tipo'     => 'checkbox',
                 ],
             ],

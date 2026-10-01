@@ -68,6 +68,36 @@ function obtenerColoresOrdenados($conexion){
     return $res->fetch_all(MYSQLI_ASSOC);
 }
 
+// Colores asignados a un área (Relaciones > Colores × Áreas)
+function obtenerColoresDeArea($conexion, $nombreArea){
+    $stmt = $conexion->prepare("
+        SELECT c.id_color, c.nombre_color
+        FROM colores c
+        JOIN color_areas ca ON ca.id_color = c.id_color
+        JOIN areas a        ON a.id_area = ca.id_area
+        WHERE c.estado = 1 AND a.nombre_area = ?
+        ORDER BY (c.nombre_color LIKE 'R %') ASC, c.nombre_color ASC
+    ");
+    $stmt->bind_param('s', $nombreArea);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+// Operarios asignados a un área (Relaciones > Operarios × Áreas)
+function obtenerOperariosDeArea($conexion, $nombreArea){
+    $stmt = $conexion->prepare("
+        SELECT o.id_operario, o.nombre_operario
+        FROM operarios o
+        JOIN operario_areas oa ON oa.id_operario = o.id_operario
+        JOIN areas a           ON a.id_area = oa.id_area
+        WHERE o.estado = 1 AND a.nombre_area = ?
+        ORDER BY o.id_operario
+    ");
+    $stmt->bind_param('s', $nombreArea);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
 // Buscar o crear en catálogo
 function resolverCatalogoIdONuevo($conexion, $tabla, $colId, $colNombre, $nombre){
     $nombre = trim($nombre);

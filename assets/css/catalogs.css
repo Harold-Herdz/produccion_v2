@@ -142,12 +142,10 @@
 }
 
 /* ===========================
-   EXPORTAR / IMPORTAR CATÁLOGOS
+   EXPORTAR / IMPORTAR
+   (overlay con tabla de selección: Catálogos y Relaciones)
 =========================== */
 #containerHistorial {
-  margin-top: 20px;
-}
-.panel-catalogos {
   margin-top: 20px;
 }
 .subtitulo-panel {
@@ -161,19 +159,64 @@
   color: var(--texto-secundario);
   margin-bottom: 16px;
 }
-.panel-catalogos .tabla th:last-child,
-.panel-catalogos .tabla td:last-child {
-  text-align: center;
-  width: 140px;
+.modal-seleccion {
+  width: 480px;
+  text-align: left;
 }
-.panel-catalogos .tabla input[type="checkbox"] {
+.modal-seleccion .modal-header h2 {
+  text-align: center;
+}
+.modal-seleccion .texto-panel {
+  margin-top: 14px;
+}
+.modal-seleccion .tabla-scroll {
+  max-height: 340px;
+  overflow-y: auto;
+  margin-top: 12px;
+  border-radius: var(--radio-m);
+}
+.modal-seleccion .tabla {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.modal-seleccion .tabla th:first-child,
+.modal-seleccion .tabla td:first-child {
+  text-align: left;
+}
+.modal-seleccion .tabla th:last-child,
+.modal-seleccion .tabla td:last-child {
+  text-align: center;
+  width: 110px;
+}
+.modal-seleccion .tabla input[type="checkbox"] {
   width: 18px;
   height: 18px;
   accent-color: var(--azul);
   cursor: pointer;
 }
-.panel-catalogos .acciones {
+.modal-seleccion .fila-todas td {
+  background: var(--azul-claro);
+  color: var(--azul-oscuro);
+  font-weight: 700;
+}
+.modal-seleccion .acciones {
   margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.modal-seleccion .acciones .btn {
+  font-size: 14px;
+}
+.btn-cerrar-modal {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  color: var(--texto-secundario);
+  cursor: pointer;
 }
 
 /* ===========================

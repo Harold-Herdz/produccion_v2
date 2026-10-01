@@ -130,7 +130,7 @@ if(!$planilla){
 $refsMaquina    = referenciasDeMaquinaExtrusion($conexion, $planilla['id_maquina']);
 $referencias    = $refsMaquina['normales'];
 $referenciasEsp = $refsMaquina['especiales'];
-$colores        = obtenerColoresOrdenados($conexion);
+$colores        = obtenerColoresDeArea($conexion, 'extrusion');
 $laminas        = laminasExtrusion($conexion);
 $borrador       = json_decode((string) $planilla['filas'], true);
 if(!is_array($borrador) || !isset($borrador[0]['pesos'])){

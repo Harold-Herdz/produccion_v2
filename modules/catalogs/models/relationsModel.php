@@ -55,6 +55,70 @@ function alternarMaquinaArea($conexion, $idMaquina, $idArea)
     return mysqli_query($conexion, "INSERT INTO MAQUINA_AREAS (id_maquina, id_area) VALUES ($idMaquina, $idArea)");
 }
 
+// Operarios activos, por id
+function operariosOrdenados($conexion)
+{
+    return mysqli_fetch_all(mysqli_query($conexion, "
+        SELECT id_operario, nombre_operario FROM OPERARIOS WHERE estado = 1 ORDER BY id_operario
+    "), MYSQLI_ASSOC);
+}
+
+// Matriz operarios × áreas
+function obtenerMatrizOperarioAreas($conexion)
+{
+    $areas = areasOrdenadas($conexion);
+    $relaciones = [];
+    $res = mysqli_query($conexion, "SELECT id_operario, id_area FROM OPERARIO_AREAS");
+    while ($r = mysqli_fetch_assoc($res)) {
+        $relaciones[$r['id_operario']][$r['id_area']] = true;
+    }
+    return ['operarios' => operariosOrdenados($conexion), 'areas' => $areas, 'relaciones' => $relaciones];
+}
+
+// Colores activos, por id
+function coloresOrdenados($conexion)
+{
+    return mysqli_fetch_all(mysqli_query($conexion, "
+        SELECT id_color, nombre_color FROM COLORES WHERE estado = 1 ORDER BY id_color
+    "), MYSQLI_ASSOC);
+}
+
+// Matriz colores × áreas
+function obtenerMatrizColorAreas($conexion)
+{
+    $areas = areasOrdenadas($conexion);
+    $relaciones = [];
+    $res = mysqli_query($conexion, "SELECT id_color, id_area FROM COLOR_AREAS");
+    while ($r = mysqli_fetch_assoc($res)) {
+        $relaciones[$r['id_color']][$r['id_area']] = true;
+    }
+    return ['colores' => coloresOrdenados($conexion), 'areas' => $areas, 'relaciones' => $relaciones];
+}
+
+// Alternar color-área
+function alternarColorArea($conexion, $idColor, $idArea)
+{
+    $idColor = (int) $idColor;
+    $idArea  = (int) $idArea;
+    $existe = mysqli_query($conexion, "SELECT 1 FROM COLOR_AREAS WHERE id_color = $idColor AND id_area = $idArea");
+    if ($existe && mysqli_num_rows($existe) > 0) {
+        return mysqli_query($conexion, "DELETE FROM COLOR_AREAS WHERE id_color = $idColor AND id_area = $idArea");
+    }
+    return mysqli_query($conexion, "INSERT INTO COLOR_AREAS (id_color, id_area) VALUES ($idColor, $idArea)");
+}
+
+// Alternar operario-área
+function alternarOperarioArea($conexion, $idOperario, $idArea)
+{
+    $idOperario = (int) $idOperario;
+    $idArea     = (int) $idArea;
+    $existe = mysqli_query($conexion, "SELECT 1 FROM OPERARIO_AREAS WHERE id_operario = $idOperario AND id_area = $idArea");
+    if ($existe && mysqli_num_rows($existe) > 0) {
+        return mysqli_query($conexion, "DELETE FROM OPERARIO_AREAS WHERE id_operario = $idOperario AND id_area = $idArea");
+    }
+    return mysqli_query($conexion, "INSERT INTO OPERARIO_AREAS (id_operario, id_area) VALUES ($idOperario, $idArea)");
+}
+
 // Matriz referencias × máquinas, para un área
 function obtenerMatrizMaquinaReferencias($conexion, $idArea)
 {
@@ -119,71 +183,107 @@ function guardarSeedRelaciones($nombre, array $lineas)
     file_put_contents(rutaSeedRelaciones($nombre), implode("\n", $lineas) . "\n");
 }
 
-// Exportar relaciones
-function exportarRelaciones($conexion)
+// Exportar relaciones. $tipos: subconjunto de ['areas','referencias','operarios','colores']
+function exportarRelaciones($conexion, array $tipos)
 {
     $fecha = date('Y-m-d H:i');
+    $totalAreas = $totalRefs = $totalEsp = $totalOperarios = $totalColores = 0;
 
-    $lineas = ["-- Máquina x Área -- generado por Relaciones > Exportar el {$fecha}"];
-    $res = mysqli_query($conexion, "
-        SELECT m.nombre_maquina, a.nombre_area
-        FROM MAQUINA_AREAS ma
-        JOIN MAQUINAS m ON m.id_maquina = ma.id_maquina
-        JOIN AREAS a    ON a.id_area = ma.id_area
-        ORDER BY CAST(REGEXP_SUBSTR(m.nombre_maquina, '[0-9]+') AS UNSIGNED), a.id_area
-    ");
-    $totalAreas = 0;
-    while ($f = mysqli_fetch_assoc($res)) {
-        $lineas[] = "INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('" . escaparSeed($f['nombre_maquina']) . "', '" . escaparSeed($f['nombre_area']) . "');";
-        $totalAreas++;
+    if (in_array('areas', $tipos, true)) {
+        $lineas = ["-- Máquina x Área -- generado por Relaciones > Exportar el {$fecha}"];
+        $res = mysqli_query($conexion, "
+            SELECT m.nombre_maquina, a.nombre_area
+            FROM MAQUINA_AREAS ma
+            JOIN MAQUINAS m ON m.id_maquina = ma.id_maquina
+            JOIN AREAS a    ON a.id_area = ma.id_area
+            ORDER BY CAST(REGEXP_SUBSTR(m.nombre_maquina, '[0-9]+') AS UNSIGNED), a.id_area
+        ");
+        while ($f = mysqli_fetch_assoc($res)) {
+            $lineas[] = "INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('" . escaparSeed($f['nombre_maquina']) . "', '" . escaparSeed($f['nombre_area']) . "');";
+            $totalAreas++;
+        }
+        guardarSeedRelaciones('maquina_areas', $lineas);
     }
-    guardarSeedRelaciones('maquina_areas', $lineas);
 
-    $lineas = ["-- Referencia x Máquina (por área) -- generado por Relaciones > Exportar el {$fecha}"];
-    $res = mysqli_query($conexion, "
-        SELECT m.nombre_maquina, a.nombre_area, r.nombre_referencia
-        FROM MAQUINA_REFERENCIAS mr
-        JOIN MAQUINAS m    ON m.id_maquina = mr.id_maquina
-        JOIN AREAS a       ON a.id_area = mr.id_area
-        JOIN REFERENCIAS r ON r.id_referencia = mr.id_referencia
-        ORDER BY CAST(REGEXP_SUBSTR(m.nombre_maquina, '[0-9]+') AS UNSIGNED), a.id_area, r.id_referencia
-    ");
-    $totalRefs = 0;
-    while ($f = mysqli_fetch_assoc($res)) {
-        $lineas[] = "INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('" . escaparSeed($f['nombre_maquina']) . "', '" . escaparSeed($f['nombre_area']) . "', '" . escaparSeed($f['nombre_referencia']) . "');";
-        $totalRefs++;
+    if (in_array('referencias', $tipos, true)) {
+        $lineas = ["-- Referencia x Máquina (por área) -- generado por Relaciones > Exportar el {$fecha}"];
+        $res = mysqli_query($conexion, "
+            SELECT m.nombre_maquina, a.nombre_area, r.nombre_referencia
+            FROM MAQUINA_REFERENCIAS mr
+            JOIN MAQUINAS m    ON m.id_maquina = mr.id_maquina
+            JOIN AREAS a       ON a.id_area = mr.id_area
+            JOIN REFERENCIAS r ON r.id_referencia = mr.id_referencia
+            ORDER BY CAST(REGEXP_SUBSTR(m.nombre_maquina, '[0-9]+') AS UNSIGNED), a.id_area, r.id_referencia
+        ");
+        while ($f = mysqli_fetch_assoc($res)) {
+            $lineas[] = "INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('" . escaparSeed($f['nombre_maquina']) . "', '" . escaparSeed($f['nombre_area']) . "', '" . escaparSeed($f['nombre_referencia']) . "');";
+            $totalRefs++;
+        }
+        $res = mysqli_query($conexion, "
+            SELECT m.nombre_maquina, a.nombre_area
+            FROM MAQUINA_AREAS ma
+            JOIN MAQUINAS m ON m.id_maquina = ma.id_maquina
+            JOIN AREAS a    ON a.id_area = ma.id_area
+            WHERE ma.usa_referencias_esp = 1
+            ORDER BY CAST(REGEXP_SUBSTR(m.nombre_maquina, '[0-9]+') AS UNSIGNED), a.id_area
+        ");
+        while ($f = mysqli_fetch_assoc($res)) {
+            $lineas[] = "UPDATE MAQUINA_AREAS SET usa_referencias_esp = 1 WHERE maquina = '" . escaparSeed($f['nombre_maquina']) . "' AND area = '" . escaparSeed($f['nombre_area']) . "';";
+            $totalEsp++;
+        }
+        guardarSeedRelaciones('maquina_referencias', $lineas);
     }
-    $res = mysqli_query($conexion, "
-        SELECT m.nombre_maquina, a.nombre_area
-        FROM MAQUINA_AREAS ma
-        JOIN MAQUINAS m ON m.id_maquina = ma.id_maquina
-        JOIN AREAS a    ON a.id_area = ma.id_area
-        WHERE ma.usa_referencias_esp = 1
-        ORDER BY CAST(REGEXP_SUBSTR(m.nombre_maquina, '[0-9]+') AS UNSIGNED), a.id_area
-    ");
-    $totalEsp = 0;
-    while ($f = mysqli_fetch_assoc($res)) {
-        $lineas[] = "UPDATE MAQUINA_AREAS SET usa_referencias_esp = 1 WHERE maquina = '" . escaparSeed($f['nombre_maquina']) . "' AND area = '" . escaparSeed($f['nombre_area']) . "';";
-        $totalEsp++;
-    }
-    guardarSeedRelaciones('maquina_referencias', $lineas);
 
-    return ['areas' => $totalAreas, 'referencias' => $totalRefs, 'especiales' => $totalEsp];
+    if (in_array('operarios', $tipos, true)) {
+        $lineas = ["-- Operario x Área -- generado por Relaciones > Exportar el {$fecha}"];
+        $res = mysqli_query($conexion, "
+            SELECT o.nombre_operario, a.nombre_area
+            FROM OPERARIO_AREAS oa
+            JOIN OPERARIOS o ON o.id_operario = oa.id_operario
+            JOIN AREAS a     ON a.id_area = oa.id_area
+            ORDER BY o.id_operario, a.id_area
+        ");
+        while ($f = mysqli_fetch_assoc($res)) {
+            $lineas[] = "INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('" . escaparSeed($f['nombre_operario']) . "', '" . escaparSeed($f['nombre_area']) . "');";
+            $totalOperarios++;
+        }
+        guardarSeedRelaciones('operario_areas', $lineas);
+    }
+
+    if (in_array('colores', $tipos, true)) {
+        $lineas = ["-- Color x Área -- generado por Relaciones > Exportar el {$fecha}"];
+        $res = mysqli_query($conexion, "
+            SELECT c.nombre_color, a.nombre_area
+            FROM COLOR_AREAS ca
+            JOIN COLORES c ON c.id_color = ca.id_color
+            JOIN AREAS a   ON a.id_area = ca.id_area
+            ORDER BY c.id_color, a.id_area
+        ");
+        while ($f = mysqli_fetch_assoc($res)) {
+            $lineas[] = "INSERT INTO COLOR_AREAS (color, area) VALUES ('" . escaparSeed($f['nombre_color']) . "', '" . escaparSeed($f['nombre_area']) . "');";
+            $totalColores++;
+        }
+        guardarSeedRelaciones('color_areas', $lineas);
+    }
+
+    return ['areas' => $totalAreas, 'referencias' => $totalRefs, 'especiales' => $totalEsp, 'operarios' => $totalOperarios, 'colores' => $totalColores];
 }
 
-// Importar relaciones faltantes
-function importarRelaciones($conexion)
+// Importar relaciones faltantes. $tipos: subconjunto de ['areas','referencias','operarios','colores']
+function importarRelaciones($conexion, array $tipos)
 {
-    $rutaAreas = rutaSeedRelaciones('maquina_areas');
-    $rutaRefs  = rutaSeedRelaciones('maquina_referencias');
-    if (!is_file($rutaAreas) && !is_file($rutaRefs)) {
+    $rutaAreas     = rutaSeedRelaciones('maquina_areas');
+    $rutaRefs      = rutaSeedRelaciones('maquina_referencias');
+    $rutaOperarios = rutaSeedRelaciones('operario_areas');
+    $rutaColores   = rutaSeedRelaciones('color_areas');
+    if (!is_file($rutaAreas) && !is_file($rutaRefs) && !is_file($rutaOperarios) && !is_file($rutaColores)) {
         return ['agregados' => 0, 'existentes' => 0, 'omitidos' => 0, 'error' => 'Todavía no se han exportado las relaciones (no existen los archivos semilla).'];
     }
 
     $agregados = $existentes = $omitidos = 0;
 
     // Máquina x Área
-    if (is_file($rutaAreas)) {
+    if (in_array('areas', $tipos, true) && is_file($rutaAreas)) {
         $patron = "/INSERT INTO MAQUINA_AREAS \\(maquina, area\\) VALUES\\s*\\('((?:[^']|'')*)'\\s*,\\s*'((?:[^']|'')*)'\\)/i";
         foreach (file($rutaAreas, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $linea) {
             if (!preg_match($patron, $linea, $m)) {
@@ -210,7 +310,7 @@ function importarRelaciones($conexion)
     }
 
     // Referencia x Máquina (por área) + Especiales
-    if (is_file($rutaRefs)) {
+    if (in_array('referencias', $tipos, true) && is_file($rutaRefs)) {
         $patronRef = "/INSERT INTO MAQUINA_REFERENCIAS \\(maquina, area, referencia\\) VALUES\\s*\\('((?:[^']|'')*)'\\s*,\\s*'((?:[^']|'')*)'\\s*,\\s*'((?:[^']|'')*)'\\)/i";
         $patronEsp = "/UPDATE MAQUINA_AREAS SET usa_referencias_esp = 1 WHERE maquina = '((?:[^']|'')*)' AND area = '((?:[^']|'')*)'/i";
         foreach (file($rutaRefs, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $linea) {
@@ -252,6 +352,60 @@ function importarRelaciones($conexion)
                     $existentes++;
                 }
             }
+        }
+    }
+
+    // Operario x Área
+    if (in_array('operarios', $tipos, true) && is_file($rutaOperarios)) {
+        $patron = "/INSERT INTO OPERARIO_AREAS \\(operario, area\\) VALUES\\s*\\('((?:[^']|'')*)'\\s*,\\s*'((?:[^']|'')*)'\\)/i";
+        foreach (file($rutaOperarios, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $linea) {
+            if (!preg_match($patron, $linea, $m)) {
+                continue;
+            }
+            $operario = mysqli_real_escape_string($conexion, desescaparSeed($m[1]));
+            $area     = mysqli_real_escape_string($conexion, desescaparSeed($m[2]));
+            $ids = mysqli_fetch_assoc(mysqli_query($conexion, "
+                SELECT (SELECT id_operario FROM OPERARIOS WHERE nombre_operario = '{$operario}' LIMIT 1) AS id_o,
+                       (SELECT id_area FROM AREAS WHERE nombre_area = '{$area}' LIMIT 1) AS id_a
+            "));
+            if (!$ids['id_o'] || !$ids['id_a']) {
+                $omitidos++;
+                continue;
+            }
+            $existe = mysqli_query($conexion, "SELECT 1 FROM OPERARIO_AREAS WHERE id_operario = {$ids['id_o']} AND id_area = {$ids['id_a']}");
+            if ($existe && mysqli_num_rows($existe) > 0) {
+                $existentes++;
+                continue;
+            }
+            mysqli_query($conexion, "INSERT INTO OPERARIO_AREAS (id_operario, id_area) VALUES ({$ids['id_o']}, {$ids['id_a']})");
+            $agregados++;
+        }
+    }
+
+    // Color x Área
+    if (in_array('colores', $tipos, true) && is_file($rutaColores)) {
+        $patron = "/INSERT INTO COLOR_AREAS \\(color, area\\) VALUES\\s*\\('((?:[^']|'')*)'\\s*,\\s*'((?:[^']|'')*)'\\)/i";
+        foreach (file($rutaColores, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $linea) {
+            if (!preg_match($patron, $linea, $m)) {
+                continue;
+            }
+            $color = mysqli_real_escape_string($conexion, desescaparSeed($m[1]));
+            $area  = mysqli_real_escape_string($conexion, desescaparSeed($m[2]));
+            $ids = mysqli_fetch_assoc(mysqli_query($conexion, "
+                SELECT (SELECT id_color FROM COLORES WHERE nombre_color = '{$color}' LIMIT 1) AS id_c,
+                       (SELECT id_area FROM AREAS WHERE nombre_area = '{$area}' LIMIT 1) AS id_a
+            "));
+            if (!$ids['id_c'] || !$ids['id_a']) {
+                $omitidos++;
+                continue;
+            }
+            $existe = mysqli_query($conexion, "SELECT 1 FROM COLOR_AREAS WHERE id_color = {$ids['id_c']} AND id_area = {$ids['id_a']}");
+            if ($existe && mysqli_num_rows($existe) > 0) {
+                $existentes++;
+                continue;
+            }
+            mysqli_query($conexion, "INSERT INTO COLOR_AREAS (id_color, id_area) VALUES ({$ids['id_c']}, {$ids['id_a']})");
+            $agregados++;
         }
     }
 

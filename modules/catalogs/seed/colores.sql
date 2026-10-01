@@ -1,14 +1,21 @@
--- Colores (COLORES) -- generado por Catalogos > Exportar el 2026-09-30 15:28
-INSERT INTO COLORES (nombre_color, estado) VALUES ('', 1);
+-- Colores (COLORES) -- generado por Catalogos > Exportar el 2026-10-01 23:05
+INSERT INTO COLORES (nombre_color, estado) VALUES ('Aguapanelo', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Amarillo', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Azul', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Beige', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Blanco', 1);
-INSERT INTO COLORES (nombre_color, estado) VALUES ('Gris', 1);
+INSERT INTO COLORES (nombre_color, estado) VALUES ('Gris', 0);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Ladrillo', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Marrón', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Naranja', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Negro', 1);
+INSERT INTO COLORES (nombre_color, estado) VALUES ('P.P', 1);
+INSERT INTO COLORES (nombre_color, estado) VALUES ('P.P Azul', 1);
+INSERT INTO COLORES (nombre_color, estado) VALUES ('P.P Gris', 1);
+INSERT INTO COLORES (nombre_color, estado) VALUES ('P.P Lona', 1);
+INSERT INTO COLORES (nombre_color, estado) VALUES ('P.P Marrón', 1);
+INSERT INTO COLORES (nombre_color, estado) VALUES ('P.P Negro', 1);
+INSERT INTO COLORES (nombre_color, estado) VALUES ('P.P Rojo', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('R Amarillo', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('R Azul', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('R Blanco', 1);

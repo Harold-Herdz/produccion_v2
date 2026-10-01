@@ -19,22 +19,6 @@ window.addEventListener("click", function (evento) {
     }
 });
 
-// Mostrar panel exportar/importar
-function mostrarPanelCatalogos(tipo) {
-    document.getElementById("containerHistorial").style.display = "none";
-    document.getElementById("accionesCatalogos").style.display = "none";
-    document.getElementById("panelExportar").style.display = tipo === "exportar" ? "block" : "none";
-    document.getElementById("panelImportar").style.display = tipo === "importar" ? "block" : "none";
-}
-
-// Volver a la tabla normal
-function ocultarPanelesCatalogos() {
-    document.getElementById("panelExportar").style.display = "none";
-    document.getElementById("panelImportar").style.display = "none";
-    document.getElementById("containerHistorial").style.display = "block";
-    document.getElementById("accionesCatalogos").style.display = "flex";
-}
-
 // Pintar resultados en overlay
 function mostrarResultadoCatalogos(datos) {
     document.getElementById("tituloResultadoCatalogos").textContent =
@@ -55,12 +39,32 @@ function mostrarResultadoCatalogos(datos) {
         lista.appendChild(li);
     });
 
-    ocultarPanelesCatalogos();
+    cerrarModal("modalExportarCatalogos");
+    cerrarModal("modalImportarCatalogos");
     abrirModal("modalResultadoCatalogos");
 }
 
+// Casilla "Todas" de una tabla de selección (Exportar/Importar)
+document.querySelectorAll(".modal-seleccion .chk-todas-seleccion").forEach(todas => {
+    const tabla = todas.closest("table");
+    const casillas = () => Array.from(tabla.querySelectorAll('tbody input[type="checkbox"]:not(.chk-todas-seleccion)'));
+    todas.addEventListener("change", () => {
+        casillas().forEach(c => { c.checked = todas.checked; });
+    });
+    tabla.addEventListener("change", e => {
+        if (e.target === todas) return;
+        if (e.target.matches('tbody input[type="checkbox"]')) {
+            todas.checked = casillas().every(c => c.checked);
+        }
+    });
+});
+
 // Enviar por AJAX
 function enviarFormularioCatalogos(form, tipo) {
+    if (!form.querySelector('input[name="catalogos[]"]:checked')) {
+        mostrarAviso("Selecciona al menos un catálogo.", { tipo: "error" });
+        return;
+    }
     const overlayCarga = document.getElementById("overlayCargaCatalogos");
     document.getElementById("textoCargaCatalogos").textContent =
         tipo === "exportar" ? "Exportando…" : "Importando…";

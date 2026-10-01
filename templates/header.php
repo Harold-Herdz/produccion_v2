@@ -137,6 +137,16 @@ require_once dirname(__DIR__) . '/includes/config.php';
                 <a href="<?= BASE_URL ?>/modules/extrusion/views/register.php">Planilla</a>
                 <a href="<?= BASE_URL ?>/modules/extrusion/views/history.php">Historial</a>
             </div>
+
+            <!-- Modulo Peletizado -->
+            <div class="side-menu-module">
+                <span class="side-menu-module-name">Peletizado</span>
+                <?php if($_SESSION['rol'] == 'admin'){ ?>
+                    <a href="<?= BASE_URL ?>/modules/peletizado/views/dashboard.php">Panel</a>
+                <?php } ?>
+                <a href="<?= BASE_URL ?>/modules/peletizado/views/register.php">Planilla</a>
+                <a href="<?= BASE_URL ?>/modules/peletizado/views/history.php">Historial</a>
+            </div>
         </div>
 
         <div class="side-menu-bottom">
@@ -152,6 +162,20 @@ require_once dirname(__DIR__) . '/includes/config.php';
             document.getElementById('sideMenu').classList.toggle('open');
             document.body.classList.toggle('menu-open');
         }
+
+        // Mantiene el scroll del menú lateral al navegar a otro módulo
+        (function () {
+            var CLAVE = 'scrollSideMenu';
+            var cont = document.querySelector('#sideMenu .side-menu-content');
+            if (!cont) return;
+            try {
+                var y = sessionStorage.getItem(CLAVE);
+                if (y !== null) cont.scrollTop = parseInt(y, 10) || 0;
+            } catch (e) { /* almacenamiento bloqueado: se ignora */ }
+            cont.addEventListener('scroll', function () {
+                try { sessionStorage.setItem(CLAVE, cont.scrollTop); } catch (e) { /* ignorado */ }
+            });
+        })();
     </script>
 
     <?php if($_SESSION['rol'] == 'admin'){ ?>

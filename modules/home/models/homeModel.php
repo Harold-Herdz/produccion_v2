@@ -74,6 +74,7 @@ function homeModulos()
             // Columnas de la tabla
             'columnas'  => ['paquetes_x70', 'paquetes_x90', 'paquetes_x98', 'paquetes_total'],
             'tabla_dims_defecto' => ['fecha', 'maquina'],
+            'operario_col' => 'id_operario',
         ],
         'rollo' => [
             'etiqueta'  => 'Rollos',
@@ -92,6 +93,7 @@ function homeModulos()
             'principal' => 'peso_total',
             'columnas'  => ['peso_rollo', 'peso_retal', 'peso_total'],
             'tabla_dims_defecto' => ['fecha', 'maquina'],
+            'operario_col' => 'id_operario',
         ],
         'plana' => [
             'etiqueta'  => 'Máquina Plana',
@@ -111,6 +113,7 @@ function homeModulos()
             'principal' => 'peso_total',
             'columnas'  => ['peso_rollo', 'peso_retal', 'bultos', 'peso_total'],
             'tabla_dims_defecto' => ['fecha', 'maquina'],
+            'operario_col' => 'id_operario',
         ],
         'extrusion' => [
             'etiqueta'  => 'Extrusión',
@@ -130,12 +133,13 @@ function homeModulos()
             'principal' => 'rollos',
             'columnas'  => ['rollos', 'peso_total'],
             'tabla_dims_defecto' => ['fecha', 'maquina'],
+            'operario_col' => 'id_operador',
         ],
         'peletizado' => [
             'etiqueta'  => 'Peletizado',
             'tabla'     => 'PRODUCCION_PELETIZADO',
             'fecha'     => 'fecha_peletizado',
-            'url'       => null, // aún no existe su módulo
+            'url'       => '/modules/peletizado/views/dashboard.php',
             'uniones'   => $uniones,
             'dims'      => $fechas('fecha_peletizado') + [
                 'maquina' => $maquina, 'turno' => $turno, 'operario' => $operario, 'color' => $color,
@@ -152,6 +156,7 @@ function homeModulos()
             'principal' => 'total',
             'columnas'  => ['alta_retal', 'baja', 'refiltrado', 'soplado', 'torta', 'limpieza', 'total'],
             'tabla_dims_defecto' => ['fecha', 'maquina'],
+            'operario_col' => ['id_operario', 'id_operario2'],
         ],
     ];
 
@@ -293,6 +298,7 @@ function homeHojas()
         'rollo'     => ['id' => '1LtibtaYF6GEsXE5Mxgq6uq8BR_ZEQ1idlqFUof5mgRo', 'gid_registros' => '46026898'],
         'plana'     => ['id' => '1DO_G6MHfoMagMMEOUOipTiE6W1UC-65f7BamJZQwGSc', 'gid_registros' => '1759801026'],
         'extrusion' => ['id' => '1TLsQx_s9tWBjJwuPm9xseJfsDQbKDQNQKOK9lf9Xezk', 'gid_registros' => '1284283091', 'gid_import' => '1583688034'],
+        'peletizado' => ['id' => '1GDmQDnOrJGoipBT5Cd26uYwd6My32YIJBZOpoDn5jEY', 'gid_registros' => '1650985044'],
     ];
 }
 
@@ -370,6 +376,7 @@ function homeSeguimiento()
         'rollo'     => ['tabla' => 'ROLLO_SHEET',     'abierto' => "estado = 'en_proceso'", 'cerrado' => "estado = 'completado'", 'etq_abierto' => 'Días en proceso',     'etq_cerrado' => 'Días cerrados'],
         'plana'     => ['tabla' => 'PLANA_SHEET',     'abierto' => "estado = 'en_proceso'", 'cerrado' => "estado = 'completado'", 'etq_abierto' => 'Días en proceso',     'etq_cerrado' => 'Días cerrados'],
         'extrusion' => ['tabla' => 'EXTRUSION_SHEET', 'abierto' => "estado = 'abierta'",    'cerrado' => "estado = 'finalizada'", 'etq_abierto' => 'Planillas abiertas', 'etq_cerrado' => 'Planillas finalizadas'],
+        'peletizado'=> ['tabla' => 'PELETIZADO_SHEET','abierto' => "estado = 'abierta'",    'cerrado' => "estado = 'finalizada'", 'etq_abierto' => 'Planillas abiertas', 'etq_cerrado' => 'Planillas finalizadas'],
     ];
 }
 
@@ -381,10 +388,28 @@ function homeResumenModulo($conexion, $clave, $desde, $hasta)
     $r = homeResumen($conexion, $clave, $desde, $hasta);
 
     $where = homeFromWhere($conexion, $mod, [], $desde, $hasta, []);
-    $sql = "SELECT COUNT(DISTINCT p.id_maquina) AS maquinas, COUNT(DISTINCT p.{$mod['fecha']}) AS dias {$where}";
+    $colsOp = (array) ($mod['operario_col'] ?? []);
+    $selectOp = (count($colsOp) === 1) ? ", COUNT(DISTINCT p.{$colsOp[0]}) AS operarios" : '';
+    $sql = "SELECT COUNT(DISTINCT p.id_maquina) AS maquinas, COUNT(DISTINCT p.{$mod['fecha']}) AS dias{$selectOp} {$where}";
     $extra = mysqli_fetch_assoc(mysqli_query($conexion, $sql)) ?: [];
     $r['maquinas'] = (int) ($extra['maquinas'] ?? 0);
     $r['dias']     = (int) ($extra['dias'] ?? 0);
+
+    if (count($colsOp) > 1) {
+        // Varias columnas de operario (p.ej. operario1/operario2): cada aparición cuenta
+        $union = implode(' UNION ', array_map(fn($c) => "SELECT p.{$c} AS op {$where}", $colsOp));
+        $fo = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(DISTINCT op) FROM ({$union}) u WHERE op IS NOT NULL"));
+        $r['operarios'] = (int) ($fo[0] ?? 0);
+    } elseif (count($colsOp) === 1) {
+        $r['operarios'] = (int) ($extra['operarios'] ?? 0);
+    } else {
+        $r['operarios'] = null;
+    }
+
+    // Promedio diario de la medida principal del módulo
+    $totalPrincipal = $r['medidas'][$mod['principal']] ?? 0;
+    $r['promedio_diario']    = $r['dias'] > 0 ? round($totalPrincipal / $r['dias'], 2) : 0;
+    $r['principal_etiqueta'] = $mod['medidas'][$mod['principal']]['etiqueta'] ?? '';
     return $r;
 }
 
@@ -395,9 +420,13 @@ function homeEstadoModulo($conexion, $clave)
     $mod = $modulos[$clave];
     $estado = estadoSistemaLeer();
 
-    $fila = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) AS total, MAX(p.{$mod['fecha']}) AS ultimo FROM {$mod['tabla']} p")) ?: [];
+    $fila = mysqli_fetch_assoc(mysqli_query($conexion, "
+        SELECT COUNT(*) AS total, MIN(p.{$mod['fecha']}) AS primero, MAX(p.{$mod['fecha']}) AS ultimo
+        FROM {$mod['tabla']} p
+    ")) ?: [];
     $out = [
         'total_registros' => (int) ($fila['total'] ?? 0),
+        'primer_registro' => $fila['primero'] ?? null,
         'ultimo_registro' => $fila['ultimo'] ?? null,
         'importa'         => isset(homeHojas()[$clave]),
     ];
@@ -413,11 +442,11 @@ function homeEstadoModulo($conexion, $clave)
     if ($seg) {
         $ab = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$seg['tabla']} WHERE {$seg['abierto']}"));
         $ce = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$seg['tabla']} WHERE {$seg['cerrado']}"));
-        $sp = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$seg['tabla']} WHERE {$seg['cerrado']} AND (ruta_pdf IS NULL OR ruta_pdf = '')"));
+        $cp = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$seg['tabla']} WHERE {$seg['cerrado']} AND ruta_pdf IS NOT NULL AND ruta_pdf != ''"));
         $out['seguimiento'] = [
             ['etiqueta' => $seg['etq_abierto'], 'valor' => (int) $ab[0]],
             ['etiqueta' => $seg['etq_cerrado'], 'valor' => (int) $ce[0]],
-            ['etiqueta' => 'Cerrados sin PDF', 'valor' => (int) $sp[0], 'alerta' => (int) $sp[0] > 0],
+            ['etiqueta' => 'PDFs generados', 'valor' => (int) $cp[0]],
         ];
     }
     return $out;
@@ -432,17 +461,18 @@ function homePendientes($conexion, $clave, $forzar = false)
     $estado = estadoSistemaLeer();
     $cache = $estado['pendientes'][$clave] ?? null;
     if (!$forzar && $cache && (time() - (int) ($cache['ts'] ?? 0)) < 300) {
-        return ['disponible' => true, 'pendientes' => (int) $cache['n']];
+        return ['disponible' => true, 'pendientes' => (int) $cache['n'], 'filas_sheet' => (int) ($cache['total'] ?? 0)];
     }
 
     $filas = homeLeerHoja($clave, 'IMPORT', 60000);
     if ($filas === null) {
-        return ['disponible' => true, 'pendientes' => null, 'error' => 'No se pudo leer el Sheet'];
+        return ['disponible' => true, 'pendientes' => null, 'filas_sheet' => null, 'error' => 'No se pudo leer el Sheet'];
     }
     $area = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT ultimo_id_sheet FROM AREAS WHERE nombre_area = '" . mysqli_real_escape_string($conexion, $clave) . "'"));
     $ultimo = $area['ultimo_id_sheet'] ?? null;
     $n = 0;
-    foreach (array_slice($filas, 1) as $f) {
+    $filasDatos = array_slice($filas, 1);
+    foreach ($filasDatos as $f) {
         $id = trim($f[0] ?? '');
         if ($id === '') {
             continue;
@@ -451,8 +481,9 @@ function homePendientes($conexion, $clave, $forzar = false)
             $n++;
         }
     }
-    estadoSistemaGuardar('pendientes', $clave, ['n' => $n, 'ts' => time()]);
-    return ['disponible' => true, 'pendientes' => $n];
+    $total = count($filasDatos);
+    estadoSistemaGuardar('pendientes', $clave, ['n' => $n, 'total' => $total, 'ts' => time()]);
+    return ['disponible' => true, 'pendientes' => $n, 'filas_sheet' => $total];
 }
 
 /* =====================================================

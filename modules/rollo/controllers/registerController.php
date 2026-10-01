@@ -13,4 +13,4 @@ $operarios   = mysqli_fetch_all(obtenerOperariosActivosRollo($conexion), MYSQLI_
 $datosMaquina = obtenerMaquinasConReferencias($conexion, 'rollo');
 $maquinas     = $datosMaquina['maquinas'];
 $mapaReferenciasMaquina = $datosMaquina['mapaJs'];
-$colores     = obtenerColoresOrdenados($conexion);
+$colores     = obtenerColoresDeArea($conexion, 'rollo');

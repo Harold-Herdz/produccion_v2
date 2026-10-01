@@ -706,25 +706,30 @@
         const cont = document.getElementById("res-" + m);
         Promise.all([
             consulta({ accion: "resumen", modulo: m, desde: e.desde, hasta: e.hasta }),
-            consulta({ accion: "estado", modulo: m })
-        ]).then(([rr, re]) => {
+            consulta({ accion: "estado", modulo: m }),
+            consulta({ accion: "pendientes", modulo: m })
+        ]).then(([rr, re, rp]) => {
             if (!rr.ok || !re.ok) return;
             const r = rr.resumen, est = re.estado;
             cont.innerHTML = "";
 
             const colPeriodo = el("div", "home-res-col");
             colPeriodo.appendChild(el("div", "home-res-titulo", "Producción · " + textoRango(m)));
-            colPeriodo.appendChild(linea("Registros", fmt(r.registros)));
             info.medidas.forEach(md => {
                 const principal = md.clave === info.principal;
                 colPeriodo.appendChild(linea(md.etiqueta, fmt(r.medidas[md.clave] || 0), principal ? "destacada" : ""));
+                if (principal) colPeriodo.appendChild(linea("Promedio diario", fmt(r.promedio_diario)));
             });
-            colPeriodo.appendChild(linea("Máquinas con producción", fmt(r.maquinas)));
-            colPeriodo.appendChild(linea("Días con producción", fmt(r.dias)));
+            colPeriodo.appendChild(linea("Máquinas activas", fmt(r.maquinas)));
+            if (r.operarios !== null && r.operarios !== undefined) {
+                colPeriodo.appendChild(linea("Operarios activos", fmt(r.operarios)));
+            }
+            colPeriodo.appendChild(linea("Días trabajados", fmt(r.dias)));
 
             const colEstado = el("div", "home-res-col");
             colEstado.appendChild(el("div", "home-res-titulo", "Estado del módulo"));
             colEstado.appendChild(linea("Registros totales", fmt(est.total_registros)));
+            colEstado.appendChild(linea("Primer registro", fechaCorta(est.primer_registro)));
             colEstado.appendChild(linea("Último registro", fechaCorta(est.ultimo_registro)));
             est.seguimiento.forEach(s => colEstado.appendChild(linea(s.etiqueta, fmt(s.valor), s.alerta ? "alerta" : "")));
 
@@ -734,7 +739,18 @@
                 colImport.appendChild(linea("Último ID Sheet importado", est.ultimo_id_sheet || "—"));
                 colImport.appendChild(linea("Fecha de la última importación", fechaHora(est.ultima_importacion)));
                 if (est.ultima_importacion_detalle) colImport.appendChild(linea("Resultado", est.ultima_importacion_detalle));
-                colImport.appendChild(lineaPendientes(m));
+                if (rp.ok && rp.disponible && rp.filas_sheet !== null && rp.filas_sheet !== undefined) {
+                    colImport.appendChild(linea("Filas en el Sheet", fmt(rp.filas_sheet)));
+                }
+                if (rp.ok && rp.disponible) {
+                    if (rp.pendientes === null || rp.pendientes === undefined) {
+                        colImport.appendChild(linea("Pendientes por importar", "No se pudo consultar", "alerta"));
+                    } else if (rp.pendientes === 0) {
+                        colImport.appendChild(linea("Pendientes por importar", "Todo importado", "ok"));
+                    } else {
+                        colImport.appendChild(linea("Pendientes por importar", fmt(rp.pendientes), "alerta"));
+                    }
+                }
                 const a = el("a", "home-enlace", "Ir a importar");
                 a.href = BASE + meta[m].url + "?importar=1"; // abre overlay de importar
                 colImport.appendChild(a);

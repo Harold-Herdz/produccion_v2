@@ -175,23 +175,27 @@ function cancelarPlanilla($conexion, $planilla){
 /* =================================================
    CATÁLOGOS DE LA PLANILLA
 ================================================= */
-// Operarios activos
+// Operarios activos del área sellado
 function obtenerOperariosActivos($conexion){
     return $conexion->query("
-        SELECT id_operario, nombre_operario
-        FROM operarios
-        WHERE estado = 1
-        ORDER BY nombre_operario
+        SELECT o.id_operario, o.nombre_operario
+        FROM operarios o
+        JOIN operario_areas oa ON oa.id_operario = o.id_operario
+        JOIN areas a ON a.id_area = oa.id_area
+        WHERE o.estado = 1 AND a.nombre_area = 'sellado'
+        ORDER BY o.nombre_operario
     ");
 }
 
-// Operarios supervisores
+// Operarios supervisores del área sellado
 function obtenerOperariosSupervisores($conexion){
     return $conexion->query("
-        SELECT id_operario, nombre_operario
-        FROM operarios
-        WHERE estado = 1 AND es_supervisor = 1
-        ORDER BY nombre_operario
+        SELECT o.id_operario, o.nombre_operario
+        FROM operarios o
+        JOIN operario_areas oa ON oa.id_operario = o.id_operario
+        JOIN areas a ON a.id_area = oa.id_area
+        WHERE o.estado = 1 AND o.es_supervisor = 1 AND a.nombre_area = 'sellado'
+        ORDER BY o.nombre_operario
     ");
 }
 

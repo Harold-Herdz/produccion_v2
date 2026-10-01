@@ -838,6 +838,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   gap: 16px;
   margin-top: 16px;
 }
+.grid-tablas-full {
+  grid-template-columns: 1fr;
+}
 .grid-tablas .tabla-dashboard {
   margin-top: 0;
 }
