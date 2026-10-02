@@ -72,6 +72,7 @@ $contador     = 0;
 $insertados   = 0;
 $actualizados = 0;
 $duplicados   = 0;
+$omitidos     = 0;
 
 foreach ($filas as $data) {
     // Limpiar datos de la fila
@@ -93,10 +94,17 @@ foreach ($filas as $data) {
     $peso_h5    = ($data[15] === "") ? null : convertirNumero($data[15]);
     $obs_sellado        = mysqli_real_escape_string($conexion, $data[16]);
 
-    // IDs de catálogos (o crear)
-    $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
-    $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
-    $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
+    // Máquina: catálogo cerrado, si no coincide se omite la fila
+    $id_maquina = idCatalogoCerrado($maquinas, $maquina);
+    if ($id_maquina === null) {
+        avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet, "máquina «{$maquina}» no existe en el catálogo");
+        continue;
+    }
+
+    // Operario y color: pendientes de revisión si son nuevos (color es opcional)
+    $id_operario   = idCatalogoPendienteImport($conexion, $operarios, "OPERARIOS", "nombre_operario", $operario, 'nuevo operario', 'sellado');
+    $id_color      = idCatalogoPendienteImport($conexion, $colores,   "COLORES",   "nombre_color",    $color,    'nuevo color',    'sellado');
+    $id_color_sql  = ($id_color === null) ? "NULL" : "'{$id_color}'";
 
     // Referencia: solo las «…K» van al catálogo REFERENCIAS; cualquier otra
     // (ya exista o no) va a REFERENCIAS_ESP, nunca se crea una nueva en REFERENCIAS.
@@ -105,7 +113,7 @@ foreach ($filas as $data) {
         $id_referencia_esp = null;
     } else {
         $id_referencia     = null;
-        $id_referencia_esp = $referenciasEsp[$referencia] ?? autoCrear($conexion, $referenciasEsp, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia);
+        $id_referencia_esp = idCatalogoPendienteImport($conexion, $referenciasEsp, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia, 'nueva referencia especial', 'sellado');
     }
     $id_referencia_sql     = ($id_referencia === null) ? "NULL" : "'{$id_referencia}'";
     $id_referencia_esp_sql = ($id_referencia_esp === null) ? "NULL" : "'{$id_referencia_esp}'";
@@ -123,7 +131,7 @@ foreach ($filas as $data) {
     $id_turno_sql = ($id_turno === null) ? "NULL" : "'{$id_turno}'";
     if ($id_turno === null) {
         $logMsg = addslashes("⚠ Turno no reconocido «{$turno}» · {$id_sheet}: guardado sin turno");
-        echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,'$logMsg','dup');</script>\n";
+        echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,$omitidos,'$logMsg','dup');</script>\n";
         if (ob_get_level()) ob_flush();
         flush();
     }
@@ -134,7 +142,7 @@ foreach ($filas as $data) {
     $id_jornada_sql = ($id_jornada === null) ? "NULL" : "'{$id_jornada}'";
     if ($id_jornada === null) {
         $logMsg = addslashes("⚠ Jornada «{$nombreJornada}» aún no existe en el catálogo · {$id_sheet}: guardado sin jornada");
-        echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,'$logMsg','dup');</script>\n";
+        echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,$omitidos,'$logMsg','dup');</script>\n";
         if (ob_get_level()) ob_flush();
         flush();
     }
@@ -147,7 +155,7 @@ foreach ($filas as $data) {
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_operario',$id_turno_sql,$id_jornada_sql,
-                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$paq_x70','$paq_x90','$paq_x98',
+                    $id_referencia_sql,$id_referencia_esp_sql,$id_color_sql,'$paq_x70','$paq_x90','$paq_x98',
                     $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')
                 ON DUPLICATE KEY UPDATE
                     fecha_sellado      = VALUES(fecha_sellado),
@@ -175,13 +183,13 @@ foreach ($filas as $data) {
                     peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_operario',$id_turno_sql,$id_jornada_sql,
-                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$paq_x70','$paq_x90','$paq_x98',
+                    $id_referencia_sql,$id_referencia_esp_sql,$id_color_sql,'$paq_x70','$paq_x90','$paq_x98',
                     $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')";
     }
     // Ejecutar inserción y actualizar progreso
-    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
+    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
 }
 
 // Mostrar contadores al final
-finalizarImportacion($conexion,'sellado',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
+finalizarImportacion($conexion,'sellado',$insertados,$actualizados,$duplicados,$omitidos,$total,$ultimo_id_sheet);
 ?>

@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/modules/shared/systemState.php';
+require_once dirname(__DIR__) . '/modules/shared/catalogosModel.php';
 // Límites de memoria y tiempo
 ini_set('memory_limit', '512M');
 set_time_limit(0);
@@ -20,9 +21,9 @@ function limpiarNombre($texto) {
     $texto = trim($texto);
     if (strpos($texto, ' - ') !== false) {
         $partes = explode(' - ', $texto);
-        return trim($partes[1]);
+        $texto = trim($partes[1]);
     }
-    return $texto;
+    return preg_replace('/\s+/', ' ', $texto); // espacios dobles no deben crear duplicados en catálogos
 }
 // Horario a turno del catálogo
 function convertirBloque($turno) {
@@ -80,13 +81,42 @@ function cargarCatalogo($conexion, $tabla, $campo_nombre, $campo_id) {
     }
     return $lista;
 }
-// Crear en catálogo si falta
-function autoCrear($conexion, &$catalogo, $tabla, $campo, $valor) {
-    $valor_esc = mysqli_real_escape_string($conexion, $valor);
-    mysqli_query($conexion, "INSERT INTO $tabla ($campo) VALUES ('$valor_esc')");
-    $id = mysqli_insert_id($conexion);
+// Catálogo cerrado (máquinas, turnos, operadores): si el valor no coincide
+// con ninguno ya existente no se crea nada, la fila se omite.
+function idCatalogoCerrado($catalogo, $valor) {
+    $valor = trim((string) $valor);
+    return ($valor !== '' && isset($catalogo[$valor])) ? $catalogo[$valor] : null;
+}
+
+// Catálogo con revisión de admin (operarios, colores, referencias,
+// referencias_esp, lamina_p): mismo comportamiento que "Otro" en las
+// planillas, se crea con verificado=0 y queda pendiente en Catálogos >
+// Pendientes, nunca se da por verificado automáticamente desde un import.
+function idCatalogoPendienteImport($conexion, &$catalogo, $tabla, $colNombre, $valor, $etiqueta, $modulo) {
+    $valor = normalizarNombreCatalogo($tabla, $valor);
+    if ($valor === '') {
+        return null;
+    }
+    if (isset($catalogo[$valor])) {
+        return $catalogo[$valor];
+    }
+    $stmt = $conexion->prepare("INSERT INTO {$tabla} ({$colNombre}, verificado) VALUES (?, 0)");
+    $stmt->bind_param('s', $valor);
+    $stmt->execute();
+    $id = $conexion->insert_id;
     $catalogo[$valor] = $id;
+    registrarCatalogoPendiente($conexion, strtolower($tabla), $id, $valor, $etiqueta, 'Importado desde Sheet', $modulo);
     return $id;
+}
+
+// Avisar y saltar una fila cuyo catálogo cerrado no coincidió con nada
+function avisarFilaOmitida(&$contador, $total, $insertados, $actualizados, $duplicados, &$omitidos, $id_sheet, $motivo) {
+    $contador++;
+    $omitidos++;
+    $logMsg = addslashes("✖ Omitida · $id_sheet: $motivo");
+    echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,$omitidos,'$logMsg','omit');</script>\n";
+    if (ob_get_level()) ob_flush();
+    flush();
 }
 // Obtener el último id_sheet importado
 function obtenerUltimoIdSheet($conexion, $nombre) {
@@ -139,7 +169,7 @@ function leerSheet($url, $modo, $ultimo_id_sheet) {
 }
 // Ejecutar SQL e informar
 function procesarFila($conexion, $sql, $id_sheet, &$contador, $total,
-    &$insertados, &$actualizados, &$duplicados, &$ultimo_id_sheet) {
+    &$insertados, &$actualizados, &$duplicados, $omitidos, &$ultimo_id_sheet) {
     $contador++;
 
     mysqli_query($conexion, $sql);
@@ -161,12 +191,12 @@ function procesarFila($conexion, $sql, $id_sheet, &$contador, $total,
         $logMsg = addslashes("⚠ Duplicado · $id_sheet");
     }
     // Resultado al navegador
-    echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,'$logMsg','$tipo');</script>\n";
+    echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,$omitidos,'$logMsg','$tipo');</script>\n";
     if (ob_get_level()) ob_flush();
     flush();
 }
 // Guardar y avisar fin
-function finalizarImportacion($conexion, $nombre, $insertados, $actualizados, $duplicados, $total, $ultimo_id_sheet = null) {
+function finalizarImportacion($conexion, $nombre, $insertados, $actualizados, $duplicados, $omitidos, $total, $ultimo_id_sheet = null) {
 
     if (!empty($ultimo_id_sheet)) {
         actualizarUltimoIdSheet($conexion, $nombre, $ultimo_id_sheet);
@@ -174,11 +204,11 @@ function finalizarImportacion($conexion, $nombre, $insertados, $actualizados, $d
     // Estado para Inicio
     estadoSistemaGuardar('importaciones', $nombre, [
         'fecha' => date('Y-m-d H:i:s'), 'insertados' => $insertados, 'actualizados' => $actualizados,
-        'duplicados' => $duplicados, 'total' => $total,
+        'duplicados' => $duplicados, 'omitidos' => $omitidos, 'total' => $total,
     ]);
     estadoSistemaGuardar('pendientes', $nombre, ['ts' => 0]); // invalida la caché de pendientes
 
-    echo "<script>done($insertados,$actualizados,$duplicados,$total);</script>\n";
+    echo "<script>done($insertados,$actualizados,$duplicados,$omitidos,$total);</script>\n";
     if (ob_get_level()) ob_flush();
     flush();
 }

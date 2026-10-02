@@ -98,9 +98,21 @@ function obtenerOperariosDeArea($conexion, $nombreArea){
     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
+// "r negro" / "R negro" -> "R Negro": mayúscula inicial en cada palabra.
+// Solo para catálogos de nombres (operarios, colores, lamina_p); las
+// referencias son códigos (25K, 100x100, 18+4+4 ESP) y no se tocan.
+function normalizarNombreCatalogo($tabla, $texto){
+    $texto = trim(preg_replace('/\s+/', ' ', (string) $texto));
+    $tablasConNombre = ['operarios', 'colores', 'lamina_p'];
+    if($texto === '' || !in_array(strtolower($tabla), $tablasConNombre, true)){
+        return $texto;
+    }
+    return mb_convert_case($texto, MB_CASE_TITLE, 'UTF-8');
+}
+
 // Buscar o crear en catálogo
 function resolverCatalogoIdONuevo($conexion, $tabla, $colId, $colNombre, $nombre){
-    $nombre = trim($nombre);
+    $nombre = normalizarNombreCatalogo($tabla, $nombre);
     $stmt = $conexion->prepare("SELECT {$colId} AS id FROM {$tabla} WHERE {$colNombre} = ? LIMIT 1");
     $stmt->bind_param('s', $nombre);
     $stmt->execute();

@@ -79,6 +79,7 @@ $contador     = 0;
 $insertados   = 0;
 $actualizados = 0;
 $duplicados   = 0;
+$omitidos     = 0;
 
 foreach ($filas as $data) {
     // Limpiar datos de la fila
@@ -98,17 +99,24 @@ foreach ($filas as $data) {
     $total_cat   = (int) convertirNumero($data[13]);
     $obs         = mysqli_real_escape_string($conexion, trim((string) ($data[14] ?? '')));
 
-    // IDs de catálogos (o crear). Operario 2 y color son opcionales.
-    $id_maquina  = $maquinas[$maquina] ?? autoCrear($conexion, $maquinas, "MAQUINAS", "nombre_maquina", $maquina);
-    $id_turno    = $turnos[$turno]     ?? autoCrear($conexion, $turnos,   "TURNOS",   "nombre_turno",   $turno);
-    $id_operario = $operarios[$operario1] ?? autoCrear($conexion, $operarios, "OPERARIOS", "nombre_operario", $operario1);
-    $id_operario2 = ($operario2 === '')
-        ? null
-        : ($operarios[$operario2] ?? autoCrear($conexion, $operarios, "OPERARIOS", "nombre_operario", $operario2));
-    $id_color = ($color === '')
-        ? null
-        : ($colores[$color] ?? autoCrear($conexion, $colores, "COLORES", "nombre_color", $color));
+    // Máquina y turno: catálogos cerrados, si no coinciden se omite la fila
+    $id_maquina = idCatalogoCerrado($maquinas, $maquina);
+    if ($id_maquina === null) {
+        avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet, "máquina «{$maquina}» no existe en el catálogo");
+        continue;
+    }
+    $id_turno = idCatalogoCerrado($turnos, $turno);
+    if ($id_turno === null) {
+        avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet, "turno «{$turno}» no existe en el catálogo");
+        continue;
+    }
 
+    // Operario 1, operario 2 y color: opcionales, pendientes de revisión si son nuevos
+    $id_operario  = idCatalogoPendienteImport($conexion, $operarios, "OPERARIOS", "nombre_operario", $operario1, 'nuevo operario', 'peletizado');
+    $id_operario2 = idCatalogoPendienteImport($conexion, $operarios, "OPERARIOS", "nombre_operario", $operario2, 'nuevo operario', 'peletizado');
+    $id_color     = idCatalogoPendienteImport($conexion, $colores,   "COLORES",   "nombre_color",    $color,     'nuevo color',    'peletizado');
+
+    $id_operario_sql  = ($id_operario === null) ? "NULL" : "'{$id_operario}'";
     $id_operario2_sql = ($id_operario2 === null) ? "NULL" : "'{$id_operario2}'";
     $id_color_sql      = ($id_color === null) ? "NULL" : "'{$id_color}'";
 
@@ -118,7 +126,7 @@ foreach ($filas as $data) {
                     (id_sheet,fecha_peletizado,id_maquina,id_turno,id_operario,id_operario2,id_color,
                     alta_retal,baja,refiltrado,soplado,torta,limpieza,total,obs_peletizado)
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina','$id_turno','$id_operario',$id_operario2_sql,$id_color_sql,
+                    ('$id_sheet','$fecha','$id_maquina','$id_turno',$id_operario_sql,$id_operario2_sql,$id_color_sql,
                     '$alta_retal','$baja','$refiltrado','$soplado','$torta','$limpieza','$total_cat','$obs')
                 ON DUPLICATE KEY UPDATE
                     fecha_peletizado = VALUES(fecha_peletizado),
@@ -141,13 +149,13 @@ foreach ($filas as $data) {
                     (id_sheet,fecha_peletizado,id_maquina,id_turno,id_operario,id_operario2,id_color,
                     alta_retal,baja,refiltrado,soplado,torta,limpieza,total,obs_peletizado)
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina','$id_turno','$id_operario',$id_operario2_sql,$id_color_sql,
+                    ('$id_sheet','$fecha','$id_maquina','$id_turno',$id_operario_sql,$id_operario2_sql,$id_color_sql,
                     '$alta_retal','$baja','$refiltrado','$soplado','$torta','$limpieza','$total_cat','$obs')";
     }
     // Ejecutar inserción y actualizar progreso
-    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
+    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
 }
 
 // Mostrar contadores al final
-finalizarImportacion($conexion,'peletizado',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
+finalizarImportacion($conexion,'peletizado',$insertados,$actualizados,$duplicados,$omitidos,$total,$ultimo_id_sheet);
 ?>

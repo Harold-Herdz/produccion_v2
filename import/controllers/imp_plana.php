@@ -66,6 +66,7 @@ $contador     = 0;
 $insertados   = 0;
 $actualizados = 0;
 $duplicados   = 0;
+$omitidos     = 0;
 $nueva_fecha  = null;
 
 foreach ($filas as $data) {
@@ -80,10 +81,16 @@ foreach ($filas as $data) {
     $bultos      = (int)$data[7];
     $peso_total  = convertirNumero($data[8]);
 
-    // IDs de catálogos (o crear)
-    $id_operario       = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
-    $id_maquina        = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
-    $id_referencia_esp = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia);
+    // Máquina: catálogo cerrado, si no coincide se omite la fila
+    $id_maquina = idCatalogoCerrado($maquinas, $maquina);
+    if ($id_maquina === null) {
+        avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet, "máquina «{$maquina}» no existe en el catálogo");
+        continue;
+    }
+
+    // Operario y referencia especial: pendientes de revisión si son nuevos
+    $id_operario       = idCatalogoPendienteImport($conexion, $operarios,   "OPERARIOS",        "nombre_operario",       $operario,   'nuevo operario',           'plana');
+    $id_referencia_esp = idCatalogoPendienteImport($conexion, $referencias, "REFERENCIAS_ESP",  "nombre_referencia_esp", $referencia, 'nueva referencia especial', 'plana');
 
     // Modo todo: insertar/actualizar
     if ($modo === 'todo') {
@@ -112,9 +119,9 @@ foreach ($filas as $data) {
                     '$peso_rollo','$peso_retal','$bultos','$peso_total')";
     }
     // Ejecutar inserción y actualizar progreso
-    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
+    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
 }
 
 // Mostrar contadores al final
-finalizarImportacion($conexion,'plana',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
+finalizarImportacion($conexion,'plana',$insertados,$actualizados,$duplicados,$omitidos,$total,$ultimo_id_sheet);
 ?>

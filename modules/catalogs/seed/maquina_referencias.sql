@@ -1,4 +1,4 @@
--- Referencia x Máquina (por área) -- generado por Relaciones > Exportar el 2026-10-01 23:06
+-- Referencia x Máquina (por área) -- generado por Relaciones > Exportar el 2026-10-02 19:08
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 01', 'sellado', '10K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 01', 'sellado', '15K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 01', 'sellado', '20K');

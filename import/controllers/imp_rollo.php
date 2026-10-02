@@ -67,6 +67,7 @@ $contador     = 0;
 $insertados   = 0;
 $actualizados = 0;
 $duplicados   = 0;
+$omitidos     = 0;
 
 foreach ($filas as $data) {
     // Limpiar datos de la fila
@@ -79,11 +80,17 @@ foreach ($filas as $data) {
     $peso_rollo  = convertirNumero($data[6]);
     $peso_retal  = convertirNumero($data[7]);
 
-    // IDs de catálogos (o crear)
-    $id_operario   = $operarios[$operario]     ?? autoCrear($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario);
-    $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
-    $id_referencia = $referencias[$referencia] ?? autoCrear($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia);
-    $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
+    // Máquina: catálogo cerrado, si no coincide se omite la fila
+    $id_maquina = idCatalogoCerrado($maquinas, $maquina);
+    if ($id_maquina === null) {
+        avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet, "máquina «{$maquina}» no existe en el catálogo");
+        continue;
+    }
+
+    // Operario, referencia y color: pendientes de revisión si son nuevos
+    $id_operario   = idCatalogoPendienteImport($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario,   'nuevo operario',  'rollo');
+    $id_referencia = idCatalogoPendienteImport($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia, 'nueva referencia', 'rollo');
+    $id_color      = idCatalogoPendienteImport($conexion, $colores,     "COLORES",     "nombre_color",      $color,      'nuevo color',      'rollo');
 
     // Modo todo: insertar/actualizar
     if ($modo === 'todo') {
@@ -111,9 +118,9 @@ foreach ($filas as $data) {
                     '$id_referencia','$id_color','$peso_rollo','$peso_retal')";
     }
     // Ejecutar inserción y actualizar progreso
-    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
+    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
 }
 
 // Mostrar contadores al final
-finalizarImportacion($conexion,'rollo',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
+finalizarImportacion($conexion,'rollo',$insertados,$actualizados,$duplicados,$omitidos,$total,$ultimo_id_sheet);
 ?>

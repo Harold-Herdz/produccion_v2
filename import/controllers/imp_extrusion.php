@@ -70,6 +70,7 @@ $contador     = 0;
 $insertados   = 0;
 $actualizados = 0;
 $duplicados   = 0;
+$omitidos     = 0;
 
 foreach ($filas as $data) {
     // Limpiar datos de la fila
@@ -85,7 +86,19 @@ foreach ($filas as $data) {
     $rollos     = convertirNumero($data[8] ?? '');
     $peso_total = convertirNumero($data[9] ?? '');
 
-    // Turno: catálogo cerrado
+    // Máquina y operador: catálogos cerrados, si no coinciden se omite la fila
+    $id_maquina = idCatalogoCerrado($maquinas, $maquina);
+    if ($id_maquina === null) {
+        avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet, "máquina «{$maquina}» no existe en el catálogo");
+        continue;
+    }
+    $id_operador = idCatalogoCerrado($operadores, $operador);
+    if ($id_operador === null) {
+        avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet, "operador «{$operador}» no existe en el catálogo");
+        continue;
+    }
+
+    // Turno: catálogo cerrado también, pero se guarda la fila sin turno
     // El Sheet trae "Día"/"Tarde"/"Noche"/"18 Horas"
     $mapaTurnoExt = ['dia' => 'Día', 'día' => 'Día', 'tarde' => 'Tarde', 'noche' => 'Noche', '18 horas' => '18 Horas'];
     $nombreTurno = $mapaTurnoExt[strtolower(trim($turno))] ?? null;
@@ -93,27 +106,24 @@ foreach ($filas as $data) {
     $id_turno_sql = ($id_turno === null) ? "NULL" : "'{$id_turno}'";
     if ($id_turno === null) {
         $logMsg = addslashes("⚠ Turno no reconocido «{$turno}» · {$id_sheet}: guardado sin turno");
-        echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,'$logMsg','dup');</script>\n";
+        echo "<script>tick($contador,$total,$insertados,$actualizados,$duplicados,$omitidos,'$logMsg','dup');</script>\n";
         if (ob_get_level()) ob_flush();
         flush();
     }
 
-    // IDs de catálogos (o crear)
-    $id_maquina    = $maquinas[$maquina]       ?? autoCrear($conexion, $maquinas,    "MAQUINAS",    "nombre_maquina",    $maquina);
-    $id_operador   = $operadores[$operador]    ?? autoCrear($conexion, $operadores,  "OPERADORES",  "nombre_operador",   $operador);
     // Referencia normal o especial (el Sheet trae solo el nombre). Solo las
     // «…K» viven en REFERENCIAS; cualquier otra (ya exista o no) va a
-    // REFERENCIAS_ESP, nunca se crea una nueva en REFERENCIAS.
+    // REFERENCIAS_ESP, pendiente de revisión si es nueva.
     $id_referencia = $referencias[$referencia] ?? null;
     $id_referencia_esp = null;
     if ($id_referencia === null) {
-        $id_referencia_esp = $referenciasEsp[$referencia] ?? autoCrear($conexion, $referenciasEsp, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia);
+        $id_referencia_esp = idCatalogoPendienteImport($conexion, $referenciasEsp, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia, 'nueva referencia especial', 'extrusion');
     }
     $id_referencia_sql     = ($id_referencia === null) ? "NULL" : "'{$id_referencia}'";
     $id_referencia_esp_sql = ($id_referencia_esp === null) ? "NULL" : "'{$id_referencia_esp}'";
-    $id_color      = $colores[$color]          ?? autoCrear($conexion, $colores,     "COLORES",     "nombre_color",      $color);
-    // Lámina P opcional (vacía = sin lámina)
-    $id_lamina_p   = ($lamina === '') ? null : ($laminas[$lamina] ?? autoCrear($conexion, $laminas, "LAMINA_P", "nombre_lamina_p", $lamina));
+    // Color y lámina P: pendientes de revisión si son nuevos (lámina es opcional)
+    $id_color      = idCatalogoPendienteImport($conexion, $colores, "COLORES",  "nombre_color",    $color,  'nuevo color', 'extrusion');
+    $id_lamina_p   = idCatalogoPendienteImport($conexion, $laminas, "LAMINA_P", "nombre_lamina_p", $lamina, 'nueva lámina P', 'extrusion');
     $id_lamina_sql = ($id_lamina_p === null) ? "NULL" : "'{$id_lamina_p}'";
 
     // Modo todo: insertar/actualizar
@@ -145,9 +155,9 @@ foreach ($filas as $data) {
                     $id_referencia_sql,$id_referencia_esp_sql,'$id_color',$id_lamina_sql,'$rollos','$peso_total')";
     }
     // Ejecutar inserción y actualizar progreso
-    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$ultimo_id_sheet);
+    procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
 }
 
 // Mostrar contadores al final
-finalizarImportacion($conexion,'extrusion',$insertados,$actualizados,$duplicados,$total,$ultimo_id_sheet);
+finalizarImportacion($conexion,'extrusion',$insertados,$actualizados,$duplicados,$omitidos,$total,$ultimo_id_sheet);
 ?>

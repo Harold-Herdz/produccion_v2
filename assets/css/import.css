@@ -193,7 +193,7 @@ body {
 =========================== */
 #stats {
   display: none;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-bottom: 4px;
 }
@@ -201,7 +201,7 @@ body {
   display: grid;
 }
 .st.tot {
-  grid-column: span 3;
+  grid-column: span 2;
 }
 .st {
   background: var(--fondo-superficie);
@@ -230,6 +230,9 @@ body {
   color: var(--azul-oscuro);
 }
 .st.dup .v {
+  color: var(--azul-oscuro);
+}
+.st.omit .v {
   color: var(--azul-oscuro);
 }
 .st.tot .v,
@@ -309,6 +312,9 @@ body {
   color: var(--azul-oscuro);
 }
 .lr.dup .t {
+  color: var(--warning);
+}
+.lr.omit .t {
   color: var(--warning);
 }
 

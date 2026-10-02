@@ -18,7 +18,7 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 <title>Importando <?php echo $titulo; ?></title>
     <!-- Fuente y estilos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/import.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/import.css?v=<?= filemtime(dirname(__DIR__, 2) . '/assets/css/import.css') ?>">
 
 </head>
 <body>
@@ -76,6 +76,11 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
                     <div class="l">Duplicados</div>
                 </div>
 
+                <div class="st omit">
+                    <div class="v" id="s-omit">0</div>
+                    <div class="l">Omitidos</div>
+                </div>
+
                 <div class="st tot">
                     <div class="v" id="s-tot">0</div>
                     <div class="l">Total</div>
@@ -103,4 +108,4 @@ require_once dirname(__DIR__, 2) . '/includes/config.php';
 
 <!-- URL de retorno y scripts -->
 <script>window.VOLVER_URL = '<?php echo $volver_url; ?>';</script>
-<script src="<?= BASE_URL ?>/import/scripts/import.js"></script>
+<script src="<?= BASE_URL ?>/import/scripts/import.js?v=<?= filemtime(dirname(__DIR__) . '/scripts/import.js') ?>"></script>

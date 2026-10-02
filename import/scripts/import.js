@@ -7,11 +7,12 @@ function up(pct, msg) {
     document.getElementById('status-lbl').textContent  = 'Procesando';
 }
 // Actualizar contadores y log
-function tick(cur, total, ok, upd, dup, msgLog, type) {
+function tick(cur, total, ok, upd, dup, omit, msgLog, type) {
     // Actualizar contadores de estado
-    document.getElementById('s-ok').textContent  = ok;
-    document.getElementById('s-upd').textContent = upd;
-    document.getElementById('s-dup').textContent = dup;
+    document.getElementById('s-ok').textContent   = ok;
+    document.getElementById('s-upd').textContent  = upd;
+    document.getElementById('s-dup').textContent  = dup;
+    document.getElementById('s-omit').textContent = omit;
     document.getElementById('counter').textContent = cur + ' / ' + total + ' registros';
 
     // Calcular y mostrar progreso
@@ -32,7 +33,7 @@ function tick(cur, total, ok, upd, dup, msgLog, type) {
     log.scrollTop = log.scrollHeight;
 }
 // Finalizar importación y mostrar resumen
-function done(ok, upd, dup, total) {
+function done(ok, upd, dup, omit, total) {
     // Completar barra de progreso
     document.getElementById('fill').style.width        = '100%';
     document.getElementById('pct').textContent         = '100';
@@ -41,10 +42,11 @@ function done(ok, upd, dup, total) {
     document.getElementById('status-lbl').textContent  = 'Completado';
 
     // Mostrar estadísticas finales
-    document.getElementById('s-ok').textContent  = ok;
-    document.getElementById('s-upd').textContent = upd;
-    document.getElementById('s-dup').textContent = dup;
-    document.getElementById('s-tot').textContent = total;
+    document.getElementById('s-ok').textContent   = ok;
+    document.getElementById('s-upd').textContent  = upd;
+    document.getElementById('s-dup').textContent  = dup;
+    document.getElementById('s-omit').textContent = omit;
+    document.getElementById('s-tot').textContent  = total;
 
     // Mostrar controles finales
     document.getElementById('stats').classList.add('show');
