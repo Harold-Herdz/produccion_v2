@@ -1,4 +1,4 @@
--- Operarios (OPERARIOS) -- generado por Catalogos > Exportar el 2026-10-02 23:31
+-- Operarios (OPERARIOS) -- generado por Catalogos > Exportar el 2026-10-06 18:55
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Adriana', 0, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Alejandra', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Alejandro', 1, 0);
@@ -18,6 +18,7 @@ INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Camilo',
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Carlos', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Cristian', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Danna', 1, 0);
+INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Dayana', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Daza', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Duglas', 1, 0);
 INSERT INTO OPERARIOS (nombre_operario, estado, es_supervisor) VALUES ('Gervis', 1, 0);
