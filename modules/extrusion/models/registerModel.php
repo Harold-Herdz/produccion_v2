@@ -141,9 +141,14 @@ function buscarPlanillaExtrusion($conexion, $codigo, $idMaquina){
     return $stmt->get_result()->fetch_assoc();
 }
 
-// Planillas abiertas (para continuar)
-function planillasAbiertasExtrusion($conexion){
-    return $conexion->query(sqlPlanillaExtrusion() . " WHERE p.estado = 'abierta' ORDER BY p.creado_en DESC")->fetch_all(MYSQLI_ASSOC);
+// Planillas abiertas (para continuar), opcionalmente de una sola máquina
+function planillasAbiertasExtrusion($conexion, $idMaquina = null){
+    $sql = sqlPlanillaExtrusion() . " WHERE p.estado = 'abierta'";
+    if($idMaquina){
+        $sql .= " AND p.id_maquina = " . (int) $idMaquina;
+    }
+    $sql .= " ORDER BY p.creado_en DESC";
+    return $conexion->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
 // Finalizadas por máquina y fecha

@@ -95,4 +95,4 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Jumbo ZPG',
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('King Kong', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Mediana', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('N N', 1);
-INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('ZP6 Jumbo', 0);
+

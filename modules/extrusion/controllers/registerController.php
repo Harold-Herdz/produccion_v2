@@ -28,7 +28,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
     foreach(operadoresExtrusion($conexion) as $o){ if((int) $o['id_operador'] === $idOperador){ $operador = $o; } }
 
     if(!$maquina || !$turno || !$operador){
-        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode('Completa máquina, turno y operador.'));
+        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode('Completa máquina, turno y operador.')
+            . '&id_maquina=' . $idMaquina);
         exit;
     }
 
@@ -36,7 +37,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
     $existente = buscarPlanillaExtrusion($conexion, $codigo, $idMaquina);
     if($existente && $existente['estado'] === 'finalizada'){
         header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} de {$maquina['nombre_maquina']} ya fue finalizado.")
-            . '&reabrir_id=' . $existente['id_planilla']);
+            . '&reabrir_id=' . $existente['id_planilla'] . '&id_maquina=' . $idMaquina);
         exit;
     }
     // La BD local puede haberse reiniciado y no recordarlo: Google es la fuente
@@ -58,7 +59,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
 ================================================= */
 if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'cancelar'){
     cancelarPlanillaExtrusion($conexion, (int) ($_POST['id'] ?? 0));
-    header('Location: ' . $rutaRegister);
+    $idMaquinaCancelada = (int) ($_POST['id_maquina'] ?? 0);
+    header('Location: ' . $rutaRegister . ($idMaquinaCancelada ? '?id_maquina=' . $idMaquinaCancelada : ''));
     exit;
 }
 
@@ -118,11 +120,17 @@ if(isset($_GET['id'])){
 }
 
 if(!$planilla){
-    // Sin planilla: formulario de inicio + turnos abiertos
-    $maquinas    = maquinasExtrusion($conexion);
-    $turnos      = turnosCatalogoExtrusion($conexion);
-    $operadores  = operadoresExtrusion($conexion);
-    $abiertas    = planillasAbiertasExtrusion($conexion);
+    // Sin planilla: primero elegir máquina, luego fecha/turno/operador
+    $maquinas = maquinasExtrusion($conexion);
+    $idMaquina = (int) ($_GET['id_maquina'] ?? 0);
+    $maquinaSeleccionada = null;
+    foreach($maquinas as $m){ if((int) $m['id_maquina'] === $idMaquina){ $maquinaSeleccionada = $m; } }
+
+    if($maquinaSeleccionada){
+        $turnos      = turnosCatalogoExtrusion($conexion);
+        $operadores  = operadoresExtrusion($conexion);
+    }
+    $abiertas = planillasAbiertasExtrusion($conexion, $maquinaSeleccionada ? $idMaquina : null);
     return;
 }
 

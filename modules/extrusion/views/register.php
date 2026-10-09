@@ -19,11 +19,11 @@ if(!function_exists('opcionesCatalogoExtrusion')){
 }
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css?v=<?= filemtime(dirname(__DIR__, 3) . '/assets/css/register.css') ?>">
 
 <?php if(!$planilla): ?>
 
-<!-- Formulario de inicio de turno -->
+<!-- Formulario de inicio: máquina, luego turno -->
 <div class="container container-formulario" id="containerRegister" data-sel-zona="formulario">
     <h2 class="titulo-vista">Registro de Producción · Extrusión</h2>
 
@@ -33,15 +33,36 @@ if(!function_exists('opcionesCatalogoExtrusion')){
             <div class="aviso-toast-barra" id="avisoInicioBarra"></div>
         </div>
 
-        <form class="form-inicio" method="POST" action="<?= BASE_URL ?>/modules/extrusion/views/register.php">
-            <input type="hidden" name="accion" value="iniciar">
-
+        <?php $reabrirId = (int) ($_GET['reabrir_id'] ?? 0); ?>
+        <?php if(!$maquinaSeleccionada): ?>
+        <!-- Paso 1: elegir máquina -->
+        <form class="form-inicio" id="formElegirMaquina">
             <div class="campo">
                 <label>Máquina</label>
-                <select name="id_maquina" required>
+                <select id="selMaquinaInicio" required>
                     <option value=""></option>
                     <?= opcionesCatalogoExtrusion($maquinas, 'id_maquina', 'nombre_maquina') ?>
                 </select>
+            </div>
+            <button type="button" class="btn" id="btnSiguienteMaquina">Siguiente</button>
+        </form>
+        <script>
+        document.getElementById('btnSiguienteMaquina').addEventListener('click', function () {
+            var v = document.getElementById('selMaquinaInicio').value;
+            if (!v) return;
+            window.location.href = 'register.php?id_maquina=' + v;
+        });
+        </script>
+        <?php else: ?>
+        <!-- Paso 2: fecha, turno y operador -->
+        <form class="form-inicio" method="POST" action="<?= BASE_URL ?>/modules/extrusion/views/register.php">
+            <input type="hidden" name="accion" value="iniciar">
+            <input type="hidden" name="id_maquina" value="<?= (int) $maquinaSeleccionada['id_maquina'] ?>">
+
+            <div class="campo">
+                <label>Máquina</label>
+                <input type="text" value="<?= htmlspecialchars($maquinaSeleccionada['nombre_maquina']) ?>" readonly>
+                <a class="cambiar-maquina" href="<?= BASE_URL ?>/modules/extrusion/views/register.php">Cambiar máquina</a>
             </div>
 
             <div class="campo">
@@ -68,7 +89,7 @@ if(!function_exists('opcionesCatalogoExtrusion')){
             <button type="submit" class="btn" id="btnIniciar">Iniciar planilla</button>
         </form>
 
-        <?php $reabrirId = (int) ($_GET['reabrir_id'] ?? 0); if($reabrirId > 0): ?>
+        <?php if($reabrirId > 0): ?>
         <form id="formReabrir" method="POST" action="<?= BASE_URL ?>/modules/extrusion/views/register.php" hidden>
             <input type="hidden" name="accion" value="reabrir">
             <input type="hidden" name="id" value="<?= $reabrirId ?>">
@@ -82,10 +103,11 @@ if(!function_exists('opcionesCatalogoExtrusion')){
             <input type="hidden" name="id_operador" value="<?= (int) ($_GET['id_operador'] ?? 0) ?>">
         </form>
         <?php endif; ?>
+        <?php endif; ?>
     </div>
 
     <?php if(!empty($abiertas)): ?>
-    <!-- Turnos abiertos para continuar -->
+    <!-- Turnos abiertos (de todas las máquinas si aún no se eligió una) -->
     <div class="card ext-abiertas">
         <h3 class="ext-subtitulo">Turnos abiertos</h3>
         <?php foreach($abiertas as $a): ?>
@@ -231,23 +253,10 @@ if(!function_exists('opcionesCatalogoExtrusion')){
         <form method="POST" id="formCancelarTurno" class="form-cancelar">
             <input type="hidden" name="accion" value="cancelar">
             <input type="hidden" name="id" value="<?= (int) $planilla['id_planilla'] ?>">
+            <input type="hidden" name="id_maquina" value="<?= (int) $planilla['id_maquina'] ?>">
             <button type="submit" class="btn btn-cancelar-turno">Cancelar</button>
         </form>
         <button type="button" class="btn btn-finalizar" id="btnFinalizar">Finalizar turno</button>
-    </div>
-</div>
-
-<!-- Modal de confirmación de finalización -->
-<div class="overlay" id="modalFinalizar">
-    <div class="modal">
-        <div class="modal-header">
-            <h2>Confirmar finalización</h2>
-            <button type="button" onclick="cerrarModal('modalFinalizar')">X</button>
-        </div>
-        <div class="btn-row">
-            <button type="button" class="btn" id="btnConfirmarFinalizar">Sí</button>
-            <button type="button" class="btn btn-cancelar" onclick="cerrarModal('modalFinalizar')">No</button>
-        </div>
     </div>
 </div>
 
@@ -259,7 +268,7 @@ if(!function_exists('opcionesCatalogoExtrusion')){
         </div>
         <div class="btn-row">
             <a class="btn" id="btnVerPdf" href="#" target="_blank">Ver PDF</a>
-            <a class="btn" id="btnNuevaPlanilla" href="<?= BASE_URL ?>/modules/extrusion/views/register.php">Nueva planilla</a>
+            <a class="btn" id="btnNuevaPlanilla" href="<?= BASE_URL ?>/modules/extrusion/views/register.php?id_maquina=<?= (int) $planilla['id_maquina'] ?>">Nueva planilla</a>
         </div>
     </div>
 </div>
@@ -272,6 +281,6 @@ if(!function_exists('opcionesCatalogoExtrusion')){
     'maxPesos' => 10,
     'rollosConfirmados' => $planilla['rollos_confirmados'] !== null ? (int) $planilla['rollos_confirmados'] : null,
 ], JSON_HEX_TAG) ?>;</script>
-<script src="<?= BASE_URL ?>/modules/extrusion/scripts/register.js"></script>
+<script src="<?= BASE_URL ?>/modules/extrusion/scripts/register.js?v=<?= filemtime(dirname(__DIR__) . '/scripts/register.js') ?>"></script>
 
 <?php include dirname(__DIR__, 3) . '/templates/footer.php'; ?>

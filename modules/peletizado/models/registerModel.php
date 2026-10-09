@@ -101,9 +101,14 @@ function buscarPlanillaPeletizado($conexion, $codigo, $idMaquina){
     return $stmt->get_result()->fetch_assoc();
 }
 
-// Planillas abiertas (para continuar)
-function planillasAbiertasPeletizado($conexion){
-    return $conexion->query(sqlPlanillaPeletizado() . " WHERE p.estado = 'abierta' ORDER BY p.creado_en DESC")->fetch_all(MYSQLI_ASSOC);
+// Planillas abiertas (para continuar), opcionalmente de una sola máquina
+function planillasAbiertasPeletizado($conexion, $idMaquina = null){
+    $sql = sqlPlanillaPeletizado() . " WHERE p.estado = 'abierta'";
+    if($idMaquina){
+        $sql .= " AND p.id_maquina = " . (int) $idMaquina;
+    }
+    $sql .= " ORDER BY p.creado_en DESC";
+    return $conexion->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
 // Finalizadas por máquina y fecha (para armar el PDF del día completo)
@@ -208,10 +213,7 @@ function normalizarBorradorPeletizado($conexion, array $borrador){
         : ($mapas['operario'][$v] ?? null);
 
     $idOp1 = (string) ($borrador['id_operario'] ?? '');
-    $operario1 = $idOp1 !== '' ? $valorOp($idOp1) : null;
-    if($operario1 === null || $operario1 === ''){
-        return ['filas' => [], 'error' => 'Elige el operario 1.'];
-    }
+    $operario1 = $idOp1 !== '' ? ($valorOp($idOp1) ?? '') : '';
     $idOp2 = (string) ($borrador['id_operario2'] ?? '');
     $operario2 = $idOp2 !== '' ? ($valorOp($idOp2) ?? '') : '';
 

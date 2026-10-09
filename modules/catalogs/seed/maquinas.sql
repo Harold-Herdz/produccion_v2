@@ -1,4 +1,4 @@
--- Máquinas (MAQUINAS) -- generado por Catalogos > Exportar el 2026-10-06 18:55
+-- Máquinas (MAQUINAS) -- generado por Catalogos > Exportar el 2026-10-08 15:53
 INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 01', 1);
 INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 02', 1);
 INSERT INTO MAQUINAS (nombre_maquina, estado) VALUES ('Máquina 03', 1);

@@ -40,6 +40,7 @@
         caja.className = "dlg-caja" + (opciones.tipo === "error" ? " dlg-peligro" : "");
         tituloEl.textContent = opciones.titulo || (opciones.tipo === "error" ? "Atención" : "Aviso");
         mensajeEl.textContent = mensaje;
+        mensajeEl.style.display = ""; // por si quedó oculto de una confirmación anterior sin mensaje
         accionesEl.innerHTML = "";
         return new Promise(function (resolve) {
             const bOk = boton(opciones.boton || "Aceptar", "dlg-btn-principal");
@@ -56,7 +57,8 @@
         construir();
         caja.className = "dlg-caja" + (opciones.peligro ? " dlg-peligro" : "");
         tituloEl.textContent = opciones.titulo || "Confirmar";
-        mensajeEl.textContent = mensaje;
+        mensajeEl.textContent = mensaje || "";
+        mensajeEl.style.display = mensaje ? "" : "none";
         accionesEl.innerHTML = "";
         return new Promise(function (resolve) {
             const bNo = boton(opciones.textoNo || "No", "dlg-btn-secundario");

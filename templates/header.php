@@ -21,7 +21,7 @@ require_once dirname(__DIR__) . '/includes/config.php';
     <?php } ?>
 
     <script src="<?= BASE_URL ?>/assets/js/keepScroll.js"></script>
-    <script src="<?= BASE_URL ?>/assets/js/dialog.js"></script>
+    <script src="<?= BASE_URL ?>/assets/js/dialog.js?v=<?= filemtime(dirname(__DIR__) . '/assets/js/dialog.js') ?>"></script>
     <script src="<?= BASE_URL ?>/assets/js/selectBuscable.js"></script>
 
 </head>
@@ -146,6 +146,18 @@ require_once dirname(__DIR__) . '/includes/config.php';
                 <?php } ?>
                 <a href="<?= BASE_URL ?>/modules/peletizado/views/register.php">Planilla</a>
                 <a href="<?= BASE_URL ?>/modules/peletizado/views/history.php">Historial</a>
+            </div>
+
+            <p class="side-menu-title">Mezclas</p>
+
+            <!-- Modulo Mezclas -->
+            <div class="side-menu-module">
+                <span class="side-menu-module-name">Mezclas</span>
+                <?php if($_SESSION['rol'] == 'admin'){ ?>
+                    <a href="<?= BASE_URL ?>/modules/mezclas/views/dashboard.php">Panel</a>
+                <?php } ?>
+                <a href="<?= BASE_URL ?>/modules/mezclas/views/register.php">Planilla</a>
+                <a href="<?= BASE_URL ?>/modules/mezclas/views/history.php">Historial</a>
             </div>
         </div>
 

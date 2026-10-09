@@ -243,27 +243,24 @@ if (listaColores) {
     /* =========================================
        FINALIZAR
     ========================================= */
-    const btnConfirmar = document.getElementById("btnConfirmarFinalizar");
-
     btnFinalizar.addEventListener("click", async () => {
+        if (finalizando) return;
         if (!(await guardar())) {
             await mostrarAviso("No se pudo guardar el turno. Revisa la conexión e intenta de nuevo.", { tipo: "error" });
             return;
         }
-        abrirModal("modalFinalizar");
-    });
+        const ok = await mostrarConfirmacion("", { titulo: "Confirmar finalización", textoSi: "Sí" });
+        if (!ok) return;
 
-    btnConfirmar.addEventListener("click", async () => {
         finalizando = true;
         clearTimeout(temporizador);
-        btnConfirmar.disabled = true;
         btnFinalizar.disabled = true;
-        btnConfirmar.textContent = "Procesando…";
+        const textoOriginal = btnFinalizar.textContent;
+        btnFinalizar.textContent = "Procesando…";
         const restaurarBoton = () => {
             finalizando = false;
-            btnConfirmar.disabled = false;
             btnFinalizar.disabled = false;
-            btnConfirmar.textContent = "Sí";
+            btnFinalizar.textContent = textoOriginal;
         };
 
         try {
@@ -274,14 +271,12 @@ if (listaColores) {
             });
             const data = await res.json();
             if (!data.ok) {
-                cerrarModal("modalFinalizar");
                 await mostrarAviso(data.error || "No se pudo finalizar el turno.", { tipo: "error" });
                 restaurarBoton();
                 return;
             }
 
             sinGuardar = false;
-            cerrarModal("modalFinalizar");
             const verPdf = document.getElementById("btnVerPdf");
             if (data.pdf_url) {
                 verPdf.href = data.pdf_url;
@@ -294,7 +289,6 @@ if (listaColores) {
             abrirModal("modalResultado");
 
         } catch (e) {
-            cerrarModal("modalFinalizar");
             await mostrarAviso("Error de conexión al finalizar. Intenta de nuevo.", { tipo: "error" });
             restaurarBoton();
         }

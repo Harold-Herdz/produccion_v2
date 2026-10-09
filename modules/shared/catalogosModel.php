@@ -57,6 +57,21 @@ function obtenerMaquinasConReferencias($conexion, $nombreArea){
     return ['maquinas' => $maquinas, 'mapaJs' => $mapaJs];
 }
 
+// Máquinas de un área, sin referencias (ej: Mezclas)
+function obtenerMaquinasDeArea($conexion, $nombreArea){
+    $stmt = $conexion->prepare("
+        SELECT m.id_maquina, m.nombre_maquina
+        FROM maquinas m
+        JOIN maquina_areas ma ON ma.id_maquina = m.id_maquina
+        JOIN areas a ON a.id_area = ma.id_area
+        WHERE m.estado = 1 AND a.nombre_area = ?
+        ORDER BY CAST(REGEXP_SUBSTR(m.nombre_maquina, '[0-9]+') AS UNSIGNED)
+    ");
+    $stmt->bind_param('s', $nombreArea);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
 // Colores activos
 function obtenerColoresOrdenados($conexion){
     $res = $conexion->query("

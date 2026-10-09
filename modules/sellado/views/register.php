@@ -80,7 +80,7 @@ if(!function_exists('celdasEntradaPlanilla')){
 }
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css?v=<?= filemtime(dirname(__DIR__, 3) . '/assets/css/register.css') ?>">
 
 <?php if(!$planilla): ?>
 
@@ -302,20 +302,6 @@ if(!function_exists('celdasEntradaPlanilla')){
 
 </div>
 
-<!-- Modal de confirmación de finalización -->
-<div class="overlay" id="modalFinalizar">
-    <div class="modal">
-        <div class="modal-header">
-            <h2>Confirmar finalización</h2>
-            <button type="button" onclick="cerrarModal('modalFinalizar')">X</button>
-        </div>
-        <div class="btn-row">
-            <button type="button" class="btn" id="btnConfirmarFinalizar">Sí</button>
-            <button type="button" class="btn btn-cancelar" onclick="cerrarModal('modalFinalizar')">No</button>
-        </div>
-    </div>
-</div>
-
 <!-- Modal de resultado -->
 <div class="overlay" id="modalResultado">
     <div class="modal">
@@ -332,6 +318,6 @@ if(!function_exists('celdasEntradaPlanilla')){
 <!-- Scripts -->
 <script src="<?= BASE_URL ?>/modules/shared/global.js"></script>
 <script>const mapaReferenciasMaquina = <?= json_encode($mapaReferenciasMaquina, JSON_HEX_TAG) ?>;</script>
-<script src="<?= BASE_URL ?>/modules/sellado/scripts/register.js"></script>
+<script src="<?= BASE_URL ?>/modules/sellado/scripts/register.js?v=<?= filemtime(dirname(__DIR__) . '/scripts/register.js') ?>"></script>
 
 <?php include dirname(__DIR__, 3) . '/templates/footer.php'; ?>

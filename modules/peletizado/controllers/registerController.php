@@ -25,14 +25,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
     foreach(turnosCatalogoPeletizado($conexion) as $t){ if((int) $t['id_turno'] === $idTurno){ $turno = $t; } }
 
     if(!$maquina || !$turno){
-        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode('Completa máquina, fecha y turno.'));
+        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode('Completa máquina, fecha y turno.')
+            . '&id_maquina=' . $idMaquina);
         exit;
     }
 
     $codigo = construirCodigoPeletizado($fecha, $turno['nombre_turno']);
     $existente = buscarPlanillaPeletizado($conexion, $codigo, $idMaquina);
     if($existente && $existente['estado'] === 'finalizada'){
-        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} de {$maquina['nombre_maquina']} ya fue finalizado."));
+        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} de {$maquina['nombre_maquina']} ya fue finalizado.")
+            . '&id_maquina=' . $idMaquina);
         exit;
     }
     // La BD local puede haberse reiniciado y no recordarlo: Google es la fuente
@@ -40,7 +42,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
     if(!$existente && appScriptConfiguradoPeletizado()
         && turnoYaEnRegistrosPeletizado($fecha, $maquina['nombre_maquina'], $turno['nombre_turno'])
     ){
-        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} de {$maquina['nombre_maquina']} ya fue finalizado."));
+        header('Location: ' . $rutaRegister . '?reg_error=' . urlencode("El turno {$codigo} de {$maquina['nombre_maquina']} ya fue finalizado.")
+            . '&id_maquina=' . $idMaquina);
         exit;
     }
     $planilla = $existente ?: crearPlanillaPeletizado($conexion, $fecha, $idTurno, $turno['nombre_turno'], $idMaquina);
@@ -53,7 +56,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'inicia
 ================================================= */
 if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'cancelar'){
     cancelarPlanillaPeletizado($conexion, (int) ($_POST['id'] ?? 0));
-    header('Location: ' . $rutaRegister);
+    $idMaquinaCancelada = (int) ($_POST['id_maquina'] ?? 0);
+    header('Location: ' . $rutaRegister . ($idMaquinaCancelada ? '?id_maquina=' . $idMaquinaCancelada : ''));
     exit;
 }
 
@@ -69,10 +73,16 @@ if(isset($_GET['id'])){
 }
 
 if(!$planilla){
-    // Sin planilla: formulario de inicio + turnos abiertos
+    // Sin planilla: primero elegir máquina, luego fecha/turno
     $maquinas = maquinasPeletizado($conexion);
-    $turnos   = turnosCatalogoPeletizado($conexion);
-    $abiertas = planillasAbiertasPeletizado($conexion);
+    $idMaquina = (int) ($_GET['id_maquina'] ?? 0);
+    $maquinaSeleccionada = null;
+    foreach($maquinas as $m){ if((int) $m['id_maquina'] === $idMaquina){ $maquinaSeleccionada = $m; } }
+
+    if($maquinaSeleccionada){
+        $turnos = turnosCatalogoPeletizado($conexion);
+    }
+    $abiertas = planillasAbiertasPeletizado($conexion, $maquinaSeleccionada ? $idMaquina : null);
     return;
 }
 

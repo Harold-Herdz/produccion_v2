@@ -8,7 +8,6 @@ if (planilla) {
     const indicador    = document.getElementById("indicadorGuardado");
     const zonaAvisos    = document.getElementById("zonaAvisos");
     const btnFinalizar  = document.getElementById("btnFinalizar");
-    const btnConfirmar   = document.getElementById("btnConfirmarFinalizar");
     const inputFecha     = document.getElementById("fechaPlanilla");
     const spanCodigo     = document.getElementById("codigoPlanilla");
     const notaGeneral    = document.getElementById("notaGeneral");
@@ -321,21 +320,19 @@ if (planilla) {
     /* =========================================
        FINALIZAR TURNO
     ========================================= */
-    btnFinalizar.addEventListener("click", () => {
-        if (!finalizando) abrirModal("modalFinalizar");
-    });
-
-    btnConfirmar.addEventListener("click", async () => {
+    btnFinalizar.addEventListener("click", async () => {
         if (finalizando) return;               // anti doble clic
+        const ok = await mostrarConfirmacion("", { titulo: "Confirmar finalización", textoSi: "Sí" });
+        if (!ok) return;
+
         finalizando = true;
-        btnConfirmar.disabled = true;
         btnFinalizar.disabled = true;
-        btnConfirmar.textContent = "Procesando…";
+        const textoOriginal = btnFinalizar.textContent;
+        btnFinalizar.textContent = "Procesando…";
         const restaurarBoton = () => {
             finalizando = false;
-            btnConfirmar.disabled = false;
             btnFinalizar.disabled = false;
-            btnConfirmar.textContent = "Sí";
+            btnFinalizar.textContent = textoOriginal;
         };
 
         try {
@@ -355,7 +352,6 @@ if (planilla) {
             // Éxito: limpiar borrador local
             sinGuardar = false;
             try { sessionStorage.removeItem(notaKey); } catch (e) {}
-            cerrarModal("modalFinalizar");
 
             const verPdf = document.getElementById("btnVerPdf");
             if (data.pdf_url) {

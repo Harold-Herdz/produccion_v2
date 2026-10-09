@@ -1,4 +1,4 @@
--- Color x Área -- generado por Relaciones > Exportar el 2026-10-06 18:09
+-- Color x Área -- generado por Relaciones > Exportar el 2026-10-08 15:53
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Aguapanelo', 'peletizado');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Amarillo', 'sellado');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Amarillo', 'rollo');
@@ -30,6 +30,8 @@ INSERT INTO COLOR_AREAS (color, area) VALUES ('Negro', 'sellado');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Negro', 'rollo');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Negro', 'extrusion');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Negro', 'peletizado');
+INSERT INTO COLOR_AREAS (color, area) VALUES ('Negro R', 'sellado');
+INSERT INTO COLOR_AREAS (color, area) VALUES ('Negro R', 'rollo');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('P.P', 'peletizado');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('P.P Azul', 'peletizado');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('P.P Gris', 'peletizado');
@@ -58,5 +60,3 @@ INSERT INTO COLOR_AREAS (color, area) VALUES ('Verde', 'sellado');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Verde', 'rollo');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Verde', 'extrusion');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Verde', 'peletizado');
-INSERT INTO COLOR_AREAS (color, area) VALUES ('Negro R', 'sellado');
-INSERT INTO COLOR_AREAS (color, area) VALUES ('Negro R', 'rollo');

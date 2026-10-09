@@ -1,4 +1,4 @@
--- Referencias (REFERENCIAS) -- generado por Catalogos > Exportar el 2026-10-06 18:55
+-- Referencias (REFERENCIAS) -- generado por Catalogos > Exportar el 2026-10-08 15:53
 INSERT INTO REFERENCIAS (nombre_referencia, estado) VALUES ('1,5K', 1);
 INSERT INTO REFERENCIAS (nombre_referencia, estado) VALUES ('10K', 1);
 INSERT INTO REFERENCIAS (nombre_referencia, estado) VALUES ('15K', 1);

@@ -22,6 +22,40 @@
 #modalRegistrar .aviso-error {
   margin-top: 14px;
 }
+
+/* ===========================
+   MODAL "SELECCIONAR MÁQUINA" (antes de iniciar planilla)
+=========================== */
+#modalMaquina .modal {
+  background: var(--fondo-superficie);
+}
+#modalMaquina .overlay-maquina-texto {
+  margin: 10px 0 16px;
+  font-size: 14px;
+  color: var(--texto-secundario);
+}
+#modalMaquina select,
+#modalMaquina .sel-buscador {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 18px;
+}
+.cambiar-maquina {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radio-s);
+  border: 1px solid var(--azul-oscuro);
+  color: var(--azul-oscuro);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transicion);
+}
+.cambiar-maquina:hover {
+  background: var(--azul-oscuro);
+  color: var(--texto-claro);
+}
 .form-inicio .campo {
   margin-bottom: 16px;
 }
@@ -71,7 +105,8 @@
 .form-inicio input.campo-libre {
   margin-top: 8px;
 }
-.form-inicio #btnIniciar {
+.form-inicio #btnIniciar,
+.form-inicio #btnSiguienteMaquina {
   width: 100%;
   display: block;
   font-size: 16px;
@@ -1087,4 +1122,88 @@
     padding: 6px;
     font-size: 12px;
   }
+}
+
+/* ===========================
+   MEZCLAS: CABECERA (OPERARIO / REFERENCIA)
+=========================== */
+.mez-tabla-cabecera th:nth-child(1),
+.mez-tabla-cabecera td:nth-child(1),
+.mez-tabla-cabecera th:nth-child(2),
+.mez-tabla-cabecera td:nth-child(2) {
+  width: 50%;
+}
+.mez-tabla-cabecera td input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  font-size: 14px;
+}
+
+/* ===========================
+   MEZCLAS: TABLAS ANGOSTAS CON UNIDAD AL LADO
+=========================== */
+.mez-tabla {
+  width: 100%;
+  table-layout: fixed;
+}
+.mez-tabla td {
+  padding: 10px 6px;
+  white-space: nowrap;
+}
+.mez-tabla th {
+  padding: 9px 4px;
+  font-size: 11px;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.25;
+}
+.mez-celda {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.mez-celda input {
+  width: 52px;
+  box-sizing: border-box;
+  padding: 7px 4px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  font-size: 14px;
+  text-align: center;
+}
+.mez-celda input:focus {
+  border-color: var(--azul-oscuro);
+  outline: none;
+}
+.mez-unidad {
+  font-size: 11px;
+  color: var(--texto-secundario);
+}
+.mez-tabla-wrap {
+  overflow-x: auto;
+}
+.mez-tabla-wrap + .mez-tabla-wrap {
+  margin-top: 4px;
+}
+
+/* Tabla 2: mezcla números angostos + observaciones en texto libre, más ancha */
+.mez-tabla-mixta th:last-child,
+.mez-tabla-mixta td:last-child {
+  width: 30%;
+}
+.mez-input-texto {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 8px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-s);
+  font-size: 14px;
+}
+.mez-input-texto:focus {
+  border-color: var(--azul-oscuro);
+  outline: none;
 }

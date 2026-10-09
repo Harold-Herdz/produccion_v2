@@ -1,0 +1,18 @@
+<?php
+/** @var mysqli $conexion */
+
+// Importar conexion.php
+require_once dirname(__DIR__, 3) . '/includes/conexion.php';
+// Importar historyModel.php
+require_once dirname(__DIR__) . '/models/historyModel.php';
+
+// ID a editar
+$id = $_GET['id'];
+$fila = obtenerProduccionPorId($conexion, $id);
+
+// Catálogos del formulario
+$operarios = obtenerOperarios($conexion);
+
+$maquinas = obtenerMaquinas($conexion);
+
+$referencias = obtenerReferencias($conexion);
