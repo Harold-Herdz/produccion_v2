@@ -297,7 +297,7 @@ function resolverLibreExtrusion($conexion, $tipo, $texto, array &$cache){
         return $cache[$clave];
     }
     if($tipo === 'ref'){
-        // Si ya existe (normal o especial) se usa; si no, "… ESP" va a especiales
+        // Si ya existe (normal o especial) se usa tal cual
         foreach([['referencias', 'nombre_referencia'], ['referencias_esp', 'nombre_referencia_esp']] as [$tabla, $col]){
             $stmt = $conexion->prepare("SELECT {$col} AS n FROM {$tabla} WHERE {$col} = ? LIMIT 1");
             $stmt->bind_param('s', $texto);
@@ -305,9 +305,11 @@ function resolverLibreExtrusion($conexion, $tipo, $texto, array &$cache){
             $fila = $stmt->get_result()->fetch_assoc();
             if($fila){ return $cache[$clave] = $fila['n']; }
         }
-        $esEsp = (bool) preg_match('/\bESP$/i', $texto);
-        $def = $esEsp ? ['referencias_esp', 'id_referencia_esp', 'nombre_referencia_esp'] : ['referencias', 'id_referencia', 'nombre_referencia'];
-        $etiqueta = 'nueva referencia';
+        // Referencias es un catálogo cerrado (solo los que ya existen, p.ej.
+        // los que terminan en K): cualquier valor nuevo SIEMPRE se crea en
+        // referencias especiales, nunca aquí.
+        $def = ['referencias_esp', 'id_referencia_esp', 'nombre_referencia_esp'];
+        $etiqueta = 'nueva referencia especial';
     } elseif($tipo === 'color'){
         $def = ['colores', 'id_color', 'nombre_color'];
         $etiqueta = 'nuevo color';

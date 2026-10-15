@@ -402,11 +402,11 @@ function guardarPlanilla($conexion, $planilla, $maquinas, $final = false){
                 );
                 $idReferencia = null;
             } else {
-                [$idReferencia, $avisoRef] = resolverValorCatalogo(
-                    $conexion, 'referencias', 'id_referencia', 'nombre_referencia',
-                    $ent['id_referencia'] ?? '', 'nueva referencia', "Máquina {$maqEtiqueta}", 'sellado'
+                // Catálogo cerrado: un valor nuevo ("Otro") nunca se crea en
+                // referencias, siempre en referencias especiales.
+                [$idReferencia, $idReferenciaEsp, $avisoRef] = resolverReferenciaCerrada(
+                    $conexion, $ent['id_referencia'] ?? '', 'nueva referencia especial', "Máquina {$maqEtiqueta}", 'sellado'
                 );
-                $idReferenciaEsp = null;
             }
             if($avisoRef){ $avisos[] = $avisoRef; }
             if($diferir($ent['id_color'] ?? '')){

@@ -1,4 +1,4 @@
--- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-10-06 18:55
+-- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-10-15 22:21
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('1,5K ESP', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x1,5', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x100', 1);
@@ -76,13 +76,16 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('65x1,2', 1)
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('65x100', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('65x88', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('65x90', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('70x0,90', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('70x0,94', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('70x1', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('70x104', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('70x90', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('72x3,7', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x1,10', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x1,15', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x1,2', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('88x1,15', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('88x1,18', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('88x1,2', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('90x1,10', 1);
@@ -95,4 +98,3 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Jumbo ZPG',
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('King Kong', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Mediana', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('N N', 1);
-

@@ -21,12 +21,14 @@ $sql_base = "FROM PRODUCCION_MEZCLA p
 LEFT JOIN OPERARIOS o ON p.id_operario = o.id_operario
 LEFT JOIN MAQUINAS m ON p.id_maquina = m.id_maquina
 LEFT JOIN REFERENCIAS ref ON p.id_referencia = ref.id_referencia
+LEFT JOIN REFERENCIAS_ESP refesp ON p.id_referencia_esp = refesp.id_referencia_esp
 WHERE 1=1";
 
 // Filtro de búsqueda
 if(!empty($busqueda)){
     $sql_base .= " AND (
         ref.nombre_referencia LIKE '%$busqueda%' OR
+        refesp.nombre_referencia_esp LIKE '%$busqueda%' OR
         o.nombre_operario LIKE '%$busqueda%' OR
         m.nombre_maquina LIKE '%$busqueda%' OR
         p.id_sheet LIKE '%$busqueda%' OR
@@ -51,7 +53,7 @@ $total_paginas = ceil($total_registros / $limite);
 $sql = "SELECT p.*,
             o.nombre_operario,
             m.nombre_maquina,
-            ref.nombre_referencia
+            COALESCE(ref.nombre_referencia, refesp.nombre_referencia_esp) AS nombre_referencia
         $sql_base
         ORDER BY p.id DESC
         LIMIT $inicio, $limite";
@@ -70,7 +72,7 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
         'id_referencia' => $_POST['id_referencia'],
         'observaciones' => $_POST['observaciones'],
     ];
-    foreach(array_merge(array_keys(columnasTabla1MezclaHistorial()), array_keys(columnasTabla2MezclaHistorial())) as $col){
+    foreach(array_keys(columnasMezclaHistorial()) as $col){
         $datos[$col] = $_POST[$col] ?? '';
     }
 

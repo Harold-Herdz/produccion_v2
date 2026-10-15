@@ -52,3 +52,6 @@ $res_tabla_referencia = obtenerTablaReferenciasMezcla($conexion,$desde,$hasta);
 // Variación entre meses (cantidad de mezclas registradas)
 $diferencia = $registros_mes2 - $registros_mes1;
 $porcentaje = ($registros_mes1 > 0) ? (($diferencia / $registros_mes1) * 100) : 0;
+
+// Última importación desde la hoja REGISTROS
+$ultimo_id_sheet = obtenerUltimaImportacionMezcla($conexion);

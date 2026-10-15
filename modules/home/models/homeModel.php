@@ -158,6 +158,26 @@ function homeModulos()
             'tabla_dims_defecto' => ['fecha', 'maquina'],
             'operario_col' => ['id_operario', 'id_operario2'],
         ],
+        'mezclas' => [
+            'etiqueta'  => 'Mezclas',
+            'tabla'     => 'PRODUCCION_MEZCLA',
+            'fecha'     => 'fecha_mezcla',
+            'url'       => '/modules/mezclas/views/dashboard.php',
+            'uniones'   => $uniones,
+            // Mezclas no es un módulo de producción (no suma kg ni paquetes):
+            // la única estadística que importa es cuántas mezclas se hicieron
+            // por referencia. Nada de sumar colores/kg, sería inventar datos.
+            'dims'      => $fechas('fecha_mezcla') + [
+                'referencia' => $referencia,
+            ],
+            'medidas'   => [
+                'cantidad' => ['etiqueta' => 'Mezclas', 'expr' => 'COUNT(*)', 'eje' => 'y', 'color' => '#3f9d5c', 'defecto' => true],
+            ],
+            'principal' => 'cantidad',
+            'columnas'  => ['cantidad'],
+            'tabla_dims_defecto' => ['referencia'],
+            'operario_col' => 'id_operario',
+        ],
     ];
 
     // Medidas en orden de columnas
@@ -299,6 +319,7 @@ function homeHojas()
         'plana'     => ['id' => '1DO_G6MHfoMagMMEOUOipTiE6W1UC-65f7BamJZQwGSc', 'gid_registros' => '1759801026'],
         'extrusion' => ['id' => '1TLsQx_s9tWBjJwuPm9xseJfsDQbKDQNQKOK9lf9Xezk', 'gid_registros' => '1284283091', 'gid_import' => '1583688034'],
         'peletizado' => ['id' => '1GDmQDnOrJGoipBT5Cd26uYwd6My32YIJBZOpoDn5jEY', 'gid_registros' => '1650985044'],
+        'mezclas'    => ['id' => '10JvKK9SVouBV5qo7PUt23aQDbf-GWGU-YdcQ0LkquC8', 'gid_registros' => '0'],
     ];
 }
 
@@ -320,6 +341,7 @@ function homeCarpetaPdfs($modulo)
         'rollo'     => 'https://drive.google.com/drive/folders/1GB7rr6TarxERg0TfA7SfF8-Xb7phbSyw?usp=sharing',
         'plana'     => 'https://drive.google.com/drive/folders/192yKfIMnbpEb2i8DRMw2cOdwTVCp9wvw?usp=sharing',
         'extrusion' => 'https://drive.google.com/drive/folders/1x9vnygja6Pv4S9pA8tbm-1sGzM75-m2b?usp=sharing',
+        'mezclas'   => 'https://drive.google.com/drive/folders/1XN5tyFlcgA4bnH3xjmJW0ffGn8lbg4lU?usp=sharing',
     ];
     return ($carpetas[$modulo] ?? '') ?: null;
 }
@@ -377,6 +399,7 @@ function homeSeguimiento()
         'plana'     => ['tabla' => 'PLANA_SHEET',     'abierto' => "estado = 'en_proceso'", 'cerrado' => "estado = 'completado'", 'etq_abierto' => 'Días en proceso',     'etq_cerrado' => 'Días cerrados'],
         'extrusion' => ['tabla' => 'EXTRUSION_SHEET', 'abierto' => "estado = 'abierta'",    'cerrado' => "estado = 'finalizada'", 'etq_abierto' => 'Planillas abiertas', 'etq_cerrado' => 'Planillas finalizadas'],
         'peletizado'=> ['tabla' => 'PELETIZADO_SHEET','abierto' => "estado = 'abierta'",    'cerrado' => "estado = 'finalizada'", 'etq_abierto' => 'Planillas abiertas', 'etq_cerrado' => 'Planillas finalizadas'],
+        'mezclas'   => ['tabla' => 'MEZCLA_SHEET',    'abierto' => "estado = 'abierta'",    'cerrado' => "estado = 'finalizada'", 'etq_abierto' => 'Planillas abiertas', 'etq_cerrado' => 'Planillas finalizadas'],
     ];
 }
 
@@ -494,17 +517,61 @@ function homeGeneral($conexion)
 {
     $desde = date('Y-m-01');
     $hasta = date('Y-m-d');
+    $hoy = date('Y-m-d');
+    $modulos = homeModulos();
     $mods = [];
     $totalRegistros = 0;
-    foreach (array_keys(homeModulos()) as $k) {
-        $mods[$k] = [
-            'mes'    => homeResumen($conexion, $k, $desde, $hasta),
-            'estado' => homeEstadoModulo($conexion, $k),
-        ];
-        $totalRegistros += $mods[$k]['estado']['total_registros'];
+    $registrosMes = 0;
+    $registrosHoy = 0;
+    $planillasAbiertas = 0;
+    $pdfsTotales = 0;
+    $modulosConImport = 0;
+    $modulosPorImportar = 0;
+    $estadoSistema = estadoSistemaLeer();
+
+    foreach ($modulos as $k => $mod) {
+        $mes = homeResumen($conexion, $k, $desde, $hasta);
+        $estado = homeEstadoModulo($conexion, $k);
+        $mods[$k] = ['mes' => $mes, 'estado' => $estado];
+
+        $totalRegistros += $estado['total_registros'];
+        $registrosMes += $mes['registros'];
+
+        $rHoy = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE {$mod['fecha']} = '{$hoy}'"));
+        $registrosHoy += (int) ($rHoy[0] ?? 0);
+
+        foreach ($estado['seguimiento'] as $s) {
+            // Solo las "planillas" propiamente dichas (Sellado/Extrusión/Peletizado/
+            // Mezclas); Rollo y Plana usan "Días en proceso", que se auto-cierra
+            // solo con el cambio de fecha y no es lo mismo que dejar algo a medias.
+            if ($s['etiqueta'] === 'Planillas abiertas') {
+                $planillasAbiertas += (int) $s['valor'];
+            }
+            if ($s['etiqueta'] === 'PDFs generados') {
+                $pdfsTotales += (int) $s['valor'];
+            }
+        }
+        if ($estado['importa']) {
+            $modulosConImport++;
+            // Lee la caché de "pendientes" ya calculada (no vuelve a leer el Sheet aquí)
+            $cache = $estadoSistema['pendientes'][$k] ?? null;
+            if ($cache && (int) ($cache['n'] ?? 0) > 0) {
+                $modulosPorImportar++;
+            }
+        }
     }
     $pend = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM CATALOGO_PENDIENTES WHERE decision = 'pendiente'"));
-    return ['modulos' => $mods, 'total_registros' => $totalRegistros, 'notificaciones' => (int) ($pend[0] ?? 0)];
+    return [
+        'modulos' => $mods,
+        'total_registros' => $totalRegistros,
+        'registros_mes' => $registrosMes,
+        'registros_hoy' => $registrosHoy,
+        'planillas_abiertas' => $planillasAbiertas,
+        'pdfs_totales' => $pdfsTotales,
+        'modulos_con_import' => $modulosConImport,
+        'modulos_por_importar' => $modulosPorImportar,
+        'notificaciones' => (int) ($pend[0] ?? 0),
+    ];
 }
 
 // Estado de catálogos

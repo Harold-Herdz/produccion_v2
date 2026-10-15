@@ -33,13 +33,21 @@ function doPost(e) {
     // ------------------------------------------------
     const idSolicitud = body.id_solicitud || '';
     const cache = CacheService.getScriptCache();
-    const yaProcesado = idSolicitud && cache.get('mz_' + idSolicitud);
+    const cacheKey = 'mz_' + idSolicitud;
+    const cacheado = idSolicitud ? cache.get(cacheKey) : null;
 
     const filas = body.registros || [];
-    if (filas.length > 0 && !yaProcesado) {
-      escribirRegistros(registros, filas);
+    let idSheetAsignado = null;
+    if (filas.length > 0) {
+      if (cacheado) {
+        idSheetAsignado = cacheado; // ya se había escrito antes: no duplicar, reusar el ID real
+      } else {
+        const destino = escribirRegistros(registros, filas);
+        SpreadsheetApp.flush();
+        idSheetAsignado = String(registros.getRange(destino, 1).getValue() || '') || null;
+        if (idSolicitud && idSheetAsignado) cache.put(cacheKey, idSheetAsignado, 21600);
+      }
     }
-    if (idSolicitud) cache.put('mz_' + idSolicitud, '1', 21600);
 
     // ------------------------------------------------
     // LOGS (fila del día y la máquina)
@@ -56,7 +64,7 @@ function doPost(e) {
     }
 
     SpreadsheetApp.flush();
-    return json({ ok: true, registros: filas.length, pdf_url: pdfUrl });
+    return json({ ok: true, registros: filas.length, pdf_url: pdfUrl, id_sheet: idSheetAsignado });
 
   } catch (err) {
     return json({ ok: false, error: String(err) });
@@ -64,13 +72,15 @@ function doPost(e) {
 }
 
 // ------------------------------------------------
-// REGISTROS
+// REGISTROS. Devuelve la fila (1-based) donde se escribió, para poder leer
+// de vuelta el ID SHEET real que calcula la columna A de esa fila.
 // ------------------------------------------------
 function escribirRegistros(registros, filas) {
   filas.forEach(function (f) { f[0] = isoADate(f[0]); });
   const destino = ultimaFilaConDatos(registros, 2) + 1;
   registros.getRange(destino, 2, filas.length, filas[0].length).setValues(filas);
   registros.getRange(destino, 2, filas.length, 1).setNumberFormat('dd/mm/yyyy');
+  return destino;
 }
 
 // ------------------------------------------------

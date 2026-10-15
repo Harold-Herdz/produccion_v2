@@ -150,10 +150,11 @@ function buscarPlanillaAbiertaMezcla($conexion, $codigo, $idMaquina){
 // Todas las mezclas ya finalizadas de un día+máquina, con nombres (para el PDF agregado)
 function obtenerMezclasDelDiaMezcla($conexion, $fecha, $idMaquina){
     $stmt = $conexion->prepare("
-        SELECT p.*, o.nombre_operario, r.nombre_referencia
+        SELECT p.*, o.nombre_operario, COALESCE(r.nombre_referencia, re.nombre_referencia_esp) AS nombre_referencia
         FROM produccion_mezcla p
         LEFT JOIN operarios o ON o.id_operario = p.id_operario
         LEFT JOIN referencias r ON r.id_referencia = p.id_referencia
+        LEFT JOIN referencias_esp re ON re.id_referencia_esp = p.id_referencia_esp
         WHERE p.fecha_mezcla = ? AND p.id_maquina = ?
         ORDER BY p.id
     ");
@@ -206,10 +207,10 @@ function nombreCatalogoMezcla($conexion, $tabla, $columnaId, $columnaNombre, $id
 function guardarMezcla($conexion, $idSheet, $datos){
     $columnas = array_merge(array_keys(columnasTabla1Mezcla()), array_keys(columnasTabla2Mezcla()), array_keys(columnasTabla3Mezcla()));
 
-    $campos = ['id_sheet','fecha_mezcla','id_maquina','id_operario','id_referencia','observaciones'];
-    $placeholders = ['?','?','?','?','?','?'];
-    $tipos = 'ssiiis';
-    $valores = [$idSheet, $datos['fecha'], $datos['id_maquina'], $datos['id_operario'], $datos['id_referencia'], $datos['observaciones']];
+    $campos = ['id_sheet','fecha_mezcla','id_maquina','id_operario','id_referencia','id_referencia_esp','observaciones'];
+    $placeholders = ['?','?','?','?','?','?','?'];
+    $tipos = 'ssiiiis';
+    $valores = [$idSheet, $datos['fecha'], $datos['id_maquina'], $datos['id_operario'], $datos['id_referencia'], $datos['id_referencia_esp'] ?? null, $datos['observaciones']];
 
     foreach($columnas as $col){
         $campos[] = $col;
@@ -221,5 +222,14 @@ function guardarMezcla($conexion, $idSheet, $datos){
     $sql = 'INSERT INTO PRODUCCION_MEZCLA (' . implode(',', $campos) . ') VALUES (' . implode(',', $placeholders) . ')';
     $stmt = $conexion->prepare($sql);
     $stmt->bind_param($tipos, ...$valores);
+    $stmt->execute();
+    return $conexion->insert_id;
+}
+
+// Reemplaza el id_sheet temporal por el real de la hoja REGISTROS (columna A,
+// p.ej. "MZ00287"), una vez que Apps Script confirma cuál le tocó a esta fila.
+function renombrarIdSheetMezcla($conexion, $idRegistro, $idSheetReal){
+    $stmt = $conexion->prepare("UPDATE produccion_mezcla SET id_sheet = ? WHERE id = ?");
+    $stmt->bind_param('si', $idSheetReal, $idRegistro);
     $stmt->execute();
 }

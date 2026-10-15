@@ -45,12 +45,17 @@ if($valorOperario !== '' && $valorOperario !== 'otro' && is_numeric($valorOperar
 $idMaquina     = (int) ($entrada['id_maquina'] ?? 0);
 $nombreMaquina = $idMaquina ? nombreCatalogo($conexion, 'maquinas', 'id_maquina', 'nombre_maquina', $idMaquina) : null;
 
-// Referencia: id o texto Otro
-[$idReferencia, $avisoReferencia] = resolverValorCatalogo(
-    $conexion, 'referencias', 'id_referencia', 'nombre_referencia',
-    $entrada['id_referencia'] ?? '', 'nueva referencia', '', 'rollo'
+// Referencia: id o texto Otro (catálogo cerrado; lo nuevo va siempre a especiales)
+[$idReferencia, $idReferenciaEsp, $avisoReferencia] = resolverReferenciaCerrada(
+    $conexion, $entrada['id_referencia'] ?? '', 'nueva referencia especial', '', 'rollo'
 );
-$nombreReferencia = $idReferencia ? nombreCatalogo($conexion, 'referencias', 'id_referencia', 'nombre_referencia', $idReferencia) : null;
+if($idReferencia){
+    $nombreReferencia = nombreCatalogo($conexion, 'referencias', 'id_referencia', 'nombre_referencia', $idReferencia);
+} elseif($idReferenciaEsp){
+    $nombreReferencia = nombreCatalogo($conexion, 'referencias_esp', 'id_referencia_esp', 'nombre_referencia_esp', $idReferenciaEsp);
+} else {
+    $nombreReferencia = null;
+}
 
 // Color: id o texto Otro
 [$idColor, $avisoColor] = resolverValorCatalogo(

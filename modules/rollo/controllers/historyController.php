@@ -24,6 +24,7 @@ $sql_base = "FROM PRODUCCION_ROLLO r
 LEFT JOIN OPERARIOS o ON r.id_operario = o.id_operario
 LEFT JOIN MAQUINAS m ON r.id_maquina = m.id_maquina
 LEFT JOIN REFERENCIAS ref ON r.id_referencia = ref.id_referencia
+LEFT JOIN REFERENCIAS_ESP refesp ON r.id_referencia_esp = refesp.id_referencia_esp
 LEFT JOIN COLORES c ON r.id_color = c.id_color
 WHERE 1=1";
 
@@ -31,6 +32,7 @@ WHERE 1=1";
 if(!empty($busqueda)){
     $sql_base .= " AND (
         ref.nombre_referencia LIKE '%$busqueda%' OR
+        refesp.nombre_referencia_esp LIKE '%$busqueda%' OR
         o.nombre_operario LIKE '%$busqueda%' OR
         m.nombre_maquina LIKE '%$busqueda%' OR
         c.nombre_color LIKE '%$busqueda%' OR
@@ -55,10 +57,10 @@ $total_registros = $total_fila['total'];
 $total_paginas = ceil($total_registros / $limite);
 
 // Consulta final paginada
-$sql = "SELECT r.*, 
+$sql = "SELECT r.*,
             o.nombre_operario,
             m.nombre_maquina,
-            ref.nombre_referencia,
+            COALESCE(ref.nombre_referencia, refesp.nombre_referencia_esp) AS nombre_referencia,
             c.nombre_color
         $sql_base
         ORDER BY r.id DESC

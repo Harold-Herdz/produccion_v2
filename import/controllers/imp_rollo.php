@@ -57,10 +57,11 @@ if (ob_get_level()) ob_flush(); flush();
 echo "<script>document.getElementById('msg').textContent='Cargando catálogos…';</script>\n";
 if (ob_get_level()) ob_flush(); flush();
 
-$operarios   = cargarCatalogo($conexion, "OPERARIOS",   "nombre_operario",   "id_operario");
-$maquinas    = cargarCatalogo($conexion, "MAQUINAS",    "nombre_maquina",    "id_maquina");
-$referencias = cargarCatalogo($conexion, "REFERENCIAS", "nombre_referencia", "id_referencia");
-$colores     = cargarCatalogo($conexion, "COLORES",     "nombre_color",      "id_color");
+$operarios      = cargarCatalogo($conexion, "OPERARIOS",   "nombre_operario",   "id_operario");
+$maquinas       = cargarCatalogo($conexion, "MAQUINAS",    "nombre_maquina",    "id_maquina");
+$referencias    = cargarCatalogo($conexion, "REFERENCIAS", "nombre_referencia", "id_referencia");
+$referenciasEsp = cargarCatalogo($conexion, "REFERENCIAS_ESP", "nombre_referencia_esp", "id_referencia_esp");
+$colores        = cargarCatalogo($conexion, "COLORES",     "nombre_color",      "id_color");
 
 // Contadores de resultado
 $contador     = 0;
@@ -87,35 +88,45 @@ foreach ($filas as $data) {
         continue;
     }
 
-    // Operario, referencia y color: pendientes de revisión si son nuevos
-    $id_operario   = idCatalogoPendienteImport($conexion, $operarios,   "OPERARIOS",   "nombre_operario",   $operario,   'nuevo operario',  'rollo');
-    $id_referencia = idCatalogoPendienteImport($conexion, $referencias, "REFERENCIAS", "nombre_referencia", $referencia, 'nueva referencia', 'rollo');
-    $id_color      = idCatalogoPendienteImport($conexion, $colores,     "COLORES",     "nombre_color",      $color,      'nuevo color',      'rollo');
+    // Operario y color: pendientes de revisión si son nuevos
+    $id_operario = idCatalogoPendienteImport($conexion, $operarios, "OPERARIOS", "nombre_operario", $operario, 'nuevo operario', 'rollo');
+    $id_color    = idCatalogoPendienteImport($conexion, $colores,   "COLORES",   "nombre_color",    $color,    'nuevo color',    'rollo');
+
+    // Referencia: catálogo cerrado (REFERENCIAS). Si el texto no coincide con
+    // una ya existente, SIEMPRE se resuelve/crea en REFERENCIAS_ESP, nunca aquí.
+    $id_referencia = $referencias[$referencia] ?? null;
+    $id_referencia_esp = null;
+    if ($id_referencia === null && trim((string) $referencia) !== '') {
+        $id_referencia_esp = idCatalogoPendienteImport($conexion, $referenciasEsp, "REFERENCIAS_ESP", "nombre_referencia_esp", $referencia, 'nueva referencia especial', 'rollo');
+    }
+    $id_referencia_sql     = ($id_referencia === null) ? "NULL" : "'{$id_referencia}'";
+    $id_referencia_esp_sql = ($id_referencia_esp === null) ? "NULL" : "'{$id_referencia_esp}'";
 
     // Modo todo: insertar/actualizar
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_ROLLO
                     (id_sheet,fecha_rollo,id_operario,id_maquina,
-                    id_referencia,id_color,peso_rollo,peso_retal)
+                    id_referencia,id_referencia_esp,id_color,peso_rollo,peso_retal)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina',
-                    '$id_referencia','$id_color','$peso_rollo','$peso_retal')
+                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$peso_rollo','$peso_retal')
                 ON DUPLICATE KEY UPDATE
-                    fecha_rollo   = VALUES(fecha_rollo),
-                    id_operario   = VALUES(id_operario),
-                    id_maquina    = VALUES(id_maquina),
-                    id_referencia = VALUES(id_referencia),
-                    id_color      = VALUES(id_color),
-                    peso_rollo    = VALUES(peso_rollo),
-                    peso_retal    = VALUES(peso_retal)";
+                    fecha_rollo       = VALUES(fecha_rollo),
+                    id_operario       = VALUES(id_operario),
+                    id_maquina        = VALUES(id_maquina),
+                    id_referencia     = VALUES(id_referencia),
+                    id_referencia_esp = VALUES(id_referencia_esp),
+                    id_color          = VALUES(id_color),
+                    peso_rollo        = VALUES(peso_rollo),
+                    peso_retal        = VALUES(peso_retal)";
     // Modo nuevos: solo insertar
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_ROLLO
                     (id_sheet,fecha_rollo,id_operario,id_maquina,
-                    id_referencia,id_color,peso_rollo,peso_retal)
+                    id_referencia,id_referencia_esp,id_color,peso_rollo,peso_retal)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina',
-                    '$id_referencia','$id_color','$peso_rollo','$peso_retal')";
+                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$peso_rollo','$peso_retal')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);

@@ -24,34 +24,44 @@ function obtenerReferencias($conexion){
     );
 }
 
-// Columnas de valor de cada tabla (para pintar resumen e historial)
-function columnasTabla1MezclaHistorial(){
+// Todas las columnas numéricas de una mezcla, en el orden de la hoja REGISTROS.
+// Se usan para armar el resumen de cada fila en el historial (solo lo que
+// tiene dato), nunca como columnas fijas: la mayoría quedan vacías siempre.
+function columnasMezclaHistorial(){
     return [
-        'blanco_r' => 'BLANCO R', 'negro_r' => 'NEGRO R', 'rojo_r' => 'ROJO R', 'amarillo_r' => 'AMARILLO R',
-        'azul_r' => 'AZUL R', 'verde_r' => 'VERDE R', 'naranja_r' => 'NARANJA R', 'marron_r' => 'MARRÓN R', 'ladrillo_r' => 'LADRILLO R',
-        'original_b' => 'ORIGINAL B', 'fg' => 'FG', 'master' => 'MASTER', 'lineal' => 'LINEAL',
-    ];
-}
-function columnasTabla2MezclaHistorial(){
-    return [
-        'deshidratante' => 'DESHIDRATANTE',
-        'p_blanco' => 'P. BLANCO', 'p_negro' => 'P. NEGRO', 'p_rojo' => 'P. ROJO', 'p_amarillo' => 'P. AMARILLO',
-        'p_azul' => 'P. AZUL', 'p_verde' => 'P. VERDE', 'p_naranja' => 'P. NARANJA',
-        'p_marron' => 'P. MARRÓN', 'p_ladrillo' => 'P. LADRILLO',
+        'blanco_r' => ['Blanco R', 'x25'], 'negro_r' => ['Negro R', 'x25'], 'rojo_r' => ['Rojo R', 'x25'],
+        'amarillo_r' => ['Amarillo R', 'x25'], 'azul_r' => ['Azul R', 'x25'], 'verde_r' => ['Verde R', 'x25'],
+        'naranja_r' => ['Naranja R', 'x25'], 'marron_r' => ['Marrón R', 'x25'], 'ladrillo_r' => ['Ladrillo R', 'x25'],
+        'original_b' => ['Original B', 'x25'], 'fg' => ['FG', 'x25'], 'master' => ['Master', 'x25'], 'lineal' => ['Lineal', 'x25'],
+        'deshidratante' => ['Deshidratante', 'kg'],
+        'p_blanco' => ['P. Blanco', 'kg'], 'p_negro' => ['P. Negro', 'kg'], 'p_rojo' => ['P. Rojo', 'kg'],
+        'p_amarillo' => ['P. Amarillo', 'kg'], 'p_azul' => ['P. Azul', 'kg'], 'p_verde' => ['P. Verde', 'kg'],
+        'p_naranja' => ['P. Naranja', 'kg'], 'p_marron' => ['P. Marrón', 'kg'], 'p_ladrillo' => ['P. Ladrillo', 'kg'],
     ];
 }
 
-// Resumen de una fila: "Blanco R: 1x25, Master: 1x25"
-function resumenTablaMezcla($fila, $columnas, $unidad){
+// Valor de un campo ya formateado: "4x25", "17 kg", o vacío si no tiene dato
+function celdaValorMezclaHistorial($valor, $unidad){
+    if($valor === null || $valor === ''){
+        return '';
+    }
+    $num = (float) $valor;
+    $texto = (floor($num) == $num) ? (string) (int) $num : (string) $num;
+    $separador = ($unidad === 'x25') ? '' : ' ';
+    return $texto . $separador . $unidad;
+}
+
+// Resumen de una fila: solo los campos con dato, uno por línea
+// ("Blanco R: 4x25", "Original B: 6x25", "P. Blanco: 17 kg"...)
+function resumenMezclaHistorial($fila){
     $partes = [];
-    foreach($columnas as $col => $etiqueta){
-        if($fila[$col] !== null && $fila[$col] !== ''){
-            $valor = (float) $fila[$col];
-            $texto = (floor($valor) == $valor) ? (string) (int) $valor : (string) $valor;
-            $partes[] = $etiqueta . ': ' . $texto . $unidad;
+    foreach(columnasMezclaHistorial() as $col => [$etiqueta, $unidad]){
+        $valor = celdaValorMezclaHistorial($fila[$col] ?? null, $unidad);
+        if($valor !== ''){
+            $partes[] = $etiqueta . ': ' . $valor;
         }
     }
-    return $partes ? implode(', ', $partes) : '—';
+    return $partes ? implode('<br>', $partes) : '—';
 }
 
 /* =================================================
@@ -65,7 +75,7 @@ function actualizarProduccion($conexion, $id, $datos){
         $valor = $datos[$clave];
         $set[] = "$c=" . ($valor === null ? 'NULL' : "'" . mysqli_real_escape_string($conexion, $valor) . "'");
     }
-    foreach(array_merge(array_keys(columnasTabla1MezclaHistorial()), array_keys(columnasTabla2MezclaHistorial())) as $col){
+    foreach(array_keys(columnasMezclaHistorial()) as $col){
         $valor = $datos[$col];
         $set[] = "$col=" . ($valor === null || $valor === '' ? 'NULL' : (float) $valor);
     }

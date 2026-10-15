@@ -99,3 +99,17 @@ function obtenerTablaReferenciasMezcla($conexion, $desde, $hasta){
             ORDER BY registros DESC";
     return mysqli_query($conexion, $sql);
 }
+
+/* =================================================
+   IMPORTACIÓN
+================================================= */
+// Último id_sheet importado desde la hoja REGISTROS
+function obtenerUltimaImportacionMezcla($conexion){
+    $sql = "SELECT ultimo_id_sheet FROM AREAS WHERE nombre_area = 'mezclas'";
+    $res = mysqli_query($conexion, $sql);
+    if(!$res){
+        return 'Ninguno';
+    }
+    $row = mysqli_fetch_assoc($res);
+    return $row['ultimo_id_sheet'] ?? 'Ninguno';
+}

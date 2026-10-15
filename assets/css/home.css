@@ -44,6 +44,7 @@
   box-shadow: var(--sombra-card-hover);
 }
 .home-kpi-general {
+  grid-column: 1 / -1;
   background: var(--verde-claro);
   border-left-color: var(--verde-oscuro);
   cursor: default !important;
@@ -86,6 +87,19 @@
 .home-linea.alerta .home-linea-val { color: var(--danger); }
 .home-linea-val.ok,
 .home-linea.ok .home-linea-val { color: var(--verde-oscuro); }
+
+/* Tarjeta General: estadísticas en varias columnas (no una lista larga) */
+.home-lineas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 24px;
+}
+@media (max-width: 900px) {
+  .home-lineas-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .home-lineas-grid { grid-template-columns: 1fr; }
+}
 
 /* ===========================
    SECCIÓN POR MÓDULO

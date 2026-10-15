@@ -82,14 +82,18 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
         }
     }
 
-    // Referencia: id o texto Otro (opcional, puede quedar vacía)
-    [$idReferencia, $avisoReferencia] = resolverValorCatalogo(
-        $conexion, 'referencias', 'id_referencia', 'nombre_referencia',
-        $_POST['id_referencia'] ?? '', 'nueva referencia', '', 'mezclas'
+    // Referencia: id o texto Otro (opcional; catálogo cerrado, lo nuevo
+    // siempre se crea en referencias especiales, nunca en referencias)
+    [$idReferencia, $idReferenciaEsp, $avisoReferencia] = resolverReferenciaCerrada(
+        $conexion, $_POST['id_referencia'] ?? '', 'nueva referencia especial', '', 'mezclas'
     );
-    $nombreReferencia = $idReferencia
-        ? nombreCatalogoMezcla($conexion, 'referencias', 'id_referencia', 'nombre_referencia', $idReferencia)
-        : '';
+    if($idReferencia){
+        $nombreReferencia = nombreCatalogoMezcla($conexion, 'referencias', 'id_referencia', 'nombre_referencia', $idReferencia);
+    } elseif($idReferenciaEsp){
+        $nombreReferencia = nombreCatalogoMezcla($conexion, 'referencias_esp', 'id_referencia_esp', 'nombre_referencia_esp', $idReferenciaEsp);
+    } else {
+        $nombreReferencia = '';
+    }
     if($avisoReferencia){
         $aviso = $aviso ? $aviso . ' ' . $avisoReferencia : $avisoReferencia;
     }
@@ -97,7 +101,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
     // Columnas numéricas de las 2 tablas
     $datos = [
         'fecha' => $planilla['fecha_planilla'], 'id_maquina' => $planilla['id_maquina'],
-        'id_operario' => $idOperario, 'id_referencia' => $idReferencia,
+        'id_operario' => $idOperario, 'id_referencia' => $idReferencia, 'id_referencia_esp' => $idReferenciaEsp,
         'observaciones' => trim((string) ($_POST['observaciones'] ?? '')),
     ];
     foreach(array_merge(array_keys(columnasTabla1Mezcla()), array_keys(columnasTabla2Mezcla()), array_keys(columnasTabla3Mezcla())) as $col){
@@ -109,9 +113,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
         $datos[$col] = $valor;
     }
 
-    // Guardar primero: el PDF del día se arma leyendo todo lo ya guardado
+    // Guardar primero: el PDF del día se arma leyendo todo lo ya guardado.
+    // id_sheet es temporal: en cuanto Google confirme cuál le tocó en la hoja
+    // REGISTROS (columna A, p.ej. "MZ00287"), se renombra a ese mismo valor.
     $idSheet = idSheetMezcla($planilla['fecha_planilla'], $planilla['nombre_maquina'], $planilla['id_planilla']);
-    guardarMezcla($conexion, $idSheet, $datos);
+    $idRegistro = guardarMezcla($conexion, $idSheet, $datos);
 
     // PDF del día+máquina completo (puede traer más de una mezcla; solo columnas llenas)
     $mezclasDelDia = obtenerMezclasDelDiaMezcla($conexion, $planilla['fecha_planilla'], $planilla['id_maquina']);
@@ -163,6 +169,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
         ]);
         if(!empty($respuesta['ok'])){
             $rutaPdf = $respuesta['pdf_url'] ?? null;
+            $idSheetReal = trim((string) ($respuesta['id_sheet'] ?? ''));
+            if($idSheetReal !== '' && $idSheetReal !== $idSheet){
+                renombrarIdSheetMezcla($conexion, $idRegistro, $idSheetReal);
+            }
         }
     }
 

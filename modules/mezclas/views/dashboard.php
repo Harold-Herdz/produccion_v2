@@ -158,6 +158,9 @@ include dirname(__DIR__, 3) . '/templates/header.php';
 
     <hr class="seccion-divisor">
 
+    <!-- Botón de importar -->
+    <a class="btn" id="btnImportar" onclick="abrirModal('modalImportar')">Importar Registros</a>
+
     <!-- Sección de gráficos -->
     <div class="seccion-graficos">
 
@@ -293,6 +296,26 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         </table>
     </div>
 
+</div>
+
+<!-- Modal de importación -->
+<div class="overlay" id="modalImportar">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Importar Mezclas</h2>
+            <p>Último ID Importado: <strong><?php echo $ultimo_id_sheet; ?></strong></p>
+            <button id="cerrarBtn" onclick="cerrarModal('modalImportar')">X</button>
+        </div>
+        <!-- Opciones de importación -->
+        <div class="btn-row">
+            <a class="btn-nuevos" href="<?= BASE_URL ?>/import/controllers/imp_mezclas.php?modo=nuevos">
+                <div class="btn-text"><span class="btn-icon">🗲</span>Importar Nuevos<span class="btn-arrow">›</span></div>
+            </a>
+            <a class="btn-todo" href="<?= BASE_URL ?>/import/controllers/imp_mezclas.php?modo=todo">
+                <div class="btn-text"><span class="btn-icon">⟳</span>Reimportar Todo<span class="btn-arrow">›</span></div>
+            </a>
+        </div>
+    </div>
 </div>
 
  <!-- Scripts -->

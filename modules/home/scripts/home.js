@@ -9,7 +9,7 @@
     const BASE = panel.dataset.base;
     const CLAVE_ALMACEN = "homeEstado4:" + panel.dataset.usuario;
 
-    const ACENTOS = { sellado: "#2f7ec2", rollo: "#2f7ec2", plana: "#2f7ec2", extrusion: "#2f7ec2", peletizado: "#2f7ec2" }; // mismo azul en todos
+    const ACENTOS = { sellado: "#2f7ec2", rollo: "#2f7ec2", plana: "#2f7ec2", extrusion: "#2f7ec2", peletizado: "#2f7ec2", mezclas: "#2f7ec2" }; // mismo azul en todos
 
     const nf = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 2 });
     const fmt = n => nf.format(n);
@@ -162,14 +162,23 @@
             cont.innerHTML = "";
 
             // Tarjeta general
+            const totalModulos = Object.keys(meta).length;
             const gen = el("div", "home-kpi home-kpi-general");
             gen.appendChild(el("div", "home-kpi-titulo", "General"));
             gen.appendChild(el("div", "home-kpi-valor", fmt(r.total_registros)));
             gen.appendChild(el("div", "home-kpi-sub", "Registros totales"));
-            gen.appendChild(linea("Módulos", String(Object.keys(meta).length)));
-            gen.appendChild(linea("Notificaciones por revisar", String(r.notificaciones), r.notificaciones ? "alerta" : ""));
+
+            const grid = el("div", "home-lineas-grid");
+            grid.appendChild(linea("Módulos", String(totalModulos)));
+            grid.appendChild(linea("Registros este mes", fmt(r.registros_mes)));
+            grid.appendChild(linea("Registros hoy", fmt(r.registros_hoy)));
+            grid.appendChild(linea("Planillas abiertas", String(r.planillas_abiertas), r.planillas_abiertas ? "alerta" : "ok"));
+            grid.appendChild(linea("PDFs totales", fmt(r.pdfs_totales)));
+            grid.appendChild(linea("Notificaciones", String(r.notificaciones), r.notificaciones ? "alerta" : ""));
+            grid.appendChild(linea("Módulos por importar", String(r.modulos_por_importar), r.modulos_por_importar ? "alerta" : "ok"));
             const cat = linea("Catálogos por exportar", "…");
-            gen.appendChild(cat);
+            grid.appendChild(cat);
+            gen.appendChild(grid);
             cont.appendChild(gen);
             consulta({ accion: "catalogos" }).then(c => {
                 if (!c.ok) return;
@@ -453,7 +462,7 @@
         estado.graficos = estado.graficos || {};
         if (!estado.graficos[m]) {
             estado.graficos[m] = {
-                dim: "fecha", tipo: "bar",
+                dim: (meta[m].tabla_dims_defecto && meta[m].tabla_dims_defecto[0]) || "fecha", tipo: "bar",
                 series: meta[m].medidas.filter(x => x.defecto).map(x => x.clave),
                 rangoDesde: "", rangoHasta: "", filtros: {}
             };

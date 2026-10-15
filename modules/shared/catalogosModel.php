@@ -122,7 +122,11 @@ function normalizarNombreCatalogo($tabla, $texto){
     if($texto === '' || !in_array(strtolower($tabla), $tablasConNombre, true)){
         return $texto;
     }
-    return mb_convert_case($texto, MB_CASE_TITLE, 'UTF-8');
+    $texto = mb_convert_case($texto, MB_CASE_TITLE, 'UTF-8');
+    // MB_CASE_TITLE solo respeta la primera letra de cada palabra, así que
+    // "P.P Negro" queda "P.p Negro". La letra que sigue a un punto también
+    // debe quedar en mayúscula (p.ej. P.P, A.B.C), sin importar el texto original.
+    return preg_replace_callback('/\.(\p{L})/u', fn($m) => '.' . mb_strtoupper($m[1], 'UTF-8'), $texto);
 }
 
 // Buscar o crear en catálogo
@@ -170,6 +174,37 @@ function resolverValorCatalogo($conexion, $tabla, $colId, $colNombre, $valor, $e
         registrarCatalogoPendiente($conexion, $tabla, $id, $valor, $etiqueta, $contexto, $modulo);
     }
     return [$id, $aviso];
+}
+
+/* =================================================
+   REFERENCIAS: catálogo cerrado (1,5K, 2K... 50K). Nunca se crea un
+   registro nuevo ahí; cualquier valor nuevo (al elegir "Otro") va
+   siempre a REFERENCIAS_ESP. Usar esto en vez de resolverValorCatalogo
+   directo a 'referencias' en cualquier módulo.
+================================================= */
+// Devuelve [id_referencia, id_referencia_esp, aviso]
+function resolverReferenciaCerrada($conexion, $valor, $etiqueta = 'nueva referencia especial', $contexto = '', $modulo = ''){
+    $valor = trim((string) $valor);
+    if($valor === '' || $valor === 'otro'){
+        return [null, null, null];
+    }
+    if(is_numeric($valor)){
+        return [(int) $valor, null, null];
+    }
+    // ¿El texto ya coincide con una referencia existente (catálogo cerrado)?
+    $nombre = trim(preg_replace('/\s+/', ' ', $valor));
+    $stmt = $conexion->prepare("SELECT id_referencia FROM referencias WHERE nombre_referencia = ? LIMIT 1");
+    $stmt->bind_param('s', $nombre);
+    $stmt->execute();
+    $fila = $stmt->get_result()->fetch_assoc();
+    if($fila){
+        return [(int) $fila['id_referencia'], null, null];
+    }
+    [$idEsp, $aviso] = resolverValorCatalogo(
+        $conexion, 'referencias_esp', 'id_referencia_esp', 'nombre_referencia_esp',
+        $valor, $etiqueta, $contexto, $modulo
+    );
+    return [null, $idEsp, $aviso];
 }
 
 /* =================================================
