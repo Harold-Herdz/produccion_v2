@@ -1,4 +1,4 @@
--- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-10-15 22:21
+-- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-10-16 23:48
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('1,5K ESP', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x1,5', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x100', 1);
@@ -98,3 +98,4 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Jumbo ZPG',
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('King Kong', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Mediana', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('N N', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('N N ZPG', 1);

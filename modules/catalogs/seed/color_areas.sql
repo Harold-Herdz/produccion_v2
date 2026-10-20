@@ -1,4 +1,4 @@
--- Color x Área -- generado por Relaciones > Exportar el 2026-10-15 22:21
+-- Color x Área -- generado por Relaciones > Exportar el 2026-10-16 23:48
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Aguapanelo', 'peletizado');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Amarillo', 'sellado');
 INSERT INTO COLOR_AREAS (color, area) VALUES ('Amarillo', 'rollo');
