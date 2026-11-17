@@ -1,5 +1,6 @@
--- Operario x Área -- generado por Relaciones > Exportar el 2026-10-16 23:48
+-- Operario x Área -- generado por Relaciones > Exportar el 2026-11-04 21:44
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandra', 'sellado');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandra', 'plana');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandro', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandro', 'rollo');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Angie N', 'sellado');
@@ -21,6 +22,8 @@ INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Brayan', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Brayan', 'rollo');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Camilo', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Camilo', 'rollo');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Carlos', 'sellado');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Carlos', 'rollo');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Carlos', 'peletizado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Cristian', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Cristian', 'rollo');
@@ -86,6 +89,7 @@ INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Roibeth', 'peletizado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Ronald', 'peletizado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Ruben', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Ruben', 'rollo');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Samuel', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Samuel', 'mezclas');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Sandra', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Sandra', 'rollo');
@@ -102,4 +106,10 @@ INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Yulian', 'plana');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Yuri', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Yuri', 'rollo');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Mariana', 'sellado');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Mariana', 'rollo');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Yurcey', 'sellado');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Yurcey', 'rollo');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Katlin', 'sellado');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Katlin', 'rollo');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Gaby', 'sellado');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Gaby', 'rollo');

@@ -9,7 +9,7 @@ const TOKEN      = 'PLASTYPETCO_PELETIZADO';
 const CARPETA_ID = '1pqLEYcfWzbs9vhCjBTJW2rbVuLgzFjW-';
 
 // ------------------------------------------------
-// ENTRADA (POST)
+// ENTRADA
 // ------------------------------------------------
 function doPost(e) {
   try {
@@ -27,7 +27,7 @@ function doPost(e) {
     const cols       = columnasLogs(logs);
 
     // ------------------------------------------------
-    // REGISTROS (una fila por color, desde la columna B)
+    // REGISTROS
     // ------------------------------------------------
     const filas = body.registros || [];
     if (filas.length > 0) {
@@ -35,13 +35,13 @@ function doPost(e) {
     }
 
     // ------------------------------------------------
-    // LOGS (fila del día y la máquina)
+    // LOGS
     // ------------------------------------------------
     const filaLog = buscarFilaLog(logs, cols, body.log.id_dia, body.log.maquina);
     escribirLog(logs, cols, filaLog, body.log);
 
     // ------------------------------------------------
-    // PDF (maquina / mes en Drive)
+    // PDF
     // ------------------------------------------------
     let pdfUrl = null;
     if (body.pdf && body.pdf.base64) {
@@ -67,7 +67,7 @@ function escribirRegistros(registros, filas) {
 }
 
 // ------------------------------------------------
-// LOGS (columnas por nombre de encabezado)
+// LOGS
 // ------------------------------------------------
 function obtenerOCrearHojaLogs(ss) {
   let hoja = ss.getSheetByName('LOGS');
@@ -81,7 +81,7 @@ function obtenerOCrearHojaLogs(ss) {
   return hoja;
 }
 
-// Posición (1-based) de cada columna; 0 si no existe
+// Posición de cada columna
 function columnasLogs(logs) {
   const enc = logs.getRange(1, 1, 1, Math.max(logs.getLastColumn(), 1)).getValues()[0].map(normalizar);
   const pos = function (nombres) {
@@ -106,7 +106,7 @@ function columnasLogs(logs) {
   return cols;
 }
 
-// Fila (1-based) del día y máquina; 0 si no existe
+// Fila existente del día
 function buscarFilaLog(logs, cols, idDia, maquina) {
   const ultima = logs.getLastRow();
   if (ultima < 2) return 0;
@@ -120,16 +120,14 @@ function buscarFilaLog(logs, cols, idDia, maquina) {
   return 0;
 }
 
-// Crea la fila del día o actualiza fin y registros
+// Crea o actualiza la fila
 function escribirLog(logs, cols, filaLog, log) {
   const fin = isoADateHora(log.fin);
   if (filaLog > 0) {
     logs.getRange(filaLog, cols.fin).setValue(fin).setNumberFormat('dd/mm/yyyy hh:mm:ss');
     logs.getRange(filaLog, cols.registros).setValue(log.registros);
     if (cols.estado > 0) logs.getRange(filaLog, cols.estado).setValue('COMPLETADO');
-    // Normalmente no se toca INICIO al actualizar (varios turnos del mismo
-    // día no deben correr la hora de inicio ya guardada). forzar_inicio lo
-    // permite para corregir backfills.
+    // Forzar INICIO (backfill)
     if (log.forzar_inicio) {
       logs.getRange(filaLog, cols.inicio).setValue(isoADateHora(log.inicio)).setNumberFormat('dd/mm/yyyy hh:mm:ss');
     }
@@ -151,13 +149,13 @@ function escribirLog(logs, cols, filaLog, log) {
 }
 
 // ------------------------------------------------
-// PDF (carpeta maquina / mes en Drive)
+// PDF
 // ------------------------------------------------
 function guardarPdf(pdf) {
   const carpetaMaquina = obtenerOCrear(DriveApp.getFolderById(CARPETA_ID), pdf.maquina);
   const carpetaMes     = obtenerOCrear(carpetaMaquina, pdf.mes);
 
-  // Reemplaza el PDF del mismo nombre
+  // Reemplaza el PDF existente
   const existentes = carpetaMes.getFilesByName(pdf.nombre);
   while (existentes.hasNext()) existentes.next().setTrashed(true);
 
@@ -175,7 +173,7 @@ function obtenerOCrear(padre, nombre) {
 // ------------------------------------------------
 // UTILIDADES
 // ------------------------------------------------
-// Última fila con datos en una columna
+// Última fila con datos
 function ultimaFilaConDatos(hoja, columna) {
   const limite = hoja.getLastRow();
   if (limite < 1) return 0;
@@ -187,7 +185,7 @@ function ultimaFilaConDatos(hoja, columna) {
   return ultima;
 }
 
-// Encabezado sin tildes, espacios ni mayúsculas
+// Normaliza el encabezado
 function normalizar(s) {
   return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '').toUpperCase();
 }

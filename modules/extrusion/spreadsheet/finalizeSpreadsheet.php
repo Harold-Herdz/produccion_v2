@@ -76,7 +76,7 @@ try {
         'accion'    => 'finalizar',
         'registros' => filasRegistrosExtrusion($planilla, $rollosNuevos),
         'log'       => [
-            'id_dia'       => idDiaExtrusion($planilla['fecha_planilla']),
+            'id_dia'       => idDiaExtrusion($planilla['fecha_planilla'], $planilla['nombre_maquina']),
             'fecha'        => $planilla['fecha_planilla'],
             'maquina'      => $planilla['nombre_maquina'],
             'turno'        => $planilla['nombre_turno'],

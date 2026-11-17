@@ -104,22 +104,22 @@ function construirCodigoMezcla($fecha){
     return 'MZ' . date('Ymd', strtotime($fecha));
 }
 
-// Base de id_sheet / nombre del PDF: MZ{yyyyMMdd}_M{máquina}
+// Base del id_sheet: MZ{yyyyMMdd}_M{máquina}
 function baseArchivoMezcla($fecha, $nombreMaquina){
     $num = (int) preg_replace('/\D/', '', $nombreMaquina);
     return construirCodigoMezcla($fecha) . '_M' . str_pad($num, 2, '0', STR_PAD_LEFT);
 }
 
-// Nombre del PDF: MZ{yyyyMMdd}_M{máquina}.pdf (uno solo por día+máquina,
-// acumula todas las mezclas de ese día; se reemplaza cada vez que se finaliza una más)
-function nombrePdfMezcla($fecha, $nombreMaquina){
-    return baseArchivoMezcla($fecha, $nombreMaquina) . '.pdf';
-}
-
 // id_sheet de PRODUCCION_MEZCLA: único por mezcla individual (puede haber
-// varias el mismo día en la misma máquina, el PDF/código no las diferencia)
+// varias el mismo día en la misma máquina, el código no las diferencia)
 function idSheetMezcla($fecha, $nombreMaquina, $idPlanilla){
     return baseArchivoMezcla($fecha, $nombreMaquina) . '_' . $idPlanilla;
+}
+
+// Id del mes + máquina en LOGS: MZ{yyyyMM}_M{máquina}
+function idLogMezcla($fecha, $nombreMaquina){
+    $num = (int) preg_replace('/\D/', '', $nombreMaquina);
+    return 'MZ' . date('Ym', strtotime($fecha)) . '_M' . str_pad($num, 2, '0', STR_PAD_LEFT);
 }
 
 /* =================================================
@@ -147,20 +147,13 @@ function buscarPlanillaAbiertaMezcla($conexion, $codigo, $idMaquina){
     return $stmt->get_result()->fetch_assoc();
 }
 
-// Todas las mezclas ya finalizadas de un día+máquina, con nombres (para el PDF agregado)
-function obtenerMezclasDelDiaMezcla($conexion, $fecha, $idMaquina){
-    $stmt = $conexion->prepare("
-        SELECT p.*, o.nombre_operario, COALESCE(r.nombre_referencia, re.nombre_referencia_esp) AS nombre_referencia
-        FROM produccion_mezcla p
-        LEFT JOIN operarios o ON o.id_operario = p.id_operario
-        LEFT JOIN referencias r ON r.id_referencia = p.id_referencia
-        LEFT JOIN referencias_esp re ON re.id_referencia_esp = p.id_referencia_esp
-        WHERE p.fecha_mezcla = ? AND p.id_maquina = ?
-        ORDER BY p.id
-    ");
-    $stmt->bind_param('si', $fecha, $idMaquina);
+// Total de mezclas del mes en esa máquina
+function contarMezclasDelMesMezcla($conexion, $fecha, $idMaquina){
+    $mes = date('Y-m', strtotime($fecha));
+    $stmt = $conexion->prepare("SELECT COUNT(*) AS n FROM produccion_mezcla WHERE DATE_FORMAT(fecha_mezcla, '%Y-%m') = ? AND id_maquina = ?");
+    $stmt->bind_param('si', $mes, $idMaquina);
     $stmt->execute();
-    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    return (int) ($stmt->get_result()->fetch_assoc()['n'] ?? 0);
 }
 
 // Planillas abiertas (para continuar), opcionalmente de una sola máquina
@@ -207,10 +200,10 @@ function nombreCatalogoMezcla($conexion, $tabla, $columnaId, $columnaNombre, $id
 function guardarMezcla($conexion, $idSheet, $datos){
     $columnas = array_merge(array_keys(columnasTabla1Mezcla()), array_keys(columnasTabla2Mezcla()), array_keys(columnasTabla3Mezcla()));
 
-    $campos = ['id_sheet','fecha_mezcla','id_maquina','id_operario','id_referencia','id_referencia_esp','observaciones'];
-    $placeholders = ['?','?','?','?','?','?','?'];
-    $tipos = 'ssiiiis';
-    $valores = [$idSheet, $datos['fecha'], $datos['id_maquina'], $datos['id_operario'], $datos['id_referencia'], $datos['id_referencia_esp'] ?? null, $datos['observaciones']];
+    $campos = ['id_sheet','fecha_mezcla','id_maquina','id_operario','id_referencia','id_referencia_esp'];
+    $placeholders = ['?','?','?','?','?','?'];
+    $tipos = 'ssiiii';
+    $valores = [$idSheet, $datos['fecha'], $datos['id_maquina'], $datos['id_operario'], $datos['id_referencia'], $datos['id_referencia_esp'] ?? null];
 
     foreach($columnas as $col){
         $campos[] = $col;

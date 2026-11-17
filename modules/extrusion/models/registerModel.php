@@ -19,9 +19,10 @@ function construirCodigoExtrusion($fecha, $nombreTurno){
     return 'E' . date('Ymd', strtotime($fecha)) . '_T' . $cod;
 }
 
-// Id del día en LOGS
-function idDiaExtrusion($fecha){
-    return 'E' . date('Ymd', strtotime($fecha));
+// Id del día + máquina en LOGS: E{yyyyMMdd}_M{máquina}
+function idDiaExtrusion($fecha, $nombreMaquina){
+    $num = (int) preg_replace('/\D/', '', $nombreMaquina);
+    return 'E' . date('Ymd', strtotime($fecha)) . '_M' . str_pad($num, 2, '0', STR_PAD_LEFT);
 }
 
 // Nombre del PDF: E{yyyyMMdd}_E{máquina}

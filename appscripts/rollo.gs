@@ -1,11 +1,15 @@
 // ------------------------------------------------
+// APPS SCRIPT - ROLLOS
+// ------------------------------------------------
+
+// ------------------------------------------------
 // CONFIGURACION
 // ------------------------------------------------
 const TOKEN = "PLASTYPETCO_BODEGA1";
 const CARPETA_ID = "1GB7rr6TarxERg0TfA7SfF8-Xb7phbSyw";
 
 // ------------------------------------------------
-// ENTRADA (POST)
+// ENTRADA
 // ------------------------------------------------
 function doPost(e) {
   try {
@@ -18,7 +22,7 @@ function doPost(e) {
     const resultado = { ok: true };
 
     // ------------------------------------------------
-    // REGISTRO (fila en REGISTROS)
+    // REGISTROS
     // ------------------------------------------------
     if (body.fila) {
       const registros = ss.getSheetByName("REGISTROS");
@@ -29,7 +33,7 @@ function doPost(e) {
     }
 
     // ------------------------------------------------
-    // CIERRE DE DIA (LOGS + PDF)
+    // CIERRE DE DIA
     // ------------------------------------------------
     if (body.cierre) {
       const logs = obtenerOCrearHojaLogs(ss);
@@ -38,7 +42,7 @@ function doPost(e) {
       log[2] = isoADateHora(log[2]);
       log[3] = isoADateHora(log[3]);
 
-      // Upsert por ID del día
+      // Upsert del día
       const filaLog = escribirLog(logs, body.cierre.id_dia, log);
       logs.getRange(filaLog, 2).setNumberFormat("dd/mm/yyyy");
       logs.getRange(filaLog, 3, 1, 2).setNumberFormat("dd/mm/yyyy hh:mm:ss");
@@ -56,7 +60,7 @@ function doPost(e) {
 }
 
 // ------------------------------------------------
-// LOGS (crear o actualizar fila)
+// LOGS
 // ------------------------------------------------
 function escribirLog(logs, idDia, log) {
   const ultima = logs.getLastRow();
@@ -88,12 +92,12 @@ function obtenerOCrearHojaLogs(ss) {
 }
 
 // ------------------------------------------------
-// PDF (carpeta del mes en Drive)
+// PDF
 // ------------------------------------------------
 function guardarPdf(pdf) {
   const carpetaMes = obtenerOCrear(DriveApp.getFolderById(CARPETA_ID), pdf.mes);
 
-  // Reemplaza el PDF del mismo nombre
+  // Reemplaza el PDF existente
   const existentes = carpetaMes.getFilesByName(pdf.nombre);
   while (existentes.hasNext()) existentes.next().setTrashed(true);
 
@@ -113,7 +117,7 @@ function obtenerOCrear(padre, nombre) {
 // ------------------------------------------------
 // UTILIDADES
 // ------------------------------------------------
-// Última fila con datos en una columna
+// Última fila con datos
 function ultimaFilaConDatos(hoja, columna) {
   const limite = hoja.getLastRow();
   if (limite < 1) return 0;

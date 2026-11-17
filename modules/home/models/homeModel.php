@@ -518,11 +518,13 @@ function homeGeneral($conexion)
     $desde = date('Y-m-01');
     $hasta = date('Y-m-d');
     $hoy = date('Y-m-d');
+    $ayer = date('Y-m-d', strtotime('-1 day'));
     $modulos = homeModulos();
     $mods = [];
     $totalRegistros = 0;
     $registrosMes = 0;
     $registrosHoy = 0;
+    $registrosAyer = 0;
     $planillasAbiertas = 0;
     $pdfsTotales = 0;
     $modulosConImport = 0;
@@ -537,8 +539,12 @@ function homeGeneral($conexion)
         $totalRegistros += $estado['total_registros'];
         $registrosMes += $mes['registros'];
 
-        $rHoy = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE {$mod['fecha']} = '{$hoy}'"));
+        // Por cuándo se REGISTRÓ (creado_en), no por la fecha de producción
+        // que el formulario permite elegir libremente.
+        $rHoy = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE DATE(creado_en) = '{$hoy}'"));
         $registrosHoy += (int) ($rHoy[0] ?? 0);
+        $rAyer = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE DATE(creado_en) = '{$ayer}'"));
+        $registrosAyer += (int) ($rAyer[0] ?? 0);
 
         foreach ($estado['seguimiento'] as $s) {
             // Solo las "planillas" propiamente dichas (Sellado/Extrusión/Peletizado/
@@ -566,6 +572,7 @@ function homeGeneral($conexion)
         'total_registros' => $totalRegistros,
         'registros_mes' => $registrosMes,
         'registros_hoy' => $registrosHoy,
+        'registros_ayer' => $registrosAyer,
         'planillas_abiertas' => $planillasAbiertas,
         'pdfs_totales' => $pdfsTotales,
         'modulos_con_import' => $modulosConImport,

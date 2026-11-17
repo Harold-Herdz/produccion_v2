@@ -42,12 +42,6 @@ if(!function_exists('celdaNumeroMezcla')){
     }
 }
 
-// Celda de texto libre (observaciones) dentro de una mez-tabla
-if(!function_exists('celdaTextoMezcla')){
-    function celdaTextoMezcla($id){
-        return '<input type="text" class="mez-input-texto" name="' . $id . '" autocomplete="off">';
-    }
-}
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css?v=<?= filemtime(dirname(__DIR__, 3) . '/assets/css/register.css') ?>">
@@ -201,11 +195,11 @@ if(!function_exists('celdaTextoMezcla')){
 
         <!-- Tabla 2 -->
         <div class="mez-tabla-wrap">
-        <table class="ext-tabla mez-tabla mez-tabla-mixta">
+        <table class="ext-tabla mez-tabla">
             <thead>
                 <tr>
                     <th>ORIGINAL B</th><th>FG</th><th>MASTER</th><th>LINEAL</th>
-                    <th>DESHIDRATANTE</th><th>OBSERVACIONES</th>
+                    <th>DESHIDRATANTE</th>
                 </tr>
             </thead>
             <tbody>
@@ -215,7 +209,6 @@ if(!function_exists('celdaTextoMezcla')){
                     <td><?= celdaNumeroMezcla('master', 'x25') ?></td>
                     <td><?= celdaNumeroMezcla('lineal', 'x25') ?></td>
                     <td><?= celdaNumeroMezcla('deshidratante', 'kg') ?></td>
-                    <td><?= celdaTextoMezcla('observaciones') ?></td>
                 </tr>
             </tbody>
         </table>

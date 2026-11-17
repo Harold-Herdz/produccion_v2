@@ -109,7 +109,6 @@ foreach ($filas as $data) {
     $maquina    = limpiarNombre($data[2]);
     $operario   = limpiarNombre($data[3]);
     $referencia = limpiarNombre($data[4] ?? '');
-    $obs        = mysqli_real_escape_string($conexion, trim((string) ($data[19] ?? '')));
 
     // Máquina: catálogo cerrado, si no coincide se omite la fila
     $id_maquina = idCatalogoCerrado($maquinas, $maquina);
@@ -146,23 +145,22 @@ foreach ($filas as $data) {
     if ($modo === 'todo') {
         $setClauses = array_map(fn($c) => "$c = VALUES($c)", $columnas);
         $sql = "INSERT INTO PRODUCCION_MEZCLA
-                    (id_sheet,fecha_mezcla,id_maquina,id_operario,id_referencia,id_referencia_esp,observaciones,{$listaColumnas})
+                    (id_sheet,fecha_mezcla,id_maquina,id_operario,id_referencia,id_referencia_esp,{$listaColumnas})
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina',$idOperarioSql,$idReferenciaSql,$idReferenciaEspSql,'$obs',{$listaValores})
+                    ('$id_sheet','$fecha','$id_maquina',$idOperarioSql,$idReferenciaSql,$idReferenciaEspSql,{$listaValores})
                 ON DUPLICATE KEY UPDATE
                     fecha_mezcla      = VALUES(fecha_mezcla),
                     id_maquina        = VALUES(id_maquina),
                     id_operario       = VALUES(id_operario),
                     id_referencia     = VALUES(id_referencia),
                     id_referencia_esp = VALUES(id_referencia_esp),
-                    observaciones     = VALUES(observaciones),
                     " . implode(', ', $setClauses);
     // Modo nuevos: solo insertar
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_MEZCLA
-                    (id_sheet,fecha_mezcla,id_maquina,id_operario,id_referencia,id_referencia_esp,observaciones,{$listaColumnas})
+                    (id_sheet,fecha_mezcla,id_maquina,id_operario,id_referencia,id_referencia_esp,{$listaColumnas})
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina',$idOperarioSql,$idReferenciaSql,$idReferenciaEspSql,'$obs',{$listaValores})";
+                    ('$id_sheet','$fecha','$id_maquina',$idOperarioSql,$idReferenciaSql,$idReferenciaEspSql,{$listaValores})";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);

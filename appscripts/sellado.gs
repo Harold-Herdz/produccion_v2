@@ -1,4 +1,8 @@
 // ------------------------------------------------
+// APPS SCRIPT - SELLADO
+// ------------------------------------------------
+
+// ------------------------------------------------
 // CONFIGURACION
 // ------------------------------------------------
 const TOKEN = "PLASTYPETCO_BODEGA1";
@@ -6,7 +10,7 @@ const SS_ID = "1B1A-pSUBLG9w56ibWcERxhAKEsaPJN74SjRjeNv2UCg";
 const CARPETA_ID = "1YPCqkkM6EqUcPaHFJdYxh_oDqwBZJioO";
 
 // ------------------------------------------------
-// ENTRADA (POST)
+// ENTRADA
 // ------------------------------------------------
 function doPost(e) {
   try {
@@ -20,7 +24,7 @@ function doPost(e) {
     const logs = ss.getSheetByName("LOGS");
 
     // ------------------------------------------------
-    // ANTI-DUPLICADO (turno ya en LOGS)
+    // ANTI-DUPLICADO
     // ------------------------------------------------
     if (turnoYaExportado(logs, body.log[0])) {
       return json({
@@ -31,7 +35,7 @@ function doPost(e) {
     }
 
     // ------------------------------------------------
-    // REGISTROS (filas del turno)
+    // REGISTROS
     // ------------------------------------------------
     const filas = body.registros || [];
     if (filas.length > 0) {
@@ -39,7 +43,7 @@ function doPost(e) {
     }
 
     // ------------------------------------------------
-    // LOGS (fila del turno)
+    // LOGS
     // ------------------------------------------------
     const log = body.log.slice();
     log[1] = isoADate(log[1]);
@@ -49,7 +53,7 @@ function doPost(e) {
     logs.getRange(logs.getLastRow(), 2, 1, 1).setNumberFormat("dd/mm/yyyy");
 
     // ------------------------------------------------
-    // PDF (Drive)
+    // PDF
     // ------------------------------------------------
     let pdfUrl = null;
     if (body.pdf && body.pdf.base64) {
@@ -77,15 +81,15 @@ function turnoYaExportado(logs, idTurno) {
 }
 
 // ------------------------------------------------
-// REGISTROS (desde la columna B)
+// REGISTROS
 // ------------------------------------------------
 function escribirRegistros(registros, filas) {
-  // Fecha ISO a Date (columna B)
+  // Fecha ISO a Date
   filas.forEach(function (f) {
     f[0] = isoADate(f[0]);
   });
 
-  // Primera fila con columna A vacía (A es fórmula)
+  // Primera fila vacía
   const colA = registros
     .getRange("A1:A" + Math.max(registros.getLastRow(), 1))
     .getValues();
@@ -105,14 +109,14 @@ function escribirRegistros(registros, filas) {
 }
 
 // ------------------------------------------------
-// PDF (carpeta mes / dia en Drive)
+// PDF
 // ------------------------------------------------
 function guardarPdfEnDrive(pdf) {
   const principal = DriveApp.getFolderById(CARPETA_ID);
   const carpetaMes = obtenerOCrear(principal, pdf.mes);
   const carpetaDia = obtenerOCrear(carpetaMes, pdf.dia);
 
-  // Reemplaza el PDF del mismo nombre
+  // Reemplaza el PDF existente
   const existentes = carpetaDia.getFilesByName(pdf.nombre);
   while (existentes.hasNext()) existentes.next().setTrashed(true);
 

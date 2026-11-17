@@ -45,7 +45,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                         <th>Máquina</th>
                         <th>Referencia</th>
                         <th>Detalle</th>
-                        <th>Observaciones</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -60,7 +59,6 @@ include dirname(__DIR__, 3) . '/templates/header.php';
                             <td><?php echo $fila['nombre_maquina']; ?></td>
                             <td><?php echo $fila['nombre_referencia']; ?></td>
                             <td><?= resumenMezclaHistorial($fila) ?></td>
-                            <td><?php echo htmlspecialchars((string) $fila['observaciones']); ?></td>
                             <!-- Editar / eliminar -->
                             <td>
                                 <a class="btn"

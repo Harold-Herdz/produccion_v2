@@ -18,9 +18,10 @@ function construirCodigoPeletizado($fecha, $nombreTurno){
     return 'P' . date('Ymd', strtotime($fecha)) . '_T' . $cod;
 }
 
-// Id del día en LOGS (sin el turno)
-function idDiaPeletizado($fecha){
-    return 'P' . date('Ymd', strtotime($fecha));
+// Id del día + máquina en LOGS: P{yyyyMMdd}_M{máquina}
+function idDiaPeletizado($fecha, $nombreMaquina){
+    $num = (int) preg_replace('/\D/', '', $nombreMaquina);
+    return 'P' . date('Ymd', strtotime($fecha)) . '_M' . str_pad($num, 2, '0', STR_PAD_LEFT);
 }
 
 // Nombre del PDF: P{yyyyMMdd}_P{máquina}

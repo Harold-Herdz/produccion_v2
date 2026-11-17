@@ -6,7 +6,6 @@ require_once dirname(__DIR__, 3) . '/includes/conexion.php';
 require_once dirname(__DIR__, 3) . '/includes/config.php';
 require_once dirname(__DIR__) . '/models/registerModel.php';
 require_once dirname(__DIR__) . '/spreadsheet/appsScript.php';
-require_once dirname(__DIR__) . '/spreadsheet/pdfSpreadsheet.php';
 
 $hoy = date('Y-m-d');
 $rutaRegister = BASE_URL . '/modules/mezclas/views/register.php';
@@ -102,7 +101,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
     $datos = [
         'fecha' => $planilla['fecha_planilla'], 'id_maquina' => $planilla['id_maquina'],
         'id_operario' => $idOperario, 'id_referencia' => $idReferencia, 'id_referencia_esp' => $idReferenciaEsp,
-        'observaciones' => trim((string) ($_POST['observaciones'] ?? '')),
     ];
     foreach(array_merge(array_keys(columnasTabla1Mezcla()), array_keys(columnasTabla2Mezcla()), array_keys(columnasTabla3Mezcla())) as $col){
         $valor = valorMezcla($_POST[$col] ?? '');
@@ -113,22 +111,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
         $datos[$col] = $valor;
     }
 
-    // Guardar primero: el PDF del día se arma leyendo todo lo ya guardado.
     // id_sheet es temporal: en cuanto Google confirme cuál le tocó en la hoja
     // REGISTROS (columna A, p.ej. "MZ00287"), se renombra a ese mismo valor.
     $idSheet = idSheetMezcla($planilla['fecha_planilla'], $planilla['nombre_maquina'], $planilla['id_planilla']);
     $idRegistro = guardarMezcla($conexion, $idSheet, $datos);
 
-    // PDF del día+máquina completo (puede traer más de una mezcla; solo columnas llenas)
-    $mezclasDelDia = obtenerMezclasDelDiaMezcla($conexion, $planilla['fecha_planilla'], $planilla['id_maquina']);
-    foreach($mezclasDelDia as &$m){
-        $m['operario'] = $m['nombre_operario'];
-        $m['referencia'] = $m['nombre_referencia'];
-    }
-    unset($m);
-    $pdfBytes = generarPdfMezcla($planilla['fecha_planilla'], $planilla['nombre_maquina'], $mezclasDelDia);
-
-    // Google Sheets + Drive (si ya está configurado el Apps Script)
+    // Google Sheets (sin PDF)
     $rutaPdf = null;
     if(appScriptConfiguradoMezcla()){
         // Orden exacto de la hoja REGISTROS: ...LADRILLO R, ORIGINAL B...LINEAL, DESHIDRATANTE, OBSERVACIONES, P. BLANCO...
@@ -143,7 +131,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
                 $fila[] = $datos[$col]; // deshidratante: kg, número tal cual
             }
         }
-        $fila[] = $datos['observaciones'];
+        $fila[] = ''; // columna OBSERVACIONES de la hoja: ya no se pide en el formulario, se deja vacía
         foreach(array_keys(columnasTabla3Mezcla()) as $col){
             $fila[] = $datos[$col] ?? '';
         }
@@ -153,22 +141,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
             'id_solicitud' => $idSheet, // evita duplicar la fila si el 1er intento sí se guardó pero la respuesta se perdió
             'registros'    => [$fila],
             'log'       => [
-                'id_dia'    => $planilla['codigo'],
-                'fecha'     => $planilla['fecha_planilla'],
+                // LOGS por mes + máquina, no por día
+                'id_dia'    => idLogMezcla($planilla['fecha_planilla'], $planilla['nombre_maquina']),
+                'fecha'     => date('Y-m-01', strtotime($planilla['fecha_planilla'])),
                 'maquina'   => $planilla['nombre_maquina'],
                 'inicio'    => $planilla['creado_en'],
                 'fin'       => date('Y-m-d H:i:s'),
-                'registros' => count($mezclasDelDia), // total acumulado del día en esta máquina
-            ],
-            'pdf' => [
-                'nombre'  => nombrePdfMezcla($planilla['fecha_planilla'], $planilla['nombre_maquina']),
-                'maquina' => $planilla['nombre_maquina'],
-                'mes'     => date('m-Y', strtotime($planilla['fecha_planilla'])),
-                'base64'  => base64_encode($pdfBytes),
+                'registros' => contarMezclasDelMesMezcla($conexion, $planilla['fecha_planilla'], $planilla['id_maquina']), // total del mes
             ],
         ]);
         if(!empty($respuesta['ok'])){
-            $rutaPdf = $respuesta['pdf_url'] ?? null;
             $idSheetReal = trim((string) ($respuesta['id_sheet'] ?? ''));
             if($idSheetReal !== '' && $idSheetReal !== $idSheet){
                 renombrarIdSheetMezcla($conexion, $idRegistro, $idSheetReal);

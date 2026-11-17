@@ -20,13 +20,6 @@ if(!function_exists('celdaNumeroEditarMezcla')){
             . '<span class="mez-unidad">' . $unidad . '</span></div>';
     }
 }
-
-// Celda de texto libre (observaciones) con el valor ya guardado
-if(!function_exists('celdaTextoEditarMezcla')){
-    function celdaTextoEditarMezcla($id, $valor){
-        return '<input type="text" class="mez-input-texto" name="' . $id . '" value="' . htmlspecialchars((string) $valor) . '">';
-    }
-}
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/register.css">
@@ -122,10 +115,10 @@ if(!function_exists('celdaTextoEditarMezcla')){
 
             <!-- Tabla 2 -->
             <div class="mez-tabla-wrap">
-            <table class="ext-tabla mez-tabla mez-tabla-mixta">
+            <table class="ext-tabla mez-tabla">
                 <thead>
                     <tr>
-                        <th>ORIGINAL B</th><th>FG</th><th>MASTER</th><th>LINEAL</th><th>DESHIDRATANTE</th><th>OBSERVACIONES</th>
+                        <th>ORIGINAL B</th><th>FG</th><th>MASTER</th><th>LINEAL</th><th>DESHIDRATANTE</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -135,7 +128,6 @@ if(!function_exists('celdaTextoEditarMezcla')){
                         <td><?= celdaNumeroEditarMezcla('master', $fila['master'], 'x25') ?></td>
                         <td><?= celdaNumeroEditarMezcla('lineal', $fila['lineal'], 'x25') ?></td>
                         <td><?= celdaNumeroEditarMezcla('deshidratante', $fila['deshidratante'], 'kg') ?></td>
-                        <td><?= celdaTextoEditarMezcla('observaciones', $fila['observaciones']) ?></td>
                     </tr>
                 </tbody>
             </table>

@@ -172,6 +172,7 @@
             grid.appendChild(linea("Módulos", String(totalModulos)));
             grid.appendChild(linea("Registros este mes", fmt(r.registros_mes)));
             grid.appendChild(linea("Registros hoy", fmt(r.registros_hoy)));
+            grid.appendChild(linea("Registros ayer", fmt(r.registros_ayer)));
             grid.appendChild(linea("Planillas abiertas", String(r.planillas_abiertas), r.planillas_abiertas ? "alerta" : "ok"));
             grid.appendChild(linea("PDFs totales", fmt(r.pdfs_totales)));
             grid.appendChild(linea("Notificaciones", String(r.notificaciones), r.notificaciones ? "alerta" : ""));

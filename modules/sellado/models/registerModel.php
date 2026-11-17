@@ -591,6 +591,10 @@ function construirFilasRegistros($conexion, $planilla, $maquinasPayload){
     $res   = obtenerEntradasPlanillaPdf($conexion, $planilla['codigo']);
     $filas = [];
     while($f = $res->fetch_assoc()){
+        // Sin paquetes: solo PDF
+        if((int) $f['paquetes_total'] <= 0){
+            continue;
+        }
         $num = (int) $f['numero_maquina'];
         $filas[] = [
             $fechaIso,

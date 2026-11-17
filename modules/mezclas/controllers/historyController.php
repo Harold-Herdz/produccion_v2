@@ -31,8 +31,7 @@ if(!empty($busqueda)){
         refesp.nombre_referencia_esp LIKE '%$busqueda%' OR
         o.nombre_operario LIKE '%$busqueda%' OR
         m.nombre_maquina LIKE '%$busqueda%' OR
-        p.id_sheet LIKE '%$busqueda%' OR
-        p.observaciones LIKE '%$busqueda%'
+        p.id_sheet LIKE '%$busqueda%'
     )";
 }
 
@@ -70,7 +69,6 @@ if($_SERVER['REQUEST_METHOD']=="POST"){
         'id_operario' => $_POST['id_operario'],
         'id_maquina' => $_POST['id_maquina'],
         'id_referencia' => $_POST['id_referencia'],
-        'observaciones' => $_POST['observaciones'],
     ];
     foreach(array_keys(columnasMezclaHistorial()) as $col){
         $datos[$col] = $_POST[$col] ?? '';

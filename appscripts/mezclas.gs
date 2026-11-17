@@ -5,11 +5,10 @@
 // ------------------------------------------------
 // CONFIGURACION
 // ------------------------------------------------
-const TOKEN      = 'PLASTYPETCO_MEZCLAS';
-const CARPETA_ID = '1XN5tyFlcgA4bnH3xjmJW0ffGn8lbg4lU';
+const TOKEN = 'PLASTYPETCO_MEZCLAS';
 
 // ------------------------------------------------
-// ENTRADA (POST)
+// ENTRADA
 // ------------------------------------------------
 function doPost(e) {
   try {
@@ -27,9 +26,7 @@ function doPost(e) {
     const cols       = columnasLogs(logs);
 
     // ------------------------------------------------
-    // REGISTROS (una fila, desde la columna B)
-    // Si PHP reintenta el mismo envío (porque la respuesta de un intento
-    // anterior se perdió aunque sí se guardó), no se duplica la fila.
+    // REGISTROS
     // ------------------------------------------------
     const idSolicitud = body.id_solicitud || '';
     const cache = CacheService.getScriptCache();
@@ -40,7 +37,7 @@ function doPost(e) {
     let idSheetAsignado = null;
     if (filas.length > 0) {
       if (cacheado) {
-        idSheetAsignado = cacheado; // ya se había escrito antes: no duplicar, reusar el ID real
+        idSheetAsignado = cacheado; // reusar ID existente
       } else {
         const destino = escribirRegistros(registros, filas);
         SpreadsheetApp.flush();
@@ -50,21 +47,13 @@ function doPost(e) {
     }
 
     // ------------------------------------------------
-    // LOGS (fila del día y la máquina)
+    // LOGS
     // ------------------------------------------------
     const filaLog = buscarFilaLog(logs, cols, body.log.id_dia, body.log.maquina);
     escribirLog(logs, cols, filaLog, body.log);
 
-    // ------------------------------------------------
-    // PDF (maquina / mes en Drive)
-    // ------------------------------------------------
-    let pdfUrl = null;
-    if (body.pdf && body.pdf.base64) {
-      pdfUrl = guardarPdf(body.pdf);
-    }
-
     SpreadsheetApp.flush();
-    return json({ ok: true, registros: filas.length, pdf_url: pdfUrl, id_sheet: idSheetAsignado });
+    return json({ ok: true, registros: filas.length, id_sheet: idSheetAsignado });
 
   } catch (err) {
     return json({ ok: false, error: String(err) });
@@ -72,8 +61,7 @@ function doPost(e) {
 }
 
 // ------------------------------------------------
-// REGISTROS. Devuelve la fila (1-based) donde se escribió, para poder leer
-// de vuelta el ID SHEET real que calcula la columna A de esa fila.
+// REGISTROS
 // ------------------------------------------------
 function escribirRegistros(registros, filas) {
   filas.forEach(function (f) { f[0] = isoADate(f[0]); });
@@ -84,7 +72,7 @@ function escribirRegistros(registros, filas) {
 }
 
 // ------------------------------------------------
-// LOGS (columnas por nombre de encabezado)
+// LOGS
 // ------------------------------------------------
 function obtenerOCrearHojaLogs(ss) {
   let hoja = ss.getSheetByName('LOGS');
@@ -98,7 +86,7 @@ function obtenerOCrearHojaLogs(ss) {
   return hoja;
 }
 
-// Posición (1-based) de cada columna; 0 si no existe
+// Posición de cada columna
 function columnasLogs(logs) {
   const enc = logs.getRange(1, 1, 1, Math.max(logs.getLastColumn(), 1)).getValues()[0].map(normalizar);
   const pos = function (nombres) {
@@ -123,7 +111,7 @@ function columnasLogs(logs) {
   return cols;
 }
 
-// Fila (1-based) del día y máquina; 0 si no existe
+// Fila existente del mes
 function buscarFilaLog(logs, cols, idDia, maquina) {
   const ultima = logs.getLastRow();
   if (ultima < 2) return 0;
@@ -137,7 +125,7 @@ function buscarFilaLog(logs, cols, idDia, maquina) {
   return 0;
 }
 
-// Crea la fila del día o actualiza fin y registros
+// Crea o actualiza la fila del mes
 function escribirLog(logs, cols, filaLog, log) {
   const fin = isoADateHora(log.fin);
   if (filaLog > 0) {
@@ -162,31 +150,9 @@ function escribirLog(logs, cols, filaLog, log) {
 }
 
 // ------------------------------------------------
-// PDF (carpeta maquina / mes en Drive)
-// ------------------------------------------------
-function guardarPdf(pdf) {
-  const carpetaMaquina = obtenerOCrear(DriveApp.getFolderById(CARPETA_ID), pdf.maquina);
-  const carpetaMes     = obtenerOCrear(carpetaMaquina, pdf.mes);
-
-  // Reemplaza el PDF del mismo nombre
-  const existentes = carpetaMes.getFilesByName(pdf.nombre);
-  while (existentes.hasNext()) existentes.next().setTrashed(true);
-
-  const blob = Utilities.newBlob(Utilities.base64Decode(pdf.base64), 'application/pdf', pdf.nombre);
-  const archivo = carpetaMes.createFile(blob);
-  archivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  return archivo.getUrl();
-}
-
-function obtenerOCrear(padre, nombre) {
-  const it = padre.getFoldersByName(nombre);
-  return it.hasNext() ? it.next() : padre.createFolder(nombre);
-}
-
-// ------------------------------------------------
 // UTILIDADES
 // ------------------------------------------------
-// Última fila con datos en una columna
+// Última fila con datos
 function ultimaFilaConDatos(hoja, columna) {
   const limite = hoja.getLastRow();
   if (limite < 1) return 0;
@@ -198,7 +164,7 @@ function ultimaFilaConDatos(hoja, columna) {
   return ultima;
 }
 
-// Encabezado sin tildes, espacios ni mayúsculas
+// Normaliza el encabezado
 function normalizar(s) {
   return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '').toUpperCase();
 }

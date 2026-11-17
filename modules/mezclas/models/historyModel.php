@@ -68,7 +68,7 @@ function resumenMezclaHistorial($fila){
    ACTUALIZAR
 ================================================= */
 function actualizarProduccion($conexion, $id, $datos){
-    $campos = ['fecha_mezcla', 'id_operario', 'id_maquina', 'id_referencia', 'observaciones'];
+    $campos = ['fecha_mezcla', 'id_operario', 'id_maquina', 'id_referencia'];
     $set = [];
     foreach($campos as $c){
         $clave = ($c === 'fecha_mezcla') ? 'fecha' : $c;

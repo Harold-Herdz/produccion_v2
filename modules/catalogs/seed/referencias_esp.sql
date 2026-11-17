@@ -1,4 +1,4 @@
--- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-10-16 23:48
+-- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-11-11 14:13
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('1,5K ESP', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x1,5', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x100', 1);
@@ -12,6 +12,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('18x24', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('18x40', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('19x25', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('20K ESP', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('20x2,34', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('20x39', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('21x28', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('22x28', 1);
@@ -23,6 +24,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24+4+4x1,05
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24+4+4x1,2', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24+7+7', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24,5+7+7', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24,5+7+7x1,75', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24,5+7+7x1,8', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24x1', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24x31', 1);
@@ -37,6 +39,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('25x31', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26+4+4', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26+4+4x1,2', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26+5+5x1,6', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26x0,72', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26x1,5', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26x35', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26x36', 1);
@@ -60,6 +63,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('45x45', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('48x0,83', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('50+10+10x0,85', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('50+7,5', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('50+7,5+7,5', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('50+7,5+7,5x0,62', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('50K ESP', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('50x80', 1);
@@ -68,6 +72,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('5K ESP', 1)
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('60+10+10x0,8', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('60+10+10x0,85', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('60x0,87', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('60x90', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('64+13+13', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('65+15+15x0,8', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('65x0,98', 1);
@@ -85,6 +90,8 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('72x3,7', 1)
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x1,10', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x1,15', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x1,2', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x2', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('80x3', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('88x1,15', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('88x1,18', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('88x1,2', 1);
@@ -99,3 +106,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('King Kong',
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Mediana', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('N N', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('N N ZPG', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Plastimas', 0);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Plastymax', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Yuca', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Yuquera', 1);

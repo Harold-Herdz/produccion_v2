@@ -1,4 +1,4 @@
--- Turnos (TURNOS) -- generado por Catalogos > Exportar el 2026-10-16 23:48
+-- Turnos (TURNOS) -- generado por Catalogos > Exportar el 2026-11-11 14:13
 INSERT INTO TURNOS (nombre_turno, estado) VALUES ('18 Horas', 1);
 INSERT INTO TURNOS (nombre_turno, estado) VALUES ('Día', 1);
 INSERT INTO TURNOS (nombre_turno, estado) VALUES ('Noche', 1);

@@ -77,7 +77,7 @@ try {
         'accion'    => 'finalizar',
         'registros' => filasRegistrosPeletizado($planilla, $filas, $operario1, $operario2, $observaciones),
         'log'       => [
-            'id_dia'    => idDiaPeletizado($planilla['fecha_planilla']),
+            'id_dia'    => idDiaPeletizado($planilla['fecha_planilla'], $planilla['nombre_maquina']),
             'fecha'     => $planilla['fecha_planilla'],
             'maquina'   => $planilla['nombre_maquina'],
             'turno'     => $planilla['nombre_turno'],
