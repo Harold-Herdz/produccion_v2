@@ -454,6 +454,17 @@ function homeEstadoModulo($conexion, $clave)
         'importa'         => isset(homeHojas()[$clave]),
     ];
 
+    // "Registrado hoy/ayer": por cuándo se GUARDÓ (creado_en), sin importar
+    // qué fecha de producción tenga esa fila (el formulario la deja elegir
+    // libremente). "Registros mes actual" es distinto: ese sí va por la
+    // fecha de producción y se calcula en homeResumen().
+    $hoy = date('Y-m-d');
+    $ayer = date('Y-m-d', strtotime('-1 day'));
+    $rHoy  = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE DATE(creado_en) = '{$hoy}'"));
+    $rAyer = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE DATE(creado_en) = '{$ayer}'"));
+    $out['registros_hoy']  = (int) ($rHoy[0] ?? 0);
+    $out['registros_ayer'] = (int) ($rAyer[0] ?? 0);
+
     $area = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT ultimo_id_sheet FROM AREAS WHERE nombre_area = '" . mysqli_real_escape_string($conexion, $clave) . "'"));
     $out['ultimo_id_sheet'] = $area['ultimo_id_sheet'] ?? null;
     $imp = $estado['importaciones'][$clave] ?? null;
@@ -517,12 +528,10 @@ function homeGeneral($conexion)
 {
     $desde = date('Y-m-01');
     $hasta = date('Y-m-d');
-    $hoy = date('Y-m-d');
-    $ayer = date('Y-m-d', strtotime('-1 day'));
     $modulos = homeModulos();
     $mods = [];
     $totalRegistros = 0;
-    $registrosMes = 0;
+    $registrosMesActual = 0;
     $registrosHoy = 0;
     $registrosAyer = 0;
     $planillasAbiertas = 0;
@@ -537,14 +546,9 @@ function homeGeneral($conexion)
         $mods[$k] = ['mes' => $mes, 'estado' => $estado];
 
         $totalRegistros += $estado['total_registros'];
-        $registrosMes += $mes['registros'];
-
-        // Por cuándo se REGISTRÓ (creado_en), no por la fecha de producción
-        // que el formulario permite elegir libremente.
-        $rHoy = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE DATE(creado_en) = '{$hoy}'"));
-        $registrosHoy += (int) ($rHoy[0] ?? 0);
-        $rAyer = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE DATE(creado_en) = '{$ayer}'"));
-        $registrosAyer += (int) ($rAyer[0] ?? 0);
+        $registrosHoy += $estado['registros_hoy'];
+        $registrosAyer += $estado['registros_ayer'];
+        $registrosMesActual += $mes['registros'];
 
         foreach ($estado['seguimiento'] as $s) {
             // Solo las "planillas" propiamente dichas (Sellado/Extrusión/Peletizado/
@@ -570,7 +574,7 @@ function homeGeneral($conexion)
     return [
         'modulos' => $mods,
         'total_registros' => $totalRegistros,
-        'registros_mes' => $registrosMes,
+        'registros_mes_actual' => $registrosMesActual,
         'registros_hoy' => $registrosHoy,
         'registros_ayer' => $registrosAyer,
         'planillas_abiertas' => $planillasAbiertas,

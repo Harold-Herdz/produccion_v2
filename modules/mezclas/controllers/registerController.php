@@ -118,6 +118,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
 
     // Google Sheets (sin PDF)
     $rutaPdf = null;
+    $respuesta = null;
     if(appScriptConfiguradoMezcla()){
         // Orden exacto de la hoja REGISTROS: ...LADRILLO R, ORIGINAL B...LINEAL, DESHIDRATANTE, OBSERVACIONES, P. BLANCO...
         $columnasX25 = columnasX25Mezcla();
@@ -159,9 +160,17 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'finali
     }
 
     finalizarPlanillaMezcla($conexion, $id, $rutaPdf);
+    $destino = $rutaRegister . '?id_maquina=' . $planilla['id_maquina'];
+
+    // Se guardó local pero no llegó a Google: avisar, no quedarse callado
+    if($respuesta !== null && empty($respuesta['ok'])){
+        header('Location: ' . $destino . '&reg_error=' . urlencode('Se guardó, pero no se pudo sincronizar con Google. Avisa al administrador para revisarlo.'));
+        exit;
+    }
+
     // Vuelve a Fecha (misma máquina): se sigue registrando ahí mismo
     $mensaje = 'Mezcla registrada correctamente' . ($aviso ? ' · ' . $aviso : '');
-    header('Location: ' . $rutaRegister . '?id_maquina=' . $planilla['id_maquina'] . '&aviso=' . urlencode($mensaje));
+    header('Location: ' . $destino . '&aviso=' . urlencode($mensaje));
     exit;
 }
 

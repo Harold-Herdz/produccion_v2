@@ -140,6 +140,14 @@
         return l;
     }
 
+    // Columna con título de categoría y sus líneas
+    function columnaCategoria(titulo, lineas) {
+        const col = el("div", "home-categoria");
+        col.appendChild(el("div", "home-categoria-titulo", titulo));
+        lineas.forEach(l => col.appendChild(l));
+        return col;
+    }
+
     // Pendientes de importar
     function lineaPendientes(m, forzar) {
         const cont = el("div", "home-linea");
@@ -168,18 +176,24 @@
             gen.appendChild(el("div", "home-kpi-valor", fmt(r.total_registros)));
             gen.appendChild(el("div", "home-kpi-sub", "Registros totales"));
 
-            const grid = el("div", "home-lineas-grid");
-            grid.appendChild(linea("Módulos", String(totalModulos)));
-            grid.appendChild(linea("Registros este mes", fmt(r.registros_mes)));
-            grid.appendChild(linea("Registros hoy", fmt(r.registros_hoy)));
-            grid.appendChild(linea("Registros ayer", fmt(r.registros_ayer)));
-            grid.appendChild(linea("Planillas abiertas", String(r.planillas_abiertas), r.planillas_abiertas ? "alerta" : "ok"));
-            grid.appendChild(linea("PDFs totales", fmt(r.pdfs_totales)));
-            grid.appendChild(linea("Notificaciones", String(r.notificaciones), r.notificaciones ? "alerta" : ""));
-            grid.appendChild(linea("Módulos por importar", String(r.modulos_por_importar), r.modulos_por_importar ? "alerta" : "ok"));
             const cat = linea("Catálogos por exportar", "…");
-            grid.appendChild(cat);
-            gen.appendChild(grid);
+            const categorias = el("div", "home-categorias");
+            categorias.appendChild(columnaCategoria("Módulos", [
+                linea("Módulos", String(totalModulos)),
+                linea("Módulos por importar", String(r.modulos_por_importar), r.modulos_por_importar ? "alerta" : "ok"),
+                cat,
+            ]));
+            categorias.appendChild(columnaCategoria("Registros", [
+                linea("Registrados hoy", fmt(r.registros_hoy)),
+                linea("Registrados ayer", fmt(r.registros_ayer)),
+                linea("Registros mes actual", fmt(r.registros_mes_actual)),
+            ]));
+            categorias.appendChild(columnaCategoria("Seguimiento", [
+                linea("Planillas abiertas", String(r.planillas_abiertas), r.planillas_abiertas ? "alerta" : "ok"),
+                linea("PDFs totales", fmt(r.pdfs_totales)),
+                linea("Notificaciones", String(r.notificaciones), r.notificaciones ? "alerta" : ""),
+            ]));
+            gen.appendChild(categorias);
             cont.appendChild(gen);
             consulta({ accion: "catalogos" }).then(c => {
                 if (!c.ok) return;
@@ -196,7 +210,9 @@
                 kpi.appendChild(el("div", "home-kpi-valor", fmt(d.mes.medidas[info.principal] || 0)));
                 const principal = info.medidas.find(x => x.clave === info.principal);
                 kpi.appendChild(el("div", "home-kpi-sub", (principal ? principal.etiqueta : "") + " · mes actual"));
-                kpi.appendChild(linea("Registros del mes", fmt(d.mes.registros)));
+                kpi.appendChild(linea("Registrados hoy", fmt(est.registros_hoy)));
+                kpi.appendChild(linea("Registrados ayer", fmt(est.registros_ayer)));
+                kpi.appendChild(linea("Registros mes actual", fmt(d.mes.registros)));
                 kpi.appendChild(linea("Último registro", fechaCorta(est.ultimo_registro)));
                 if (est.importa) {
                     kpi.appendChild(linea("Último ID Sheet importado", est.ultimo_id_sheet || "—"));

@@ -71,6 +71,8 @@ $duplicados   = 0;
 $omitidos     = 0;
 
 foreach ($filas as $data) {
+  $contadorAntes = $contador;
+  try {
     // Limpiar datos de la fila
     $id_sheet    = trim($data[0]);
     $fecha       = convertirFecha($data[1]);
@@ -106,10 +108,10 @@ foreach ($filas as $data) {
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_ROLLO
                     (id_sheet,fecha_rollo,id_operario,id_maquina,
-                    id_referencia,id_referencia_esp,id_color,peso_rollo,peso_retal)
+                    id_referencia,id_referencia_esp,id_color,peso_rollo,peso_retal,creado_en)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina',
-                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$peso_rollo','$peso_retal')
+                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$peso_rollo','$peso_retal','$fecha')
                 ON DUPLICATE KEY UPDATE
                     fecha_rollo       = VALUES(fecha_rollo),
                     id_operario       = VALUES(id_operario),
@@ -123,13 +125,17 @@ foreach ($filas as $data) {
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_ROLLO
                     (id_sheet,fecha_rollo,id_operario,id_maquina,
-                    id_referencia,id_referencia_esp,id_color,peso_rollo,peso_retal)
+                    id_referencia,id_referencia_esp,id_color,peso_rollo,peso_retal,creado_en)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina',
-                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$peso_rollo','$peso_retal')";
+                    $id_referencia_sql,$id_referencia_esp_sql,'$id_color','$peso_rollo','$peso_retal','$fecha')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
+  } catch (Throwable $e) {
+    $contador = $contadorAntes;
+    avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet ?? '?', 'error inesperado al procesar esta fila');
+  }
 }
 
 // Mostrar contadores al final

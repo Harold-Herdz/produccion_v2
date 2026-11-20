@@ -29,11 +29,11 @@ function enviarAppScriptUnaVez($payload){
 
     $resp = @file_get_contents(SELLADO_APPSCRIPT_URL, false, $ctx);
     if($resp === false){
-        return ['ok' => false, 'error' => 'No se pudo conectar con Google (Apps Script).'];
+        return ['ok' => false, 'error' => 'No se pudo conectar con Google. Puede ser tu internet o que Google tardó en responder: espera unos segundos y vuelve a intentar. Si ya se había guardado, no se duplica.'];
     }
     $data = json_decode($resp, true);
     if(!is_array($data)){
-        return ['ok' => false, 'error' => 'Respuesta inesperada del Apps Script.'];
+        return ['ok' => false, 'error' => 'Google tardó en responder. Espera unos segundos y vuelve a intentar. Si ya se había guardado, no se duplica.'];
     }
     return $data;
 }

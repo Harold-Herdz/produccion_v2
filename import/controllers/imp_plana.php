@@ -70,6 +70,8 @@ $omitidos     = 0;
 $nueva_fecha  = null;
 
 foreach ($filas as $data) {
+  $contadorAntes = $contador;
+  try {
     // Limpiar datos de la fila
     $id_sheet    = trim($data[0]);
     $fecha       = convertirFecha($data[1]);
@@ -96,10 +98,10 @@ foreach ($filas as $data) {
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_PLANA
                     (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia_esp,
-                    peso_rollo,peso_retal,bultos,peso_total)
+                    peso_rollo,peso_retal,bultos,peso_total,creado_en)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia_esp',
-                    '$peso_rollo','$peso_retal','$bultos','$peso_total')
+                    '$peso_rollo','$peso_retal','$bultos','$peso_total','$fecha')
                 ON DUPLICATE KEY UPDATE
                     fecha_plana       = VALUES(fecha_plana),
                     id_operario       = VALUES(id_operario),
@@ -113,13 +115,17 @@ foreach ($filas as $data) {
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_PLANA
                     (id_sheet,fecha_plana,id_operario,id_maquina,id_referencia_esp,
-                    peso_rollo,peso_retal,bultos,peso_total)
+                    peso_rollo,peso_retal,bultos,peso_total,creado_en)
                 VALUES
                     ('$id_sheet','$fecha','$id_operario','$id_maquina','$id_referencia_esp',
-                    '$peso_rollo','$peso_retal','$bultos','$peso_total')";
+                    '$peso_rollo','$peso_retal','$bultos','$peso_total','$fecha')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
+  } catch (Throwable $e) {
+    $contador = $contadorAntes;
+    avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet ?? '?', 'error inesperado al procesar esta fila');
+  }
 }
 
 // Mostrar contadores al final

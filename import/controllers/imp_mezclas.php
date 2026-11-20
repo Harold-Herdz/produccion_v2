@@ -103,6 +103,8 @@ $duplicados   = 0;
 $omitidos     = 0;
 
 foreach ($filas as $data) {
+  $contadorAntes = $contador;
+  try {
     // Limpiar datos de la fila
     $id_sheet   = trim($data[0]);
     $fecha      = convertirFecha($data[1]);
@@ -145,9 +147,9 @@ foreach ($filas as $data) {
     if ($modo === 'todo') {
         $setClauses = array_map(fn($c) => "$c = VALUES($c)", $columnas);
         $sql = "INSERT INTO PRODUCCION_MEZCLA
-                    (id_sheet,fecha_mezcla,id_maquina,id_operario,id_referencia,id_referencia_esp,{$listaColumnas})
+                    (id_sheet,fecha_mezcla,id_maquina,id_operario,id_referencia,id_referencia_esp,{$listaColumnas},creado_en)
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina',$idOperarioSql,$idReferenciaSql,$idReferenciaEspSql,{$listaValores})
+                    ('$id_sheet','$fecha','$id_maquina',$idOperarioSql,$idReferenciaSql,$idReferenciaEspSql,{$listaValores},'$fecha')
                 ON DUPLICATE KEY UPDATE
                     fecha_mezcla      = VALUES(fecha_mezcla),
                     id_maquina        = VALUES(id_maquina),
@@ -158,12 +160,16 @@ foreach ($filas as $data) {
     // Modo nuevos: solo insertar
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_MEZCLA
-                    (id_sheet,fecha_mezcla,id_maquina,id_operario,id_referencia,id_referencia_esp,{$listaColumnas})
+                    (id_sheet,fecha_mezcla,id_maquina,id_operario,id_referencia,id_referencia_esp,{$listaColumnas},creado_en)
                 VALUES
-                    ('$id_sheet','$fecha','$id_maquina',$idOperarioSql,$idReferenciaSql,$idReferenciaEspSql,{$listaValores})";
+                    ('$id_sheet','$fecha','$id_maquina',$idOperarioSql,$idReferenciaSql,$idReferenciaEspSql,{$listaValores},'$fecha')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
+  } catch (Throwable $e) {
+    $contador = $contadorAntes;
+    avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet ?? '?', 'error inesperado al procesar esta fila');
+  }
 }
 
 // Mostrar contadores al final

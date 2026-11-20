@@ -72,27 +72,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!in_array($key, $seleccionados, true)) {
                 continue;
             }
-            if ($accion === 'exportar') {
-                $total = exportarCatalogo($conexion, $cfgCat);
-                $resultados[] = ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => "{$total} exportados", 'error' => false];
-            } else {
-                $r = importarCatalogo($conexion, $cfgCat);
-                $resultados[] = $r['error']
-                    ? ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => $r['error'], 'error' => true]
-                    : ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => "{$r['agregados']} agregados, {$r['existentes']} ya existían", 'error' => false];
+            try {
+                if ($accion === 'exportar') {
+                    $total = exportarCatalogo($conexion, $cfgCat);
+                    $resultados[] = ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => "{$total} exportados", 'error' => false];
+                } else {
+                    $r = importarCatalogo($conexion, $cfgCat);
+                    $resultados[] = $r['error']
+                        ? ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => $r['error'], 'error' => true]
+                        : ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => "{$r['agregados']} agregados, {$r['existentes']} ya existían", 'error' => false];
+                }
+            } catch (Throwable $e) {
+                $resultados[] = ['etiqueta' => $cfgCat['etiqueta'], 'detalle' => 'Ocurrió un error inesperado con este catálogo.', 'error' => true];
             }
         }
 
         // Usuarios: exportar/importar
         if (in_array('usuarios', $seleccionados, true)) {
-            if ($accion === 'exportar') {
-                $total = exportarUsuarios($conexion);
-                $resultados[] = ['etiqueta' => 'Usuarios', 'detalle' => "{$total} exportados", 'error' => false];
-            } else {
-                $r = importarUsuarios($conexion);
-                $resultados[] = $r['error']
-                    ? ['etiqueta' => 'Usuarios', 'detalle' => $r['error'], 'error' => true]
-                    : ['etiqueta' => 'Usuarios', 'detalle' => "{$r['agregados']} agregados, {$r['existentes']} ya existían", 'error' => false];
+            try {
+                if ($accion === 'exportar') {
+                    $total = exportarUsuarios($conexion);
+                    $resultados[] = ['etiqueta' => 'Usuarios', 'detalle' => "{$total} exportados", 'error' => false];
+                } else {
+                    $r = importarUsuarios($conexion);
+                    $resultados[] = $r['error']
+                        ? ['etiqueta' => 'Usuarios', 'detalle' => $r['error'], 'error' => true]
+                        : ['etiqueta' => 'Usuarios', 'detalle' => "{$r['agregados']} agregados, {$r['existentes']} ya existían", 'error' => false];
+                }
+            } catch (Throwable $e) {
+                $resultados[] = ['etiqueta' => 'Usuarios', 'detalle' => 'Ocurrió un error inesperado con este catálogo.', 'error' => true];
             }
         }
 

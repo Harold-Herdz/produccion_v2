@@ -1,4 +1,4 @@
--- Máquina x Área -- generado por Relaciones > Exportar el 2026-11-04 21:44
+-- Máquina x Área -- generado por Relaciones > Exportar el 2026-11-17 22:56
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 01', 'sellado');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 01', 'rollo');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 01', 'extrusion');

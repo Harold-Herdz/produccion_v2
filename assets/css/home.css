@@ -88,17 +88,30 @@
 .home-linea-val.ok,
 .home-linea.ok .home-linea-val { color: var(--verde-oscuro); }
 
-/* Tarjeta General: estadísticas en varias columnas (no una lista larga) */
-.home-lineas-grid {
+/* Tarjeta General: categorías en columnas (Módulos / Registros / Seguimiento) */
+.home-categorias {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  column-gap: 24px;
+  gap: 18px 28px;
+  margin-top: 8px;
+}
+.home-categoria {
+  display: flex;
+  flex-direction: column;
+}
+.home-categoria-titulo {
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--verde-oscuro);
 }
 @media (max-width: 900px) {
-  .home-lineas-grid { grid-template-columns: repeat(2, 1fr); }
+  .home-categorias { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 560px) {
-  .home-lineas-grid { grid-template-columns: 1fr; }
+  .home-categorias { grid-template-columns: 1fr; }
 }
 
 /* ===========================

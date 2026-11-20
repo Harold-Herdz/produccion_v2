@@ -75,6 +75,8 @@ $duplicados   = 0;
 $omitidos     = 0;
 
 foreach ($filas as $data) {
+  $contadorAntes = $contador;
+  try {
     // Limpiar datos de la fila
     $id_sheet   = trim($data[0]);
     $fecha      = convertirFecha($data[1]);
@@ -152,11 +154,11 @@ foreach ($filas as $data) {
         $sql = "INSERT INTO PRODUCCION_SELLADO
                     (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,id_jornada,
                     id_referencia,id_referencia_esp,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
-                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
+                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado,creado_en)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_operario',$id_turno_sql,$id_jornada_sql,
                     $id_referencia_sql,$id_referencia_esp_sql,$id_color_sql,'$paq_x70','$paq_x90','$paq_x98',
-                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')
+                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado','$fecha')
                 ON DUPLICATE KEY UPDATE
                     fecha_sellado      = VALUES(fecha_sellado),
                     id_maquina         = VALUES(id_maquina),
@@ -180,14 +182,18 @@ foreach ($filas as $data) {
         $sql = "INSERT IGNORE INTO PRODUCCION_SELLADO
                     (id_sheet,fecha_sellado,id_maquina,id_operario,id_turno,id_jornada,
                     id_referencia,id_referencia_esp,id_color,paquetes_x70,paquetes_x90,paquetes_x98,
-                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado)
+                    peso_hora1,peso_hora2,peso_hora3,peso_hora4,peso_hora5,obs_sellado,creado_en)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_operario',$id_turno_sql,$id_jornada_sql,
                     $id_referencia_sql,$id_referencia_esp_sql,$id_color_sql,'$paq_x70','$paq_x90','$paq_x98',
-                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado')";
+                    $peso1, $peso2, $peso3, $peso4, $peso5,'$obs_sellado','$fecha')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
+  } catch (Throwable $e) {
+    $contador = $contadorAntes;
+    avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet ?? '?', 'error inesperado al procesar esta fila');
+  }
 }
 
 // Mostrar contadores al final

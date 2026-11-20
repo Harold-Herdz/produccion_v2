@@ -1,4 +1,4 @@
--- Colores (COLORES) -- generado por Catalogos > Exportar el 2026-11-11 14:13
+-- Colores (COLORES) -- generado por Catalogos > Exportar el 2026-11-17 22:56
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Aguapanelo', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Amarillo', 1);
 INSERT INTO COLORES (nombre_color, estado) VALUES ('Azul', 1);

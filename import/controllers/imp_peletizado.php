@@ -82,6 +82,8 @@ $duplicados   = 0;
 $omitidos     = 0;
 
 foreach ($filas as $data) {
+  $contadorAntes = $contador;
+  try {
     // Limpiar datos de la fila
     $id_sheet    = trim($data[0]);
     $fecha       = convertirFecha($data[1]);
@@ -124,10 +126,10 @@ foreach ($filas as $data) {
     if ($modo === 'todo') {
         $sql = "INSERT INTO PRODUCCION_PELETIZADO
                     (id_sheet,fecha_peletizado,id_maquina,id_turno,id_operario,id_operario2,id_color,
-                    alta_retal,baja,refiltrado,soplado,torta,limpieza,total,obs_peletizado)
+                    alta_retal,baja,refiltrado,soplado,torta,limpieza,total,obs_peletizado,creado_en)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_turno',$id_operario_sql,$id_operario2_sql,$id_color_sql,
-                    '$alta_retal','$baja','$refiltrado','$soplado','$torta','$limpieza','$total_cat','$obs')
+                    '$alta_retal','$baja','$refiltrado','$soplado','$torta','$limpieza','$total_cat','$obs','$fecha')
                 ON DUPLICATE KEY UPDATE
                     fecha_peletizado = VALUES(fecha_peletizado),
                     id_maquina       = VALUES(id_maquina),
@@ -147,13 +149,17 @@ foreach ($filas as $data) {
     } else {
         $sql = "INSERT IGNORE INTO PRODUCCION_PELETIZADO
                     (id_sheet,fecha_peletizado,id_maquina,id_turno,id_operario,id_operario2,id_color,
-                    alta_retal,baja,refiltrado,soplado,torta,limpieza,total,obs_peletizado)
+                    alta_retal,baja,refiltrado,soplado,torta,limpieza,total,obs_peletizado,creado_en)
                 VALUES
                     ('$id_sheet','$fecha','$id_maquina','$id_turno',$id_operario_sql,$id_operario2_sql,$id_color_sql,
-                    '$alta_retal','$baja','$refiltrado','$soplado','$torta','$limpieza','$total_cat','$obs')";
+                    '$alta_retal','$baja','$refiltrado','$soplado','$torta','$limpieza','$total_cat','$obs','$fecha')";
     }
     // Ejecutar inserción y actualizar progreso
     procesarFila($conexion,$sql,$id_sheet,$contador,$total,$insertados,$actualizados,$duplicados,$omitidos,$ultimo_id_sheet);
+  } catch (Throwable $e) {
+    $contador = $contadorAntes;
+    avisarFilaOmitida($contador, $total, $insertados, $actualizados, $duplicados, $omitidos, $id_sheet ?? '?', 'error inesperado al procesar esta fila');
+  }
 }
 
 // Mostrar contadores al final

@@ -54,17 +54,17 @@ include dirname(__DIR__, 3) . '/templates/header.php';
         <!-- KPI total histórico -->
         <div class="card-kpi">
             <p>Total histórico</p>
-            <h2><?php echo number_format($total); ?> kg</h2>
+            <h2><?php echo number_format($total,2); ?> kg</h2>
         </div>
         <!-- KPI semana actual -->
         <div class="card-kpi">
             <p>Peso semanal</p>
-            <h2><?php echo number_format($semana); ?> kg</h2>
+            <h2><?php echo number_format($semana,2); ?> kg</h2>
         </div>
         <!-- KPI mes actual -->
         <div class="card-kpi">
             <p>Peso mensual</p>
-            <h2><?php echo number_format($mes); ?> kg</h2>
+            <h2><?php echo number_format($mes,2); ?> kg</h2>
         </div>
     </div>
 
@@ -119,57 +119,57 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <p>
                 🏭 Peso rollo: <?php
                 echo $peso_rollo_mes1 !== null
-                    ? number_format($peso_rollo_mes1).' kg'
+                    ? number_format($peso_rollo_mes1,2).' kg'
                     : 'Sin datos';
                 ?>
             </p>
             <p>
                 ♻️ Peso retal: <?php
                 echo $peso_retal_mes1 !== null
-                    ? number_format($peso_retal_mes1).' kg'
+                    ? number_format($peso_retal_mes1,2).' kg'
                     : 'Sin datos';
                 ?>
             </p>
             <p>
                 📦 Peso total: <?php
-                echo $total_mes1 !== null 
-                    ? number_format($total_mes1).' kg' 
-                    : 'Sin datos'; 
+                echo $total_mes1 !== null
+                    ? number_format($total_mes1,2).' kg'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
-                💰 Cantidad Bultos: <?php 
-                echo $bultos_mes1 !== null 
-                    ? number_format($bultos_mes1).' bultos' 
-                    : 'Sin datos'; 
+                💰 Cantidad Bultos: <?php
+                echo $bultos_mes1 !== null
+                    ? number_format($bultos_mes1).' bultos'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
-                📅 Mejor día: <?php 
-                echo ($mejor_dia_mes1['fecha'] != "Sin datos") 
-                    ? date("d M Y", strtotime($mejor_dia_mes1['fecha'])) 
-                    : "Sin datos"; ?> (<?php echo number_format($mejor_dia_mes1['total']); 
+                📅 Mejor día: <?php
+                echo ($mejor_dia_mes1['fecha'] != "Sin datos")
+                    ? date("d M Y", strtotime($mejor_dia_mes1['fecha']))
+                    : "Sin datos"; ?> (<?php echo number_format($mejor_dia_mes1['total'],2);
                 ?> kg)
             </p>
             <p>
-                📉 Peor día: <?php 
-                echo ($peor_dia_mes1['fecha'] != "Sin datos") 
-                    ? date("d M Y", strtotime($peor_dia_mes1['fecha'])) 
-                    : "Sin datos"; ?> (<?php echo number_format($peor_dia_mes1['total']); 
+                📉 Peor día: <?php
+                echo ($peor_dia_mes1['fecha'] != "Sin datos")
+                    ? date("d M Y", strtotime($peor_dia_mes1['fecha']))
+                    : "Sin datos"; ?> (<?php echo number_format($peor_dia_mes1['total'],2);
                 ?> kg)
             </p>
             <p>
-                🔧 Mejor máquina: <?php 
-                echo $top_maquina_mes1['nombre_maquina'] ?? 'Sin datos'; ?> 
+                🔧 Mejor máquina: <?php
+                echo $top_maquina_mes1['nombre_maquina'] ?? 'Sin datos'; ?>
                 <?php if(!empty($top_maquina_mes1['total'])){ ?>
-                    (<?php echo number_format($top_maquina_mes1['total']); ?> kg)
+                    (<?php echo number_format($top_maquina_mes1['total'],2); ?> kg)
                 <?php } ?>
             </p>
             <p>
-                👷 Mejor operario: <?php 
-                echo $top_operario_mes1['nombre_operario'] ?? 'Sin datos'; ?> 
+                👷 Mejor operario: <?php
+                echo $top_operario_mes1['nombre_operario'] ?? 'Sin datos'; ?>
                 <?php if(!empty($top_operario_mes1['total'])){ ?>
-                    (<?php echo number_format($top_operario_mes1['total']); ?> kg)
+                    (<?php echo number_format($top_operario_mes1['total'],2); ?> kg)
                 <?php } ?>
             </p>
         </div>
@@ -188,10 +188,10 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <p>
                 <?php if ($diferencia > 0): ?>
                     <span>▲ Subió <?php echo round($porcentaje, 1); ?>%</span>
-                    <span>+<?php echo number_format($diferencia); ?> kg</span>
+                    <span>+<?php echo number_format($diferencia,2); ?> kg</span>
                 <?php elseif ($diferencia < 0): ?>
                     <span>▼ Bajó <?php echo round($porcentaje, 1); ?>%</span>
-                    <span>-<?php echo number_format(abs($diferencia)); ?> kg</span>
+                    <span>-<?php echo number_format(abs($diferencia),2); ?> kg</span>
                 <?php else: ?>
                     <span>Sin cambios</span>
                 <?php endif; ?>
@@ -215,57 +215,57 @@ include dirname(__DIR__, 3) . '/templates/header.php';
             <p>
                 🏭 Peso rollo: <?php
                 echo $peso_rollo_mes2 !== null
-                    ? number_format($peso_rollo_mes2).' kg'
+                    ? number_format($peso_rollo_mes2,2).' kg'
                     : 'Sin datos';
                 ?>
             </p>
             <p>
                 ♻️ Peso retal: <?php
                 echo $peso_retal_mes2 !== null
-                    ? number_format($peso_retal_mes2).' kg'
+                    ? number_format($peso_retal_mes2,2).' kg'
                     : 'Sin datos';
                 ?>
             </p>
             <p>
                 📦 Peso total: <?php
-                echo $total_mes2 !== null 
-                    ? number_format($total_mes2).' kg' 
-                    : 'Sin datos'; 
+                echo $total_mes2 !== null
+                    ? number_format($total_mes2,2).' kg'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
-                💰 Cantidad Bultos: <?php 
-                echo $bultos_mes2 !== null 
-                    ? number_format($bultos_mes2).' bultos' 
-                    : 'Sin datos'; 
+                💰 Cantidad Bultos: <?php
+                echo $bultos_mes2 !== null
+                    ? number_format($bultos_mes2).' bultos'
+                    : 'Sin datos';
                 ?>
             </p>
             <p>
-                📅 Mejor día: <?php 
-                echo ($mejor_dia_mes2['fecha'] != "Sin datos") 
-                    ? date("d M Y", strtotime($mejor_dia_mes2['fecha'])) 
-                    : "Sin datos"; ?> (<?php echo number_format($mejor_dia_mes2['total']); 
+                📅 Mejor día: <?php
+                echo ($mejor_dia_mes2['fecha'] != "Sin datos")
+                    ? date("d M Y", strtotime($mejor_dia_mes2['fecha']))
+                    : "Sin datos"; ?> (<?php echo number_format($mejor_dia_mes2['total'],2);
                 ?> kg)
             </p>
             <p>
-                📉 Peor día: <?php 
-                echo ($peor_dia_mes2['fecha'] != "Sin datos") 
-                    ? date("d M Y", strtotime($peor_dia_mes2['fecha'])) 
-                    : "Sin datos"; ?> (<?php echo number_format($peor_dia_mes2['total']); 
+                📉 Peor día: <?php
+                echo ($peor_dia_mes2['fecha'] != "Sin datos")
+                    ? date("d M Y", strtotime($peor_dia_mes2['fecha']))
+                    : "Sin datos"; ?> (<?php echo number_format($peor_dia_mes2['total'],2);
                 ?> kg)
-            </p> 
+            </p>
             <p>
-                🔧 Mejor máquina: <?php 
-                echo $top_maquina_mes2['nombre_maquina'] ?? 'Sin datos'; ?> 
+                🔧 Mejor máquina: <?php
+                echo $top_maquina_mes2['nombre_maquina'] ?? 'Sin datos'; ?>
                 <?php if(!empty($top_maquina_mes2['total'])){ ?>
-                    (<?php echo number_format($top_maquina_mes2['total']); ?> kg)
+                    (<?php echo number_format($top_maquina_mes2['total'],2); ?> kg)
                 <?php } ?>
             </p>
             <p>
-                👷 Mejor operario: <?php 
-                echo $top_operario_mes2['nombre_operario'] ?? 'Sin datos'; ?> 
+                👷 Mejor operario: <?php
+                echo $top_operario_mes2['nombre_operario'] ?? 'Sin datos'; ?>
                 <?php if(!empty($top_operario_mes2['total'])){ ?>
-                    (<?php echo number_format($top_operario_mes2['total']); ?> kg)
+                    (<?php echo number_format($top_operario_mes2['total'],2); ?> kg)
                 <?php } ?>
             </p>
         </div>
