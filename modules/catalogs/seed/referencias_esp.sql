@@ -1,4 +1,4 @@
--- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-11-17 22:56
+-- Referencias Especiales (REFERENCIAS_ESP) -- generado por Catalogos > Exportar el 2026-11-26 20:32
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('1,5K ESP', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x1,5', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('100x100', 1);
@@ -30,6 +30,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24,5+7+7x1,
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24x1', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24x31', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24x32', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24x32 Blanco', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24x32 Negro', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24x32 Rojo', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('24x32 Verde', 1);
@@ -40,6 +41,7 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('25x31', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26+4+4', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26+4+4x1,2', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26+5+5x1,6', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26x0,6', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26x0,68', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26x0,72', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('26x1,5', 1);
@@ -111,5 +113,5 @@ INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('N N', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('N N ZPG', 1);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Plastimas', 0);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Plastymax', 1);
-INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Yuca', 1);
+INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Yuca', 0);
 INSERT INTO REFERENCIAS_ESP (nombre_referencia_esp, estado) VALUES ('Yuquera', 1);

@@ -17,6 +17,10 @@ if (formFinalizar) {
             .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
             .join(" ");
     }
+    // Solo espacios
+    function limpiarEspacios(texto) {
+        return texto.trim().replace(/\s+/g, " ");
+    }
 
     // Operario: casilla Otro al lado. Referencia: reemplaza el select.
     // Ninguno de los dos se envía directo, solo alimentan el input oculto
@@ -28,7 +32,7 @@ if (formFinalizar) {
         if (!select || !libre || !valor) return;
 
         function sincronizar() {
-            valor.value = select.value === "otro" ? capitalizar(libre.value) : select.value;
+            valor.value = select.value === "otro" ? (esOperario ? capitalizar(libre.value) : limpiarEspacios(libre.value)) : select.value;
         }
 
         select.addEventListener("change", () => {
@@ -47,13 +51,15 @@ if (formFinalizar) {
         });
 
         libre.addEventListener("input", () => {
-            const limpio = soloLetras(libre.value);
-            if (limpio !== libre.value) libre.value = limpio;
+            if (esOperario) {
+                const limpio = soloLetras(libre.value);
+                if (limpio !== libre.value) libre.value = limpio;
+            }
             sincronizar();
         });
 
         libre.addEventListener("blur", () => {
-            libre.value = capitalizar(libre.value);
+            libre.value = esOperario ? capitalizar(libre.value) : limpiarEspacios(libre.value);
             sincronizar();
             if (!esOperario && libre.value === "") {
                 const base = selDesenvolver(libre.previousElementSibling);

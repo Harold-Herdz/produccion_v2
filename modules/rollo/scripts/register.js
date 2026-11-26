@@ -38,6 +38,12 @@ if (formRollo) {
             .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
             .join(" ");
     }
+    // Solo espacios
+    function limpiarEspacios(texto) {
+        return texto.trim().replace(/\s+/g, " ");
+    }
+    // Campos de nombre
+    const esCampoNombre = id => id === "operarioRolloTexto" || id === "colorRolloTexto";
 
     // Operario: casilla Otro al lado
     // Referencia/Color: reemplaza el select
@@ -58,9 +64,9 @@ if (formRollo) {
         }
     });
 
-    // Filtra letras mientras se escribe
+    // Filtra letras (Operario/Color)
     formRollo.addEventListener("input", e => {
-        if (e.target.classList.contains("campo-libre")) {
+        if (esCampoNombre(e.target.id)) {
             const limpio = soloLetras(e.target.value);
             if (limpio !== e.target.value) e.target.value = limpio;
         }
@@ -69,7 +75,7 @@ if (formRollo) {
     // Capitalizar al salir del campo
     formRollo.addEventListener("blur", e => {
         if (!e.target.classList.contains("campo-libre")) return;
-        e.target.value = capitalizar(e.target.value);
+        e.target.value = esCampoNombre(e.target.id) ? capitalizar(e.target.value) : limpiarEspacios(e.target.value);
         if (e.target.id !== "operarioRolloTexto" && e.target.value === "") {
             const select = selDesenvolver(e.target.previousElementSibling);
             e.target.hidden = true;
@@ -82,15 +88,19 @@ if (formRollo) {
     // Valor del select u Otro
     function valorConOtro(idSelect) {
         const select = document.getElementById(idSelect);
-        return select.value === "otro" ? capitalizar(selSiguiente(select).value) : select.value;
+        if (select.value !== "otro") return select.value;
+        const libre = selSiguiente(select);
+        return esCampoNombre(libre.id) ? capitalizar(libre.value) : limpiarEspacios(libre.value);
     }
 
     // Restaurar select tras Otro
     function restaurarCampoConOtro(idSelect) {
         const select = document.getElementById(idSelect);
         const libre = selSiguiente(select);
+        const caja = select._selBuscadorWrap || select;
         libre.hidden = true;
         libre.value = "";
+        caja.style.display = "";
         select.selectedIndex = 0;
         if (select._refrescar) select._refrescar();
     }

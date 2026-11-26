@@ -1,4 +1,4 @@
--- Operario x Área -- generado por Relaciones > Exportar el 2026-11-17 22:56
+-- Operario x Área -- generado por Relaciones > Exportar el 2026-11-26 16:48
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandra', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandra', 'plana');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandro', 'sellado');
@@ -46,6 +46,7 @@ INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Jose D', 'peletizado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Jose P', 'peletizado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Julieth', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Julieth', 'rollo');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Julieth', 'plana');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Julio', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Julio', 'rollo');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Julio', 'peletizado');
@@ -113,3 +114,5 @@ INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Yurcey', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Yurcey', 'rollo');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Yuri', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Yuri', 'rollo');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Kevin', 'sellado');
+INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Kevin', 'rollo');

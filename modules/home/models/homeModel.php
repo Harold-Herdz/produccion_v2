@@ -341,7 +341,7 @@ function homeCarpetaPdfs($modulo)
         'rollo'     => 'https://drive.google.com/drive/folders/1GB7rr6TarxERg0TfA7SfF8-Xb7phbSyw?usp=sharing',
         'plana'     => 'https://drive.google.com/drive/folders/192yKfIMnbpEb2i8DRMw2cOdwTVCp9wvw?usp=sharing',
         'extrusion' => 'https://drive.google.com/drive/folders/1x9vnygja6Pv4S9pA8tbm-1sGzM75-m2b?usp=sharing',
-        'mezclas'   => 'https://drive.google.com/drive/folders/1XN5tyFlcgA4bnH3xjmJW0ffGn8lbg4lU?usp=sharing',
+        'peletizado' => 'https://drive.google.com/drive/folders/1pqLEYcfWzbs9vhCjBTJW2rbVuLgzFjW-?usp=sharing',
     ];
     return ($carpetas[$modulo] ?? '') ?: null;
 }
@@ -399,7 +399,7 @@ function homeSeguimiento()
         'plana'     => ['tabla' => 'PLANA_SHEET',     'abierto' => "estado = 'en_proceso'", 'cerrado' => "estado = 'completado'", 'etq_abierto' => 'Días en proceso',     'etq_cerrado' => 'Días cerrados'],
         'extrusion' => ['tabla' => 'EXTRUSION_SHEET', 'abierto' => "estado = 'abierta'",    'cerrado' => "estado = 'finalizada'", 'etq_abierto' => 'Planillas abiertas', 'etq_cerrado' => 'Planillas finalizadas'],
         'peletizado'=> ['tabla' => 'PELETIZADO_SHEET','abierto' => "estado = 'abierta'",    'cerrado' => "estado = 'finalizada'", 'etq_abierto' => 'Planillas abiertas', 'etq_cerrado' => 'Planillas finalizadas'],
-        'mezclas'   => ['tabla' => 'MEZCLA_SHEET',    'abierto' => "estado = 'abierta'",    'cerrado' => "estado = 'finalizada'", 'etq_abierto' => 'Planillas abiertas', 'etq_cerrado' => 'Planillas finalizadas'],
+        'mezclas'   => ['tabla' => 'MEZCLA_SHEET',    'abierto' => "estado = 'abierta'",    'cerrado' => "estado = 'finalizada'", 'etq_abierto' => 'Planillas abiertas', 'etq_cerrado' => 'Planillas finalizadas', 'pdfs' => false],
     ];
 }
 
@@ -454,14 +454,13 @@ function homeEstadoModulo($conexion, $clave)
         'importa'         => isset(homeHojas()[$clave]),
     ];
 
-    // "Registrado hoy/ayer": por cuándo se GUARDÓ (creado_en), sin importar
-    // qué fecha de producción tenga esa fila (el formulario la deja elegir
-    // libremente). "Registros mes actual" es distinto: ese sí va por la
-    // fecha de producción y se calcula en homeResumen().
+    // "Registrado hoy/ayer/mes actual": siempre por la fecha de producción
+    // de la planilla, nunca por cuándo se tipeó en el sistema (eso puede
+    // pasar días después, o varias planillas atrasadas de una sola vez).
     $hoy = date('Y-m-d');
     $ayer = date('Y-m-d', strtotime('-1 day'));
-    $rHoy  = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE DATE(creado_en) = '{$hoy}'"));
-    $rAyer = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE DATE(creado_en) = '{$ayer}'"));
+    $rHoy  = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE {$mod['fecha']} = '{$hoy}'"));
+    $rAyer = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$mod['tabla']} WHERE {$mod['fecha']} = '{$ayer}'"));
     $out['registros_hoy']  = (int) ($rHoy[0] ?? 0);
     $out['registros_ayer'] = (int) ($rAyer[0] ?? 0);
 
@@ -476,12 +475,14 @@ function homeEstadoModulo($conexion, $clave)
     if ($seg) {
         $ab = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$seg['tabla']} WHERE {$seg['abierto']}"));
         $ce = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$seg['tabla']} WHERE {$seg['cerrado']}"));
-        $cp = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$seg['tabla']} WHERE {$seg['cerrado']} AND ruta_pdf IS NOT NULL AND ruta_pdf != ''"));
         $out['seguimiento'] = [
             ['etiqueta' => $seg['etq_abierto'], 'valor' => (int) $ab[0]],
             ['etiqueta' => $seg['etq_cerrado'], 'valor' => (int) $ce[0]],
-            ['etiqueta' => 'PDFs generados', 'valor' => (int) $cp[0]],
         ];
+        if ($seg['pdfs'] ?? true) {
+            $cp = mysqli_fetch_row(mysqli_query($conexion, "SELECT COUNT(*) FROM {$seg['tabla']} WHERE {$seg['cerrado']} AND ruta_pdf IS NOT NULL AND ruta_pdf != ''"));
+            $out['seguimiento'][] = ['etiqueta' => 'PDFs generados', 'valor' => (int) $cp[0]];
+        }
     }
     return $out;
 }

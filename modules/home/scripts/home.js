@@ -197,7 +197,7 @@
             cont.appendChild(gen);
             consulta({ accion: "catalogos" }).then(c => {
                 if (!c.ok) return;
-                cat.querySelector(".home-linea-val").textContent = c.sin_exportar ? String(c.sin_exportar) : "Ninguno";
+                cat.querySelector(".home-linea-val").textContent = String(c.sin_exportar);
                 cat.classList.add(c.sin_exportar ? "alerta" : "ok");
             });
 

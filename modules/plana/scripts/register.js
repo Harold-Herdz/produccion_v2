@@ -38,6 +38,10 @@ if (formPlana) {
             .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
             .join(" ");
     }
+    // Solo espacios
+    function limpiarEspacios(texto) {
+        return texto.trim().replace(/\s+/g, " ");
+    }
 
     // Operario: casilla Otro al lado
     // Referencia/Color: reemplaza el select
@@ -58,9 +62,9 @@ if (formPlana) {
         }
     });
 
-    // Filtra letras mientras se escribe
+    // Filtra letras (solo Operario)
     formPlana.addEventListener("input", e => {
-        if (e.target.classList.contains("campo-libre")) {
+        if (e.target.id === "operarioPlanaTexto") {
             const limpio = soloLetras(e.target.value);
             if (limpio !== e.target.value) e.target.value = limpio;
         }
@@ -69,7 +73,7 @@ if (formPlana) {
     // Capitalizar al salir del campo
     formPlana.addEventListener("blur", e => {
         if (!e.target.classList.contains("campo-libre")) return;
-        e.target.value = capitalizar(e.target.value);
+        e.target.value = e.target.id === "operarioPlanaTexto" ? capitalizar(e.target.value) : limpiarEspacios(e.target.value);
         if (e.target.id !== "operarioPlanaTexto" && e.target.value === "") {
             const select = selDesenvolver(e.target.previousElementSibling);
             e.target.hidden = true;
@@ -82,15 +86,19 @@ if (formPlana) {
     // Valor del select u Otro
     function valorConOtro(idSelect) {
         const select = document.getElementById(idSelect);
-        return select.value === "otro" ? capitalizar(selSiguiente(select).value) : select.value;
+        if (select.value !== "otro") return select.value;
+        const texto = selSiguiente(select).value;
+        return idSelect === "operarioPlana" ? capitalizar(texto) : limpiarEspacios(texto);
     }
 
     // Restaurar select tras Otro
     function restaurarCampoConOtro(idSelect) {
         const select = document.getElementById(idSelect);
         const libre = selSiguiente(select);
+        const caja = select._selBuscadorWrap || select;
         libre.hidden = true;
         libre.value = "";
+        caja.style.display = "";
         select.selectedIndex = 0;
         if (select._refrescar) select._refrescar();
     }
