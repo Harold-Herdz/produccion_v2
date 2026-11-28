@@ -1,6 +1,6 @@
 <?php
 /** @var array|null $planilla       Sobre del turno abierto (o null) */
-/** @var array      $maquinas       Máquinas 01-17 */
+/** @var array      $maquinas       Máquinas del área */
 /** @var array      $operarios      Operarios activos */
 /** @var array      $referencias    Referencias activas */
 /** @var array      $colores        Colores activos */

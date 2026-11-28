@@ -1,4 +1,4 @@
--- Operario x Área -- generado por Relaciones > Exportar el 2026-11-26 16:48
+-- Operario x Área -- generado por Relaciones > Exportar el 2026-11-28 17:10
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandra', 'sellado');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandra', 'plana');
 INSERT INTO OPERARIO_AREAS (operario, area) VALUES ('Alejandro', 'sellado');

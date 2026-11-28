@@ -1,4 +1,4 @@
--- Máquina x Área -- generado por Relaciones > Exportar el 2026-11-26 16:48
+-- Máquina x Área -- generado por Relaciones > Exportar el 2026-11-28 17:10
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 01', 'sellado');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 01', 'rollo');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 01', 'extrusion');
@@ -70,10 +70,13 @@ INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 17', 'rollo');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 17', 'plana');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 17', 'extrusion');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 17', 'mezclas');
+INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 18', 'sellado');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 18', 'extrusion');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 18', 'mezclas');
+INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 19', 'sellado');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 19', 'extrusion');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 19', 'mezclas');
+INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 20', 'sellado');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 20', 'extrusion');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 20', 'mezclas');
 INSERT INTO MAQUINA_AREAS (maquina, area) VALUES ('Máquina 21', 'extrusion');

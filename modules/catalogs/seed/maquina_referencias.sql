@@ -1,4 +1,4 @@
--- Referencia x Máquina (por área) -- generado por Relaciones > Exportar el 2026-11-26 16:48
+-- Referencia x Máquina (por área) -- generado por Relaciones > Exportar el 2026-11-28 17:10
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 01', 'sellado', '10K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 01', 'sellado', '15K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 01', 'sellado', '20K');
@@ -439,6 +439,8 @@ INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 17
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 17', 'mezclas', '3K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 17', 'mezclas', '50K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 17', 'mezclas', '5K');
+INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 18', 'sellado', '30K');
+INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 18', 'sellado', '50K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 18', 'extrusion', '1,5K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 18', 'extrusion', '10K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 18', 'extrusion', '15K');
@@ -459,6 +461,8 @@ INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 18
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 18', 'mezclas', '3K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 18', 'mezclas', '50K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 18', 'mezclas', '5K');
+INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 19', 'sellado', '30K');
+INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 19', 'sellado', '50K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 19', 'extrusion', '1,5K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 19', 'extrusion', '10K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 19', 'extrusion', '15K');
@@ -479,6 +483,8 @@ INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 19
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 19', 'mezclas', '3K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 19', 'mezclas', '50K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 19', 'mezclas', '5K');
+INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 20', 'sellado', '30K');
+INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 20', 'sellado', '50K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 20', 'extrusion', '1,5K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 20', 'extrusion', '10K');
 INSERT INTO MAQUINA_REFERENCIAS (maquina, area, referencia) VALUES ('Máquina 20', 'extrusion', '15K');

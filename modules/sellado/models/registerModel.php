@@ -338,7 +338,7 @@ function guardarPlanilla($conexion, $planilla, $maquinas, $final = false){
 
     foreach($maquinas as $m){
         $numMaq = (int) ($m['maquina'] ?? 0);
-        if($numMaq < 1 || $numMaq > 17){
+        if($numMaq < 1 || $numMaq > 99){
             continue;
         }
         // id_maquina real (FK)

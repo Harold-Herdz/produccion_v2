@@ -66,9 +66,9 @@ function generarPdfPlanilla($conexion, $planilla, $nota = '', $maquinasFijas = n
     }
     }
 
-    // Máquinas en dos páginas
-    $primeraPagina = 8;
-    $paginas = [array_slice($maquinas, 0, $primeraPagina), array_slice($maquinas, $primeraPagina)];
+    // Máquinas por página
+    $porPagina = 8;
+    $paginas = array_chunk($maquinas, $porPagina);
 
     $pdf = new FPDF('L', 'mm', 'Letter');
     // Márgenes chicos
